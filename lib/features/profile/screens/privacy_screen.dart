@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -125,7 +126,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.edit,
             title: 'Editar información personal',
             subtitle: 'Nombre, teléfono, foto de perfil',
-            onTap: () {},
+            onTap: () => context.push('/profile/edit'),
           ),
 
           const SizedBox(height: AppSizes.lg),
@@ -172,14 +173,14 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.description,
             title: 'Política de privacidad',
             subtitle: 'Tratamiento de datos personales',
-            onTap: () {},
+            onTap: () => context.push('/profile/privacy-policy'),
           ),
           const Divider(height: 1),
           _PrivacyAction(
             icon: Icons.assignment,
             title: 'Términos de uso',
             subtitle: 'Condiciones del servicio',
-            onTap: () {},
+            onTap: () => context.push('/profile/terms'),
           ),
 
           const SizedBox(height: AppSizes.lg),

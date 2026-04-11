@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
@@ -139,6 +140,23 @@ class OrderTrackingScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+                // Botón calificar
+                if (order.status == OrderStatus.delivered) ...[
+                  const SizedBox(height: AppSizes.lg),
+                  SizedBox(
+                    width: double.infinity,
+                    height: AppSizes.buttonHeight,
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          context.push('/stores/rate/${order.id}'),
+                      icon: const Icon(Icons.star, color: Colors.white),
+                      label: const Text('Calificar pedido'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.warning,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           );

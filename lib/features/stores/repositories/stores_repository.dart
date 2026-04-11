@@ -3,6 +3,7 @@ import 'package:vecindario_app/core/constants/firestore_paths.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
 import 'package:vecindario_app/features/stores/models/store_model.dart';
+import 'package:vecindario_app/shared/models/review_model.dart';
 
 class StoresRepository {
   final FirebaseFirestore _firestore;
@@ -90,5 +91,26 @@ class StoresRepository {
       data['deliveredAt'] = FieldValue.serverTimestamp();
     }
     await _firestore.collection(FirestorePaths.orders).doc(orderId).update(data);
+  }
+
+  Future<void> submitOrderReview({
+    required String orderId,
+    required ReviewModel review,
+  }) async {
+    final batch = _firestore.batch();
+
+    // Crear reseña
+    batch.set(
+      _firestore.collection(FirestorePaths.reviews).doc(),
+      review.toFirestore(),
+    );
+
+    // Marcar pedido como calificado
+    batch.update(
+      _firestore.collection(FirestorePaths.orders).doc(orderId),
+      {'rated': true},
+    );
+
+    await batch.commit();
   }
 }

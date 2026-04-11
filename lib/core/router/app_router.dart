@@ -35,6 +35,10 @@ import 'package:vecindario_app/features/premium/fines/screens/create_fine_screen
 import 'package:vecindario_app/features/premium/fines/screens/fine_detail_screen.dart';
 import 'package:vecindario_app/features/premium/pqrs/screens/create_pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/subscriptions/screens/subscription_plans_screen.dart';
+import 'package:vecindario_app/features/profile/screens/terms_screen.dart';
+import 'package:vecindario_app/features/profile/screens/privacy_policy_screen.dart';
+import 'package:vecindario_app/features/stores/screens/store_panel_screen.dart';
+import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -146,6 +150,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       orderId: state.pathParameters['orderId']!,
                     ),
                   ),
+                  GoRoute(
+                    path: 'rate/:orderId',
+                    builder: (_, state) => RateOrderScreen(
+                      orderId: state.pathParameters['orderId']!,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -171,7 +181,19 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'privacy',
             builder: (_, __) => const PrivacyScreen(),
           ),
+          GoRoute(
+            path: 'terms',
+            builder: (_, __) => const TermsScreen(),
+          ),
+          GoRoute(
+            path: 'privacy-policy',
+            builder: (_, __) => const PrivacyPolicyScreen(),
+          ),
         ],
+      ),
+      GoRoute(
+        path: '/store-panel',
+        builder: (_, __) => const StorePanelScreen(),
       ),
       GoRoute(
         path: '/notifications',
