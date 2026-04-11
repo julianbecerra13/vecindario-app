@@ -123,12 +123,10 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                 return RefreshIndicator(
                   onRefresh: () async =>
                       ref.invalidate(servicesListProvider),
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(AppSizes.sm),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.72,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.md,
+                      vertical: AppSizes.sm,
                     ),
                     itemCount: services.length,
                     itemBuilder: (_, i) => ServiceCard(

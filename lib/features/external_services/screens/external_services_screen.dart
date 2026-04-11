@@ -150,95 +150,141 @@ class _ExternalServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSizes.sm),
+      shape: service.sponsored
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+              side: BorderSide(
+                color: AppColors.warning.withValues(alpha: 0.3),
+              ),
+            )
+          : null,
       child: Padding(
         padding: AppSizes.paddingCard,
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-              ),
-              child: Icon(service.category.icon, color: AppColors.primary),
-            ),
-            const SizedBox(width: AppSizes.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  ),
+                  child:
+                      Icon(service.category.icon, color: AppColors.primary),
+                ),
+                const SizedBox(width: AppSizes.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          service.name,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (service.sponsored)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.2),
-                            borderRadius:
-                                BorderRadius.circular(AppSizes.radiusFull),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.star, size: 10, color: Colors.amber),
-                              SizedBox(width: 2),
-                              Text(
-                                'Patrocinado',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.amber,
-                                ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              service.name,
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          if (service.sponsored)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    Colors.amber.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(
+                                    AppSizes.radiusFull),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.star,
+                                      size: 10, color: Colors.amber),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    'SPONSOR',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      Text(
+                        service.category.label,
+                        style: AppTextStyles.caption,
+                      ),
                     ],
                   ),
-                  Text(
-                    service.category.label,
-                    style: AppTextStyles.caption,
-                  ),
-                  const SizedBox(height: 2),
-                  RatingStars(
-                    rating: service.rating,
-                    size: 14,
-                    showCount: service.reviewCount,
-                  ),
-                  if (service.recommendedByName != null)
-                    Text(
-                      'Recomendado por ${service.recommendedByName}',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.secondary,
-                      ),
-                    ),
-                ],
+                ),
+              ],
+            ),
+            if (service.description.isNotEmpty) ...[
+              const SizedBox(height: AppSizes.xs),
+              Text(
+                service.description,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
+            ],
+            const SizedBox(height: AppSizes.xs),
+            Row(
+              children: [
+                RatingStars(
+                  rating: service.rating,
+                  size: 14,
+                  showCount: service.reviewCount,
+                ),
+                const Spacer(),
+                if (service.recommendedByName != null)
+                  Text(
+                    'Rec. por ${service.recommendedByName}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.primaryLight,
+                    ),
+                  ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.phone, color: AppColors.secondary),
-              onPressed: () async {
-                final phone = service.phone;
-                if (phone.isNotEmpty) {
-                  final url = Uri.parse('tel:$phone');
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  }
-                }
-              },
-            ),
+            if (service.phone.isNotEmpty) ...[
+              const SizedBox(height: AppSizes.sm),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    final url = Uri.parse('tel:${service.phone}');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url);
+                    }
+                  },
+                  icon: const Icon(Icons.phone, size: 16),
+                  label: Text('Llamar · ${service.phone}'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.warning,
+                    side: BorderSide(
+                      color: AppColors.warning.withValues(alpha: 0.3),
+                    ),
+                    backgroundColor:
+                        AppColors.warning.withValues(alpha: 0.1),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

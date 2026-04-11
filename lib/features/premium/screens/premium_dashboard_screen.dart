@@ -84,7 +84,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
           if (isAdmin) ...[
             _AdminStats(),
             const SizedBox(height: AppSizes.lg),
-            // Acciones rápidas
+            // Acciones rápidas (cards full-width como en diseño .pen)
             const Text('ACCIONES RÁPIDAS',
                 style: TextStyle(
                   fontSize: 11,
@@ -93,46 +93,35 @@ class PremiumDashboardScreen extends ConsumerWidget {
                   letterSpacing: 1.2,
                 )),
             const SizedBox(height: AppSizes.sm),
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickAction(
-                    icon: Icons.campaign,
-                    label: 'Circular',
-                    color: AppColors.info,
-                    onTap: () => context.push('/premium/circulars/create'),
-                  ),
-                ),
-                const SizedBox(width: AppSizes.sm),
-                Expanded(
-                  child: _QuickAction(
-                    icon: Icons.gavel,
-                    label: 'Multa',
-                    color: AppColors.error,
-                    onTap: () => context.push('/premium/fines/create'),
-                  ),
-                ),
-                const SizedBox(width: AppSizes.sm),
-                Expanded(
-                  child: _QuickAction(
-                    icon: Icons.account_balance,
-                    label: 'Finanzas',
-                    color: AppColors.success,
-                    onTap: () => context.push('/premium/finances'),
-                  ),
-                ),
-                const SizedBox(width: AppSizes.sm),
-                Expanded(
-                  child: _QuickAction(
-                    icon: Icons.how_to_vote,
-                    label: 'Asamblea',
-                    color: const Color(0xFF8B5CF6),
-                    onTap: () => context.push('/premium/assemblies'),
-                  ),
-                ),
-              ],
+            _QuickActionCard(
+              icon: Icons.campaign,
+              color: AppColors.info,
+              title: 'Nueva Circular',
+              subtitle: 'Enviar comunicado oficial',
+              onTap: () => context.push('/premium/circulars/create'),
             ),
-            const SizedBox(height: AppSizes.lg),
+            _QuickActionCard(
+              icon: Icons.warning_amber,
+              color: AppColors.error,
+              title: 'Registrar Multa',
+              subtitle: 'Crear sanción con evidencia',
+              onTap: () => context.push('/premium/fines/create'),
+            ),
+            _QuickActionCard(
+              icon: Icons.account_balance,
+              color: AppColors.success,
+              title: 'Finanzas',
+              subtitle: 'Presupuesto y ejecución',
+              onTap: () => context.push('/premium/finances'),
+            ),
+            _QuickActionCard(
+              icon: Icons.how_to_vote,
+              color: const Color(0xFF8B5CF6),
+              title: 'Convocar Asamblea',
+              subtitle: 'Crear convocatoria con agenda',
+              onTap: () => context.push('/premium/assemblies'),
+            ),
+            const SizedBox(height: AppSizes.md),
           ],
 
           // === MÓDULOS ===
@@ -307,42 +296,59 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _QuickAction extends StatelessWidget {
+class _QuickActionCard extends StatelessWidget {
   final IconData icon;
-  final String label;
   final Color color;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
-  const _QuickAction({
+  const _QuickActionCard({
     required this.icon,
-    required this.label,
     required this.color,
+    required this.title,
+    required this.subtitle,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppSizes.sm + 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppSizes.xs),
+      child: ListTile(
+        onTap: onTap,
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          ),
+          child: Icon(icon, color: color, size: 20),
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ],
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.textHint,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: AppColors.textHint,
+          size: 20,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.md,
+          vertical: AppSizes.xs,
         ),
       ),
     );

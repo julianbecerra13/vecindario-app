@@ -19,56 +19,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _acceptTerms = false;
-  bool _acceptDataTreatment = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!_acceptTerms || !_acceptDataTreatment) {
-      context.showErrorSnackBar(
-        'Debes aceptar los términos y autorizar el tratamiento de datos',
-      );
-      return;
-    }
 
     final success = await ref.read(authNotifierProvider.notifier).register(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           name: _nameController.text.trim(),
-          phone: _phoneController.text.trim(),
+          phone: '',
         );
 
     if (success && mounted) {
-      final phone = _phoneController.text.trim();
-      if (phone.isNotEmpty) {
-        context.go('/verify-phone/$phone');
-      } else {
-        context.go('/join-community');
-      }
+      context.go('/join-community');
     }
   }
 
   Future<void> _handleGoogleRegister() async {
-    if (!_acceptTerms || !_acceptDataTreatment) {
-      context.showErrorSnackBar(
-        'Debes aceptar los términos y autorizar el tratamiento de datos',
-      );
-      return;
-    }
     final success =
         await ref.read(authNotifierProvider.notifier).loginWithGoogle();
     if (success && mounted) {
@@ -77,12 +54,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _handleAppleRegister() async {
-    if (!_acceptTerms || !_acceptDataTreatment) {
-      context.showErrorSnackBar(
-        'Debes aceptar los términos y autorizar el tratamiento de datos',
-      );
-      return;
-    }
     final success =
         await ref.read(authNotifierProvider.notifier).loginWithApple();
     if (success && mounted) {
@@ -110,24 +81,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Únete a tu comunidad',
-                  style: AppTextStyles.heading2,
-                ),
-                const SizedBox(height: AppSizes.xs),
-                Text(
-                  'Crea tu cuenta para conectar con tus vecinos',
-                  style: AppTextStyles.bodySmall,
-                ),
-                const SizedBox(height: AppSizes.lg),
+                const SizedBox(height: AppSizes.md),
                 TextFormField(
                   controller: _nameController,
                   textInputAction: TextInputAction.next,
                   textCapitalization: TextCapitalization.words,
                   validator: Validators.validateName,
                   decoration: const InputDecoration(
-                    labelText: 'Nombre completo',
-                    prefixIcon: Icon(Icons.person_outlined),
+                    hintText: 'Nombre completo',
                   ),
                 ),
                 const SizedBox(height: AppSizes.md),
@@ -137,31 +98,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   validator: Validators.validateEmail,
                   decoration: const InputDecoration(
-                    labelText: 'Correo electrónico',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                ),
-                const SizedBox(height: AppSizes.md),
-                TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                  validator: Validators.validatePhone,
-                  decoration: const InputDecoration(
-                    labelText: 'Teléfono',
-                    prefixIcon: Icon(Icons.phone_outlined),
-                    prefixText: '+57 ',
+                    hintText: 'Email',
                   ),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.done,
                   validator: Validators.validatePassword,
+                  onFieldSubmitted: (_) => _handleRegister(),
                   decoration: InputDecoration(
-                    labelText: 'Contraseña',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    hintText: 'Contraseña',
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -173,84 +121,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSizes.md),
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  textInputAction: TextInputAction.done,
-                  validator: (v) => Validators.validateConfirmPassword(
-                    v,
-                    _passwordController.text,
-                  ),
-                  decoration: const InputDecoration(
-                    labelText: 'Confirmar contraseña',
-                    prefixIcon: Icon(Icons.lock_outlined),
-                  ),
-                ),
-                const SizedBox(height: AppSizes.md),
-
-                // Consentimiento de Términos
-                CheckboxListTile(
-                  value: _acceptTerms,
-                  onChanged: (v) => setState(() => _acceptTerms = v ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                  title: RichText(
-                    text: TextSpan(
-                      style: AppTextStyles.bodySmall,
-                      children: const [
-                        TextSpan(text: 'Acepto los '),
-                        TextSpan(
-                          text: 'Términos de Uso',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        TextSpan(text: ' y la '),
-                        TextSpan(
-                          text: 'Política de Privacidad',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Consentimiento Habeas Data (Ley 1581/2012)
-                CheckboxListTile(
-                  value: _acceptDataTreatment,
-                  onChanged: (v) =>
-                      setState(() => _acceptDataTreatment = v ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                  title: RichText(
-                    text: TextSpan(
-                      style: AppTextStyles.bodySmall,
-                      children: const [
-                        TextSpan(
-                          text:
-                              'Autorizo el tratamiento de mis datos personales según la ',
-                        ),
-                        TextSpan(
-                          text: 'Ley 1581 de 2012',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        TextSpan(
-                          text:
-                              ' para los fines descritos en la Política de Privacidad.',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: AppSizes.lg),
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _handleRegister,
@@ -263,10 +133,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Crear cuenta'),
+                      : const Text('Registrarse'),
                 ),
-
-                const SizedBox(height: AppSizes.md),
+                const SizedBox(height: AppSizes.lg),
                 Row(
                   children: [
                     const Expanded(child: Divider()),
@@ -274,15 +143,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       padding:
                           const EdgeInsets.symmetric(horizontal: AppSizes.md),
                       child: Text(
-                        'o continúa con',
-                        style: AppTextStyles.bodySmall,
+                        'o continuar con',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textHint,
+                        ),
                       ),
                     ),
                     const Expanded(child: Divider()),
                   ],
                 ),
                 const SizedBox(height: AppSizes.md),
-
                 Row(
                   children: [
                     Expanded(
@@ -304,17 +175,38 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ],
                 ),
-
-                const SizedBox(height: AppSizes.md),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('¿Ya tienes cuenta? '),
-                    TextButton(
-                      onPressed: () => context.pop(),
-                      child: const Text('Inicia sesión'),
+                const SizedBox(height: AppSizes.lg),
+                // Consentimiento legal (como en el diseño .pen)
+                Container(
+                  padding: const EdgeInsets.all(AppSizes.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textHint,
+                        height: 1.5,
+                      ),
+                      children: const [
+                        TextSpan(text: 'Al registrarte aceptas nuestra '),
+                        TextSpan(
+                          text: 'Política de Privacidad',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              ' y autorizas el tratamiento de tus datos personales según la Ley 1581 de 2012.',
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

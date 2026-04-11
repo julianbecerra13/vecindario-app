@@ -12,7 +12,9 @@ class VecindarioApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Vecindario',
-      theme: AppTheme.light,
+      theme: AppTheme.dark,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       locale: const Locale('es'),
