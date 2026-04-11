@@ -1,0 +1,244 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Funciones helper ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isCommunityMember(communityId) {
+      return isAuthenticated() && getUserData().communityId == communityId;
+    }
+
+    function isCommunityAdmin(communityId) {
+      return isCommunityMember(communityId) && getUserData().role == 'admin';
+    }
+
+    function isVerified() {
+      return isAuthenticated() && getUserData().verified == true;
+    }
+
+    function isVerifiedMember(communityId) {
+      return isCommunityMember(communityId) && getUserData().verified == true;
+    }
+
+    // --- Usuarios ---
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['verified', 'role']);
+      allow delete: if false;
+    }
+
+    // --- Comunidades ---
+    match /communities/{communityId} {
+      allow read: if isAuthenticated();
+      allow create: if false;
+      allow update: if isCommunityAdmin(communityId);
+      allow delete: if false;
+
+      // Posts del feed
+      match /posts/{postId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.authorUid == request.auth.uid;
+        allow update: if isVerifiedMember(communityId)
+          && (isOwner(resource.data.authorUid) || isCommunityAdmin(communityId));
+        allow delete: if isOwner(resource.data.authorUid) || isCommunityAdmin(communityId);
+      }
+
+      // Comentarios de posts
+      match /posts/{postId}/comments/{commentId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.authorUid == request.auth.uid;
+        allow delete: if isOwner(resource.data.authorUid) || isCommunityAdmin(communityId);
+      }
+
+      // --- Colecciones Premium (Vecindario Admin) ---
+      // Solo se habilitan cuando admin_premium == true via Remote Config
+
+      // Circulares oficiales
+      match /circulars/{circularId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create: if isCommunityAdmin(communityId);
+        allow update: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['readBy', 'ackBy']));
+        allow delete: if isCommunityAdmin(communityId);
+      }
+
+      // Multas
+      match /fines/{fineId} {
+        allow read: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow create: if isCommunityAdmin(communityId);
+        allow update: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['defenseText', 'status']));
+        allow delete: if false;
+      }
+
+      // Amenidades (zonas sociales)
+      match /amenities/{amenityId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create, update, delete: if isCommunityAdmin(communityId);
+      }
+
+      // Reservas
+      match /bookings/{bookingId} {
+        allow read: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.residentUid == request.auth.uid;
+        allow update: if isCommunityAdmin(communityId);
+        allow delete: if false;
+      }
+
+      // Finanzas
+      match /finances/{financeId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create, update, delete: if isCommunityAdmin(communityId);
+      }
+
+      // Presupuestos
+      match /budgets/{budgetId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create, update, delete: if isCommunityAdmin(communityId);
+      }
+
+      // Estados de cuenta
+      match /account_statements/{statementId} {
+        allow read: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow create, update, delete: if isCommunityAdmin(communityId);
+      }
+
+      // Manual de convivencia
+      match /manual_versions/{versionId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create, update, delete: if isCommunityAdmin(communityId);
+      }
+
+      // Asambleas
+      match /assemblies/{assemblyId} {
+        allow read: if isVerifiedMember(communityId);
+        allow create, update: if isCommunityAdmin(communityId);
+        allow delete: if false;
+      }
+
+      // PQRS
+      match /pqrs/{pqrsId} {
+        allow read: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.residentUid == request.auth.uid;
+        allow update: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow delete: if false;
+      }
+    }
+
+    // --- Servicios de vecinos ---
+    match /services/{serviceId} {
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated() && isVerified()
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if isOwner(resource.data.ownerUid);
+      allow delete: if isOwner(resource.data.ownerUid);
+    }
+
+    // --- Tiendas de barrio ---
+    match /stores/{storeId} {
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated() && isVerified();
+      allow update: if isOwner(resource.data.ownerUid);
+      allow delete: if isOwner(resource.data.ownerUid);
+
+      // Items de la tienda (subcolección)
+      match /items/{itemId} {
+        allow read: if isAuthenticated() && isVerified();
+        allow write: if isAuthenticated()
+          && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // --- Pedidos ---
+    match /orders/{orderId} {
+      allow read: if isAuthenticated()
+        && (isOwner(resource.data.buyerUid)
+            || resource.data.storeOwnerUid == request.auth.uid);
+      allow create: if isAuthenticated() && isVerified()
+        && request.resource.data.buyerUid == request.auth.uid;
+      allow update: if resource.data.storeOwnerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status']);
+      allow delete: if false;
+    }
+
+    // --- Servicios externos ---
+    match /external_services/{serviceId} {
+      allow read: if isAuthenticated() && isVerified();
+      allow create: if isAuthenticated() && isVerified();
+      allow update: if isOwner(resource.data.recommendedByUid);
+      allow delete: if false;
+    }
+
+    // --- Reseñas ---
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isVerified()
+        && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isOwner(resource.data.authorUid);
+      allow delete: if isOwner(resource.data.authorUid);
+    }
+
+    // --- Solicitudes de eliminación ---
+    match /deletion_requests/{requestId} {
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid;
+      allow read: if isAuthenticated()
+        && resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // --- Consentimientos ---
+    match /consents/{consentId} {
+      allow read: if isOwner(consentId);
+      allow create: if isOwner(consentId);
+      allow update: if isOwner(consentId);
+      allow delete: if false;
+    }
+
+    // --- Suscripciones (solo backend) ---
+    match /subscriptions/{subId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if false;
+    }
+
+    // --- Logs de auditoría (solo backend) ---
+    match /audit_logs/{logId} {
+      allow read: if false;
+      allow create, update, delete: if false;
+    }
+  }
+}

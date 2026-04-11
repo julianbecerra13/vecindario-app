@@ -1,0 +1,59 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Solo usuarios autenticados pueden leer
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+    }
+
+    // Fotos de perfil: solo el dueño puede subir, max 5MB, solo imagenes
+    match /users/{uid}/profile/{fileName} {
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Imagenes de posts: miembro verificado, max 5MB
+    match /communities/{communityId}/posts/{postId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Imagenes de servicios
+    match /services/{serviceId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Imagenes de tiendas y productos
+    match /stores/{storeId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Adjuntos de circulares (admin)
+    match /communities/{communityId}/circulars/{circularId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    // Evidencia de multas (admin)
+    match /communities/{communityId}/fines/{fineId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Fotos de PQRS
+    match /communities/{communityId}/pqrs/{pqrsId}/{fileName} {
+      allow write: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

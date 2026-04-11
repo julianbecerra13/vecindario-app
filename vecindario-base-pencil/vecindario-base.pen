@@ -1,0 +1,305 @@
+{
+  "version": "2.10",
+  "children": [
+    {
+      "type": "text",
+      "id": "n10ud5ub",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "01-splash",
+      "x": 0,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/01_splash.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "ulqx6leq",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "02-registro",
+      "x": 425,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/02_registro.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "djua40te",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "03-codigo-comunidad",
+      "x": 850,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/03_codigo_comunidad.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "21kraivy",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "04-esperando-aprobacion",
+      "x": 1275,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/04_esperando_aprobacion.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "bfic5xdz",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "05-feed-noticias",
+      "x": 1700,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/05_feed_noticias.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "h4ip0hh4",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "06-servicios-vecinos",
+      "x": 2125,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/06_servicios_vecinos.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "p0jyhhj4",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "07-tiendas",
+      "x": 2550,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/07_tiendas.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "4xv86e0k",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "08-servicios-externos",
+      "x": 2975,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/08_servicios_externos.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "8pd26rtu",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "09-catalogo-carrito",
+      "x": 3400,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/09_catalogo_carrito.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "zderrbuv",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "10-seguimiento-pedido",
+      "x": 3825,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/10_seguimiento_pedido.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "6wtowo12",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "11-privacidad",
+      "x": 4250,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/11_privacidad.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "3mp8tc6c",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "12-eliminar-cuenta",
+      "x": 4675,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/12_eliminar_cuenta.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    }
+  ]
+}

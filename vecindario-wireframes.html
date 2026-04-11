@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vecindario — Wireframes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    padding: 40px 20px 80px;
+  }
+  
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+  h1 span { color: #3b82f6; }
+  
+  .subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+  
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  
+  .section-desc {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+    margin-bottom: 32px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+  
+  .row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 64px;
+  }
+
+  .phone {
+    width: 280px;
+    min-height: 520px;
+    background: #111118;
+    border-radius: 32px;
+    border: 2px solid #1e1e2e;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+  
+  .phone-label {
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 20px 4px;
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+  }
+  
+  .header {
+    padding: 8px 16px 10px;
+    border-bottom: 1px solid #1e1e2e;
+  }
+  .header-sm { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; }
+  .header-lg { font-size: 16px; font-weight: 700; color: #f3f4f6; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
+  .header-icons { display: flex; gap: 8px; }
+  .icon-circle {
+    width: 28px; height: 28px; border-radius: 50%; background: #1e1e2e;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .icon-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white; font-weight: 700;
+  }
+  .badge {
+    position: absolute; top: -3px; right: -3px; width: 13px; height: 13px;
+    border-radius: 50%; background: #ef4444; font-size: 8px; color: white;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  
+  .bottombar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; background: #111118; border-top: 1px solid #1e1e2e;
+    padding: 6px 0 10px;
+  }
+  .tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 9px; color: #4b5563;
+  }
+  .tab.active { color: #3b82f6; }
+  .tab-icon { font-size: 16px; }
+  
+  .content { padding: 0 0 52px; overflow: hidden; }
+  
+  /* Wireframe elements */
+  .wf-compose {
+    margin: 10px 12px; padding: 10px 12px; background: #1a1a24;
+    border-radius: 10px; border: 1px solid #2a2a3a;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .wf-compose-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    flex-shrink: 0;
+  }
+  .wf-compose-text { font-size: 11px; color: #4b5563; }
+  
+  .wf-ad {
+    margin: 8px 12px; padding: 8px 12px; border-radius: 8px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .wf-ad-label { font-size: 8px; color: #f59e0b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .wf-ad-text { font-size: 10px; color: #d1d5db; margin-top: 2px; }
+  
+  .wf-post {
+    padding: 10px 12px; border-bottom: 1px solid #1a1a24;
+  }
+  .wf-post-header { display: flex; gap: 8px; align-items: flex-start; }
+  .wf-avatar {
+    width: 28px; height: 28px; border-radius: 50%; background: #1e1e2e;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .wf-name { font-size: 11px; font-weight: 700; color: #e5e7eb; }
+  .wf-time { font-size: 9px; color: #6b7280; margin-left: 4px; }
+  .wf-text { font-size: 10px; color: #d1d5db; line-height: 1.5; margin-top: 4px; }
+  .wf-actions { display: flex; gap: 14px; margin-top: 6px; font-size: 10px; color: #6b7280; }
+  .wf-pin { font-size: 8px; color: #f59e0b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  
+  .wf-chip-row {
+    display: flex; gap: 4px; padding: 8px 12px; overflow: hidden;
+  }
+  .wf-chip {
+    padding: 4px 10px; border-radius: 12px; font-size: 9px; font-weight: 600;
+    white-space: nowrap; border: 1px solid #2a2a3a; color: #9ca3af; background: #1a1a24;
+  }
+  .wf-chip.active { border-color: #3b82f6; color: #60a5fa; background: rgba(59,130,246,0.1); }
+  
+  .wf-card {
+    margin: 6px 12px; padding: 10px; background: #1a1a24; border-radius: 12px;
+    border: 1px solid #2a2a3a;
+  }
+  .wf-card-header { display: flex; gap: 8px; align-items: center; }
+  .wf-card-icon {
+    width: 34px; height: 34px; border-radius: 8px; background: rgba(59,130,246,0.15);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    flex-shrink: 0;
+  }
+  .wf-card-title { font-size: 12px; font-weight: 700; color: #e5e7eb; }
+  .wf-card-sub { font-size: 9px; color: #6b7280; }
+  .wf-card-desc { font-size: 9px; color: #9ca3af; margin-top: 6px; line-height: 1.4; }
+  .wf-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  .wf-price { font-size: 11px; font-weight: 700; color: #10b981; }
+  .wf-stars { font-size: 10px; color: #f59e0b; }
+  .wf-btn {
+    margin-top: 8px; width: 100%; padding: 7px 0; border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none; color: white; font-size: 10px; font-weight: 700;
+    text-align: center;
+  }
+  .wf-btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+  .wf-tag {
+    font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: 4px;
+  }
+  
+  .wf-store-banner {
+    margin: 8px 12px; padding: 10px 12px; border-radius: 10px;
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+  .wf-store-banner h3 { font-size: 12px; color: white; font-weight: 700; }
+  .wf-store-banner p { font-size: 9px; color: #d1fae5; margin-top: 2px; }
+  
+  .wf-store-card { display: flex; gap: 8px; align-items: center; }
+  .wf-store-meta {
+    display: flex; gap: 10px; margin-top: 8px; padding-top: 6px;
+    border-top: 1px solid #2a2a3a; font-size: 9px; color: #6b7280;
+  }
+  .wf-store-fee { color: #10b981; font-weight: 600; }
+  
+  .wf-sponsor-badge {
+    position: absolute; top: 6px; right: -18px;
+    background: #f59e0b; color: #000; font-size: 7px; font-weight: 700;
+    padding: 1px 20px; transform: rotate(45deg);
+  }
+  .wf-recommended { font-size: 8px; color: #6b7280; }
+  .wf-recommended span { color: #60a5fa; }
+  
+  /* Onboarding */
+  .wf-onboard-center {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 40px 24px; text-align: center;
+    height: calc(100% - 50px);
+  }
+  .wf-onboard-emoji { font-size: 48px; margin-bottom: 16px; }
+  .wf-onboard-title { font-size: 18px; font-weight: 700; color: #f3f4f6; margin-bottom: 8px; }
+  .wf-onboard-text { font-size: 11px; color: #9ca3af; line-height: 1.6; margin-bottom: 24px; }
+  .wf-dots { display: flex; gap: 6px; margin-bottom: 20px; }
+  .wf-dot { width: 6px; height: 6px; border-radius: 50%; background: #2a2a3a; }
+  .wf-dot.active { background: #3b82f6; width: 18px; border-radius: 3px; }
+  
+  .wf-input {
+    width: 100%; padding: 10px 12px; background: #1a1a24; border: 1px solid #2a2a3a;
+    border-radius: 8px; margin-bottom: 8px; font-size: 11px; color: #6b7280;
+  }
+  
+  .wf-code-input {
+    display: flex; gap: 6px; justify-content: center; margin: 16px 0;
+  }
+  .wf-code-box {
+    width: 36px; height: 42px; background: #1a1a24; border: 2px solid #3b82f6;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #e5e7eb;
+  }
+  
+  .wf-waiting {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 60px 24px; text-align: center;
+  }
+  .wf-spinner {
+    width: 48px; height: 48px; border: 3px solid #2a2a3a; border-top-color: #3b82f6;
+    border-radius: 50%; margin-bottom: 20px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  /* Privacy */
+  .wf-privacy-item {
+    padding: 10px 12px; border-bottom: 1px solid #1a1a24;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wf-privacy-label { font-size: 11px; color: #e5e7eb; }
+  .wf-privacy-icon { font-size: 14px; color: #6b7280; }
+  .wf-danger { color: #ef4444 !important; }
+  
+  .wf-section-header {
+    padding: 10px 12px 4px; font-size: 9px; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+  }
+  
+  /* Checkout */
+  .wf-item-row {
+    padding: 8px 12px; border-bottom: 1px solid #1a1a24;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wf-item-name { font-size: 11px; color: #e5e7eb; }
+  .wf-item-price { font-size: 10px; color: #10b981; font-weight: 700; }
+  .wf-qty-control { display: flex; align-items: center; gap: 6px; }
+  .wf-qty-btn {
+    width: 22px; height: 22px; border-radius: 6px; background: #2a2a3a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #e5e7eb;
+  }
+  .wf-qty-btn.plus { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+  .wf-qty { font-size: 11px; font-weight: 700; color: #e5e7eb; }
+  
+  .wf-checkout-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 8px 12px; background: rgba(17,17,24,0.95);
+    border-top: 1px solid #2a2a3a;
+  }
+  .wf-checkout-row { display: flex; justify-content: space-between; font-size: 9px; color: #9ca3af; margin-bottom: 4px; }
+  
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: #2a2a3a; align-self: center;
+  }
+
+  @media (max-width: 768px) {
+    .row { gap: 24px; }
+    .phone { width: 260px; min-height: 480px; }
+    .flow-arrow { transform: rotate(90deg); font-size: 22px; }
+    body { padding: 24px 12px 60px; }
+    h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<h1><span>VECINDARIO</span> — Wireframes</h1>
+<p class="subtitle">Flutter + Firebase + Cloud Functions (Go) &nbsp;·&nbsp; Abril 2026</p>
+
+<!-- ========== ONBOARDING ========== -->
+<div class="section-title">Flujo de Onboarding</div>
+<p class="section-desc">Registro → Verificación de teléfono → Código de comunidad → Aprobación del admin. Nadie accede sin ser verificado.</p>
+
+<div class="row">
+  <!-- Onboarding splash -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:41</span><span>···</span></div>
+      <div class="wf-onboard-center">
+        <div class="wf-onboard-emoji">🏘️</div>
+        <div class="wf-onboard-title">Tu comunidad, conectada</div>
+        <div class="wf-onboard-text">Noticias, servicios y tiendas de tu conjunto en un solo lugar. Sin que se pierda nada.</div>
+        <div class="wf-dots">
+          <div class="wf-dot active"></div>
+          <div class="wf-dot"></div>
+          <div class="wf-dot"></div>
+        </div>
+        <div class="wf-btn" style="width:80%; padding:10px 0; font-size:12px;">Comenzar</div>
+      </div>
+    </div>
+    <div class="phone-label">Splash / Bienvenida</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- Register -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:41</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg">Crear cuenta</div>
+      </div>
+      <div style="padding: 16px 16px;">
+        <div class="wf-input">Nombre completo</div>
+        <div class="wf-input">Email</div>
+        <div class="wf-input">Contraseña</div>
+        <div class="wf-btn" style="margin-top:12px; padding:10px 0; font-size:12px;">Registrarse</div>
+        <div style="text-align:center; margin: 16px 0 12px; font-size:10px; color:#6b7280;">o continuar con</div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; padding:8px; border:1px solid #2a2a3a; border-radius:8px; text-align:center; font-size:11px; color:#e5e7eb;">🔵 Google</div>
+          <div style="flex:1; padding:8px; border:1px solid #2a2a3a; border-radius:8px; text-align:center; font-size:11px; color:#e5e7eb;"> Apple</div>
+        </div>
+        <div style="margin-top:20px; padding:10px; background:#1a1a24; border-radius:8px; border:1px solid #2a2a3a;">
+          <div style="font-size:9px; color:#6b7280; line-height:1.5;">
+            ✅ Al registrarte aceptas nuestra <span style="color:#3b82f6;">Política de Privacidad</span> y autorizas el tratamiento de tus datos personales según la Ley 1581 de 2012.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Registro + Consentimiento</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- Community code -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:42</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg">Únete a tu comunidad</div>
+      </div>
+      <div style="padding: 20px 16px; text-align: center;">
+        <div style="font-size:36px; margin-bottom:12px;">🔐</div>
+        <div style="font-size:12px; color:#9ca3af; line-height:1.6; margin-bottom:16px;">
+          Ingresa el código de invitación que te dieron en la administración de tu conjunto.
+        </div>
+        <div class="wf-code-input">
+          <div class="wf-code-box">V</div>
+          <div class="wf-code-box">3</div>
+          <div class="wf-code-box">C</div>
+          <div class="wf-code-box">I</div>
+          <div class="wf-code-box">N</div>
+          <div class="wf-code-box">0</div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="wf-input">Torre / Bloque</div>
+          <div class="wf-input">Número de apartamento</div>
+        </div>
+        <div class="wf-btn" style="margin-top:12px; padding:10px 0; font-size:12px;">Solicitar ingreso</div>
+      </div>
+    </div>
+    <div class="phone-label">Código de Comunidad</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- Waiting approval -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:42</span><span>···</span></div>
+      <div class="wf-waiting">
+        <div class="wf-spinner"></div>
+        <div style="font-size:16px; font-weight:700; color:#f3f4f6; margin-bottom:8px;">Solicitud enviada</div>
+        <div style="font-size:11px; color:#9ca3af; line-height:1.6; max-width:200px;">
+          El administrador de <strong style="color:#3b82f6;">Torres del Parque</strong> revisará tu solicitud. Te notificaremos cuando seas aprobado.
+        </div>
+        <div style="margin-top:24px; padding:10px 16px; background:#1a1a24; border-radius:8px; border:1px solid #2a2a3a;">
+          <div style="font-size:9px; color:#6b7280;">⏱ Tiempo promedio: 2-4 horas</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Esperando Aprobación</div>
+  </div>
+</div>
+
+<!-- ========== MAIN TABS ========== -->
+<div class="section-title">Pantallas Principales</div>
+<p class="section-desc">4 tabs: Noticias (feed comunitario), Vecinos (servicios de residentes), Tiendas (marketplace barrial), Servicios (directorio externo).</p>
+
+<div class="row">
+  <!-- Feed -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:45</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div>
+            <div class="header-sm">Mi comunidad</div>
+            <div class="header-lg">Torres del Parque</div>
+          </div>
+          <div class="header-icons">
+            <div class="icon-circle" style="position:relative;">🔔<div class="badge">3</div></div>
+            <div class="icon-avatar">JD</div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-compose">
+          <div class="wf-compose-avatar"></div>
+          <div class="wf-compose-text">¿Qué está pasando en tu conjunto?</div>
+        </div>
+        <div class="wf-post">
+          <div class="wf-pin">📌 Fijado</div>
+          <div class="wf-post-header">
+            <div class="wf-avatar">👤</div>
+            <div>
+              <div><span class="wf-name">Admin Conjunto</span><span class="wf-time">· 2h</span></div>
+              <div class="wf-text">Mañana fumigación en zonas comunes de 8am a 12pm. Mascotas adentro.</div>
+              <div class="wf-actions">🤍 24 &nbsp; 💬 8 &nbsp; ↗</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-ad">
+          <div class="wf-ad-label">Patrocinado</div>
+          <div class="wf-ad-text">🏗 Constructora Horizonte — Aptos desde $180M</div>
+        </div>
+        <div class="wf-post">
+          <div class="wf-post-header">
+            <div class="wf-avatar">👩</div>
+            <div>
+              <div><span class="wf-name">María López</span><span class="wf-time">· 3h</span></div>
+              <div class="wf-text">¿Ya arreglaron el portón del parqueadero?</div>
+              <div class="wf-actions">🤍 15 &nbsp; 💬 12 &nbsp; ↗</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-post">
+          <div class="wf-post-header">
+            <div class="wf-avatar">👨</div>
+            <div>
+              <div><span class="wf-name">Carlos Ruiz</span><span class="wf-time">· 5h</span></div>
+              <div class="wf-text">Se encontró gato gris en el piso 4, torre 2 🐱</div>
+              <div class="wf-actions">❤️ 31 &nbsp; 💬 5 &nbsp; ↗</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottombar">
+        <div class="tab active"><span class="tab-icon">📢</span>Noticias</div>
+        <div class="tab"><span class="tab-icon">🛍</span>Vecinos</div>
+        <div class="tab"><span class="tab-icon">🏪</span>Tiendas</div>
+        <div class="tab"><span class="tab-icon">🔧</span>Servicios</div>
+      </div>
+    </div>
+    <div class="phone-label">📢 Feed de Noticias</div>
+  </div>
+
+  <!-- Services -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:45</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div><div class="header-lg">Servicios Vecinales</div></div>
+          <div class="icon-circle">🔍</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-chip-row">
+          <div class="wf-chip active">Todos</div>
+          <div class="wf-chip">🍲 Comida</div>
+          <div class="wf-chip">💅 Belleza</div>
+          <div class="wf-chip">💻 Tech</div>
+          <div class="wf-chip">🐾 Mascotas</div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-header">
+            <div class="wf-card-icon" style="background:rgba(232,93,42,0.15);">👩‍🍳</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Almuerzos caseros</div>
+              <div class="wf-card-sub">Ana Torres · 156 pedidos</div>
+            </div>
+            <div class="wf-tag" style="background:rgba(232,93,42,0.1); color:#e85d2a;">Comida</div>
+          </div>
+          <div class="wf-card-desc">Bandeja paisa, ajiaco, sancocho. Domicilio en el conjunto.</div>
+          <div class="wf-card-footer">
+            <div class="wf-price">$12.000 - $18.000</div>
+            <div class="wf-stars">★★★★★ 4.8</div>
+          </div>
+          <div class="wf-btn">Contactar por WhatsApp</div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-header">
+            <div class="wf-card-icon" style="background:rgba(196,75,139,0.15);">💇‍♀️</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Manicure a domicilio</div>
+              <div class="wf-card-sub">Camila Reyes · 203 pedidos</div>
+            </div>
+            <div class="wf-tag" style="background:rgba(196,75,139,0.1); color:#c44b8b;">Belleza</div>
+          </div>
+          <div class="wf-card-desc">Semipermanente, acrílicas, decoración.</div>
+          <div class="wf-card-footer">
+            <div class="wf-price">Desde $15.000</div>
+            <div class="wf-stars">★★★★★ 4.7</div>
+          </div>
+          <div class="wf-btn">Contactar por WhatsApp</div>
+        </div>
+      </div>
+      <div class="bottombar">
+        <div class="tab"><span class="tab-icon">📢</span>Noticias</div>
+        <div class="tab active"><span class="tab-icon">🛍</span>Vecinos</div>
+        <div class="tab"><span class="tab-icon">🏪</span>Tiendas</div>
+        <div class="tab"><span class="tab-icon">🔧</span>Servicios</div>
+      </div>
+    </div>
+    <div class="phone-label">🛍 Servicios de Vecinos</div>
+  </div>
+
+  <!-- Stores -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:46</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg">Tiendas del Barrio</div>
+      </div>
+      <div class="content">
+        <div class="wf-store-banner">
+          <h3>🛒 Pide sin salir de casa</h3>
+          <p>Entrega directa en tu puerta</p>
+        </div>
+        <div class="wf-card">
+          <div class="wf-store-card">
+            <div class="wf-card-icon" style="font-size:20px; background:#1e1e2e;">🏪</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Tienda Don Julio</div>
+              <div class="wf-card-sub">Abarrotes, frutas, verduras</div>
+            </div>
+            <span style="color:#4b5563; font-size:14px;">›</span>
+          </div>
+          <div class="wf-store-meta">
+            <span>🕐 15-25 min</span>
+            <span>📦 Mín. $10.000</span>
+            <span class="wf-store-fee">Servicio: $200-$500</span>
+          </div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-store-card">
+            <div class="wf-card-icon" style="font-size:20px; background:#1e1e2e;">🥐</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Panadería La Esquina</div>
+              <div class="wf-card-sub">Pan artesanal, pasteles, café</div>
+            </div>
+            <span style="color:#4b5563; font-size:14px;">›</span>
+          </div>
+          <div class="wf-store-meta">
+            <span>🕐 10-20 min</span>
+            <span>📦 Mín. $8.000</span>
+            <span class="wf-store-fee">Servicio: $200-$500</span>
+          </div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-store-card">
+            <div class="wf-card-icon" style="font-size:20px; background:#1e1e2e;">💊</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Droguería Salud+</div>
+              <div class="wf-card-sub">Medicamentos, cuidado personal</div>
+            </div>
+            <span style="color:#4b5563; font-size:14px;">›</span>
+          </div>
+          <div class="wf-store-meta">
+            <span>🕐 20-30 min</span>
+            <span>📦 Mín. $15.000</span>
+            <span class="wf-store-fee">Servicio: $300</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottombar">
+        <div class="tab"><span class="tab-icon">📢</span>Noticias</div>
+        <div class="tab"><span class="tab-icon">🛍</span>Vecinos</div>
+        <div class="tab active"><span class="tab-icon">🏪</span>Tiendas</div>
+        <div class="tab"><span class="tab-icon">🔧</span>Servicios</div>
+      </div>
+    </div>
+    <div class="phone-label">🏪 Tiendas de Barrio</div>
+  </div>
+
+  <!-- External -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:46</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg">Servicios Externos</div>
+      </div>
+      <div class="content">
+        <div class="wf-chip-row">
+          <div class="wf-chip active">Todos</div>
+          <div class="wf-chip">⚡ Elect.</div>
+          <div class="wf-chip">🔧 Plomero</div>
+          <div class="wf-chip">🔑 Cerraj.</div>
+          <div class="wf-chip">🧹 Aseo</div>
+        </div>
+        <div style="margin:0 12px 8px; padding:6px 10px; border-radius:6px; border:1px dashed #2a2a3a;">
+          <div style="font-size:9px; color:#9ca3af;">👤 Estos servicios son <strong style="color:#f59e0b;">recomendados por vecinos</strong> — no son residentes.</div>
+        </div>
+        <div class="wf-card" style="position:relative; overflow:hidden; border-color:rgba(245,158,11,0.3);">
+          <div class="wf-sponsor-badge">SPONSOR</div>
+          <div class="wf-card-header">
+            <div class="wf-card-icon" style="background:rgba(245,158,11,0.15);">⚡</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">ElectroFix</div>
+              <div class="wf-card-sub" style="color:#f59e0b;">Electricista</div>
+            </div>
+          </div>
+          <div class="wf-card-desc">Instalaciones, reparaciones, cortos. 24h.</div>
+          <div class="wf-card-footer">
+            <div class="wf-stars">★★★★★ 4.8 <span style="color:#6b7280; font-size:8px;">(45)</span></div>
+            <div class="wf-recommended">Rec. por <span>Ana Torres</span></div>
+          </div>
+          <div class="wf-btn" style="background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">📞 Llamar · 310-XXX</div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-header">
+            <div class="wf-card-icon" style="background:rgba(59,130,246,0.15);">🔧</div>
+            <div style="flex:1;">
+              <div class="wf-card-title">Plomería Rápida</div>
+              <div class="wf-card-sub" style="color:#3b82f6;">Plomero</div>
+            </div>
+          </div>
+          <div class="wf-card-desc">Destape, grifos, tanques.</div>
+          <div class="wf-card-footer">
+            <div class="wf-stars">★★★★☆ 4.7 <span style="color:#6b7280; font-size:8px;">(28)</span></div>
+            <div class="wf-recommended">Rec. por <span>Pedro M.</span></div>
+          </div>
+          <div class="wf-btn" style="background:rgba(59,130,246,0.1); color:#3b82f6; border:1px solid rgba(59,130,246,0.3);">📞 Llamar · 312-XXX</div>
+        </div>
+      </div>
+      <div class="bottombar">
+        <div class="tab"><span class="tab-icon">📢</span>Noticias</div>
+        <div class="tab"><span class="tab-icon">🛍</span>Vecinos</div>
+        <div class="tab"><span class="tab-icon">🏪</span>Tiendas</div>
+        <div class="tab active"><span class="tab-icon">🔧</span>Servicios</div>
+      </div>
+    </div>
+    <div class="phone-label">🔧 Servicios Externos</div>
+  </div>
+</div>
+
+<!-- ========== STORE DETAIL + CHECKOUT ========== -->
+<div class="section-title">Flujo de Compra en Tienda</div>
+<p class="section-desc">El vecino selecciona productos, ve la comisión según el estrato de su conjunto, y pide con entrega a su puerta.</p>
+
+<div class="row">
+  <!-- Store detail -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:47</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#60a5fa; font-size:12px;">← </span>
+            <div>
+              <div class="header-lg">🏪 Tienda Don Julio</div>
+              <div style="font-size:9px; color:#6b7280;">🕐 15-25 min · Mín. $10.000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Leche entera 1L</div>
+            <div class="wf-item-price">$4.200</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn">−</div>
+            <div class="wf-qty">2</div>
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Pan tajado</div>
+            <div class="wf-item-price">$5.800</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Huevos x30</div>
+            <div class="wf-item-price">$18.500</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn">−</div>
+            <div class="wf-qty">1</div>
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Arroz 1kg</div>
+            <div class="wf-item-price">$4.500</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Aguacate</div>
+            <div class="wf-item-price">$3.000</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+        <div class="wf-item-row">
+          <div>
+            <div class="wf-item-name">Plátano maduro x3</div>
+            <div class="wf-item-price">$2.500</div>
+          </div>
+          <div class="wf-qty-control">
+            <div class="wf-qty-btn plus">+</div>
+          </div>
+        </div>
+      </div>
+      <div class="wf-checkout-bar">
+        <div class="wf-checkout-row">
+          <span>Subtotal: $26.900</span>
+          <span>Servicio (Est.4): <strong style="color:#f59e0b;">$350</strong></span>
+        </div>
+        <div class="wf-btn wf-btn-green" style="font-size:12px; padding:10px 0;">🛒 Pedir · $27.250</div>
+      </div>
+    </div>
+    <div class="phone-label">Catálogo + Carrito</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- Order tracking -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:50</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg">Estado del Pedido</div>
+      </div>
+      <div style="padding: 20px 16px; text-align: center;">
+        <div style="font-size:48px; margin-bottom:12px;">📦</div>
+        <div style="font-size:16px; font-weight:700; color:#f3f4f6;">Pedido #1247</div>
+        <div style="font-size:11px; color:#9ca3af; margin-top:4px;">Tienda Don Julio</div>
+        
+        <div style="margin:24px 0; text-align:left;">
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:20px; height:20px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; font-size:10px; color:white; flex-shrink:0;">✓</div>
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#10b981;">Pedido recibido</div>
+              <div style="font-size:9px; color:#6b7280;">9:48 AM</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:20px; height:20px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; font-size:10px; color:white; flex-shrink:0;">✓</div>
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#10b981;">Confirmado por la tienda</div>
+              <div style="font-size:9px; color:#6b7280;">9:49 AM</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:20px; height:20px; border-radius:50%; background:#3b82f6; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <div style="width:6px; height:6px; border-radius:50%; background:white;"></div>
+            </div>
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#3b82f6;">En camino</div>
+              <div style="font-size:9px; color:#6b7280;">Estimado: 15 min</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:20px; height:20px; border-radius:50%; background:#2a2a3a; flex-shrink:0;"></div>
+            <div>
+              <div style="font-size:11px; color:#6b7280;">Entregado</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#1a1a24; border-radius:10px; padding:12px; border:1px solid #2a2a3a; text-align:left;">
+          <div style="font-size:10px; color:#6b7280; margin-bottom:6px;">Resumen</div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:#e5e7eb; margin-bottom:3px;">
+            <span>Leche x2, Huevos x1</span>
+            <span>$26.900</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:#f59e0b; margin-bottom:3px;">
+            <span>Servicio (Estrato 4)</span>
+            <span>$350</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#10b981; padding-top:6px; border-top:1px solid #2a2a3a;">
+            <span>Total</span>
+            <span>$27.250</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Seguimiento de Pedido</div>
+  </div>
+</div>
+
+<!-- ========== PRIVACY ========== -->
+<div class="section-title">Privacidad y Eliminación de Cuenta</div>
+<p class="section-desc">Cumplimiento Ley 1581/2012 (Habeas Data). Descargar datos, gestionar consentimientos, eliminar cuenta con grace period de 15 días.</p>
+
+<div class="row">
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:48</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#60a5fa; font-size:12px;">← </span>
+            <div class="header-lg">Mi Privacidad</div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-section-header">Mis Datos</div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">📥 Descargar mis datos</div>
+          <div class="wf-privacy-icon">›</div>
+        </div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">✏️ Editar información personal</div>
+          <div class="wf-privacy-icon">›</div>
+        </div>
+        
+        <div class="wf-section-header">Consentimientos</div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">🔔 Notificaciones push</div>
+          <div style="width:36px; height:20px; border-radius:10px; background:#10b981; position:relative;">
+            <div style="width:16px; height:16px; border-radius:50%; background:white; position:absolute; right:2px; top:2px;"></div>
+          </div>
+        </div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">📧 Email de novedades</div>
+          <div style="width:36px; height:20px; border-radius:10px; background:#2a2a3a; position:relative;">
+            <div style="width:16px; height:16px; border-radius:50%; background:#6b7280; position:absolute; left:2px; top:2px;"></div>
+          </div>
+        </div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">📊 Datos de uso (analytics)</div>
+          <div style="width:36px; height:20px; border-radius:10px; background:#10b981; position:relative;">
+            <div style="width:16px; height:16px; border-radius:50%; background:white; position:absolute; right:2px; top:2px;"></div>
+          </div>
+        </div>
+        
+        <div class="wf-section-header">Legal</div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">📄 Política de privacidad</div>
+          <div class="wf-privacy-icon">›</div>
+        </div>
+        <div class="wf-privacy-item">
+          <div class="wf-privacy-label">📋 Términos de uso</div>
+          <div class="wf-privacy-icon">›</div>
+        </div>
+
+        <div class="wf-section-header" style="color:#ef4444;">Zona de peligro</div>
+        <div class="wf-privacy-item" style="border-bottom:none;">
+          <div class="wf-privacy-label wf-danger">🗑️ Eliminar mi cuenta</div>
+          <div class="wf-privacy-icon wf-danger">›</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">🔒 Mi Privacidad</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:48</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#60a5fa; font-size:12px;">← </span>
+            <div class="header-lg" style="color:#ef4444;">Eliminar Cuenta</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding: 16px;">
+        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:12px; margin-bottom:16px;">
+          <div style="font-size:11px; color:#ef4444; font-weight:700; margin-bottom:6px;">⚠️ Esta acción es irreversible</div>
+          <div style="font-size:10px; color:#fca5a5; line-height:1.5;">Después de 15 días no podrás recuperar tu cuenta.</div>
+        </div>
+
+        <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin-bottom:8px;">Se eliminará:</div>
+        <div style="font-size:10px; color:#ef4444; margin-bottom:4px;">✕ Tu perfil y foto</div>
+        <div style="font-size:10px; color:#ef4444; margin-bottom:4px;">✕ Documentos de verificación</div>
+        <div style="font-size:10px; color:#ef4444; margin-bottom:4px;">✕ Tokens y sesiones</div>
+
+        <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin:12px 0 8px;">Se anonimizará:</div>
+        <div style="font-size:10px; color:#f59e0b; margin-bottom:4px;">~ Posts → "Usuario eliminado"</div>
+        <div style="font-size:10px; color:#f59e0b; margin-bottom:4px;">~ Reseñas → "Usuario eliminado"</div>
+        <div style="font-size:10px; color:#f59e0b; margin-bottom:4px;">~ Pedidos → uid → null</div>
+
+        <div style="margin-top:16px;">
+          <div class="wf-input" style="border-color:#ef4444;">Confirma tu contraseña</div>
+          <div class="wf-input" style="border-color:#ef4444;">Código OTP (enviado a tu tel.)</div>
+        </div>
+
+        <div style="background:#ef4444; color:white; text-align:center; padding:10px 0; border-radius:8px; font-size:12px; font-weight:700; margin-top:12px;">
+          Eliminar mi cuenta (15 días de gracia)
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">🗑️ Confirmar Eliminación</div>
+  </div>
+</div>
+
+<!-- ========== ADMIN ========== -->
+<div class="section-title">Panel del Administrador</div>
+<p class="section-desc">El admin del conjunto aprueba residentes, modera contenido y gestiona el código de invitación.</p>
+
+<div class="row">
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:50</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div>
+            <div class="header-sm">Panel Admin</div>
+            <div class="header-lg">Torres del Parque</div>
+          </div>
+          <div class="icon-circle" style="position:relative;">🔔<div class="badge">5</div></div>
+        </div>
+      </div>
+      <div class="content">
+        <div style="margin:10px 12px; padding:12px; background:linear-gradient(135deg, #1e3a5f, #1a2744); border-radius:10px; border:1px solid #2a4a7a;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:9px; color:#60a5fa; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Código de invitación</div>
+              <div style="font-size:22px; font-weight:700; color:#e5e7eb; letter-spacing:4px; margin-top:4px;">V3CIN0</div>
+            </div>
+            <div style="padding:6px 10px; background:rgba(59,130,246,0.2); border-radius:6px; font-size:9px; color:#60a5fa; font-weight:600;">🔄 Rotar</div>
+          </div>
+        </div>
+
+        <div class="wf-section-header">Solicitudes Pendientes (3)</div>
+
+        <div style="margin:0 12px 8px; padding:10px; background:#1a1a24; border-radius:10px; border:1px solid #2a2a3a;">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+            <div class="wf-avatar">👨</div>
+            <div style="flex:1;">
+              <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Juan Pérez</div>
+              <div style="font-size:9px; color:#6b7280;">Torre 3 · Apto 501 · Hace 2h</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <div style="flex:1; padding:7px 0; text-align:center; background:#10b981; border-radius:6px; font-size:10px; font-weight:700; color:white;">✓ Aprobar</div>
+            <div style="flex:1; padding:7px 0; text-align:center; background:#2a2a3a; border-radius:6px; font-size:10px; color:#9ca3af;">✕ Rechazar</div>
+            <div style="padding:7px 10px; text-align:center; background:#2a2a3a; border-radius:6px; font-size:10px; color:#f59e0b;">📄</div>
+          </div>
+        </div>
+
+        <div style="margin:0 12px 8px; padding:10px; background:#1a1a24; border-radius:10px; border:1px solid #2a2a3a;">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+            <div class="wf-avatar">👩</div>
+            <div style="flex:1;">
+              <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Laura Mendoza</div>
+              <div style="font-size:9px; color:#6b7280;">Torre 1 · Apto 302 · Hace 4h</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <div style="flex:1; padding:7px 0; text-align:center; background:#10b981; border-radius:6px; font-size:10px; font-weight:700; color:white;">✓ Aprobar</div>
+            <div style="flex:1; padding:7px 0; text-align:center; background:#2a2a3a; border-radius:6px; font-size:10px; color:#9ca3af;">✕ Rechazar</div>
+            <div style="padding:7px 10px; text-align:center; background:#2a2a3a; border-radius:6px; font-size:10px; color:#f59e0b;">📄</div>
+          </div>
+        </div>
+
+        <div class="wf-section-header">Estadísticas</div>
+        <div style="display:flex; gap:6px; margin:0 12px;">
+          <div style="flex:1; padding:10px; background:#1a1a24; border-radius:8px; text-align:center; border:1px solid #2a2a3a;">
+            <div style="font-size:18px; font-weight:700; color:#3b82f6;">127</div>
+            <div style="font-size:8px; color:#6b7280;">Residentes</div>
+          </div>
+          <div style="flex:1; padding:10px; background:#1a1a24; border-radius:8px; text-align:center; border:1px solid #2a2a3a;">
+            <div style="font-size:18px; font-weight:700; color:#10b981;">23</div>
+            <div style="font-size:8px; color:#6b7280;">Servicios</div>
+          </div>
+          <div style="flex:1; padding:10px; background:#1a1a24; border-radius:8px; text-align:center; border:1px solid #2a2a3a;">
+            <div style="font-size:18px; font-weight:700; color:#f59e0b;">48</div>
+            <div style="font-size:8px; color:#6b7280;">Pedidos/sem</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">👨‍💼 Panel de Administrador</div>
+  </div>
+</div>
+
+</body>
+</html>

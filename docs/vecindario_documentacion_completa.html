@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Vecindario - Documentacion Tecnica Completa</title>
+<style>
+  @page { margin: 1.5cm 2cm; size: A4; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1a1a2e;
+    line-height: 1.65;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-size: 13px;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 80px 0 60px;
+    page-break-after: always;
+  }
+  .cover h1 { font-size: 42px; color: #2D5BE3; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 18px; color: #64748b; margin-bottom: 40px; }
+  .cover .meta { font-size: 13px; color: #94a3b8; }
+  .cover .badge {
+    display: inline-block;
+    background: #2D5BE3;
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 30px;
+  }
+
+  /* TOC */
+  .toc { page-break-after: always; }
+  .toc h2 { color: #2D5BE3; border-bottom: 3px solid #2D5BE3; padding-bottom: 8px; }
+  .toc ol { counter-reset: toc; padding-left: 0; }
+  .toc li {
+    list-style: none;
+    padding: 6px 0;
+    border-bottom: 1px dotted #e2e8f0;
+  }
+  .toc li::before {
+    counter-increment: toc;
+    content: counter(toc) ".";
+    font-weight: 700;
+    color: #2D5BE3;
+    margin-right: 8px;
+  }
+
+  /* Headings */
+  h1 { font-size: 28px; color: #2D5BE3; margin-top: 40px; }
+  h2 { font-size: 22px; color: #2D5BE3; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-top: 36px; }
+  h3 { font-size: 17px; color: #334155; margin-top: 24px; }
+  h4 { font-size: 14px; color: #475569; margin-top: 18px; }
+
+  /* Section breaks */
+  .section { page-break-before: always; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 12px;
+  }
+  th, td { border: 1px solid #e2e8f0; padding: 7px 10px; text-align: left; }
+  th { background: #f1f5f9; font-weight: 600; color: #334155; }
+  tr:nth-child(even) { background: #f8fafc; }
+
+  /* Code */
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    color: #7c3aed;
+  }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* Boxes */
+  .info-box {
+    background: #eff6ff;
+    border-left: 4px solid #2D5BE3;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .warning-box {
+    background: #fff7ed;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .success-box {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .badge-admin { background: #fef3c7; color: #92400e; }
+  .badge-resident { background: #dbeafe; color: #1e40af; }
+  .badge-both { background: #f0fdf4; color: #166534; }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .flow-step {
+    background: #2D5BE3;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .flow-arrow { color: #94a3b8; font-size: 18px; }
+
+  /* Lists */
+  ul { padding-left: 20px; }
+  li { margin-bottom: 4px; }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .stat-card {
+    text-align: center;
+    padding: 16px 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  .stat-number { font-size: 28px; font-weight: 700; color: #2D5BE3; }
+  .stat-label { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+  .dual-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 2px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== PORTADA ==================== -->
+<div class="cover">
+  <div style="font-size:72px; margin-bottom:20px;">&#127959;</div>
+  <h1>Vecindario</h1>
+  <p class="subtitle">Tu comunidad, conectada</p>
+  <p class="meta">Documentacion Tecnica Completa del Proyecto</p>
+  <br>
+  <p class="meta">Version 1.0 &middot; 2026</p>
+  <p class="meta">Flutter + Firebase + Go</p>
+  <div class="badge">106 ARCHIVOS DART &middot; 15 MODULOS &middot; 6 FASES</div>
+</div>
+
+<!-- ==================== TABLA DE CONTENIDOS ==================== -->
+<div class="toc">
+  <h2>Tabla de Contenidos</h2>
+  <ol>
+    <li>Vision General del Proyecto</li>
+    <li>Stack Tecnologico</li>
+    <li>Arquitectura y Patrones</li>
+    <li>Estructura de Archivos</li>
+    <li>Sistema de Roles y Permisos</li>
+    <li>Modulo: Autenticacion y Onboarding</li>
+    <li>Modulo: Feed Comunitario</li>
+    <li>Modulo: Servicios entre Vecinos</li>
+    <li>Modulo: Servicios Externos</li>
+    <li>Modulo: Tiendas y Marketplace</li>
+    <li>Modulo: Premium - Circulares</li>
+    <li>Modulo: Premium - Multas</li>
+    <li>Modulo: Premium - PQRS</li>
+    <li>Modulo: Premium - Zonas Sociales</li>
+    <li>Modulo: Premium - Finanzas</li>
+    <li>Modulo: Premium - Asambleas</li>
+    <li>Modulo: Administracion</li>
+    <li>Modulo: Perfil y Privacidad</li>
+    <li>Modelos de Datos Completos</li>
+    <li>Base de Datos Firestore</li>
+    <li>Sistema de Navegacion (Router)</li>
+    <li>Sistema de Diseno (Theme)</li>
+    <li>Utilidades y Extensions</li>
+    <li>Internacionalizacion</li>
+    <li>Planes de Suscripcion</li>
+    <li>Cumplimiento Legal (Ley 1581)</li>
+    <li>Comandos de Desarrollo</li>
+  </ol>
+</div>
+
+<!-- ==================== 1. VISION GENERAL ==================== -->
+<div class="section">
+<h1>1. Vision General del Proyecto</h1>
+
+<p><strong>Vecindario</strong> es una aplicacion movil para conjuntos residenciales en Colombia. Conecta residentes, administradores, tenderos y proveedores de servicios dentro de una misma comunidad.</p>
+
+<h3>Problema que resuelve</h3>
+<ul>
+  <li>Comunicacion fragmentada en conjuntos (WhatsApp, carteleras, porteria)</li>
+  <li>Falta de visibilidad de servicios y comercios locales entre vecinos</li>
+  <li>Administracion manual de multas, PQRS, finanzas y asambleas</li>
+  <li>Dificultad para gestionar reservas de zonas sociales</li>
+</ul>
+
+<h3>Propuesta de valor</h3>
+<ul>
+  <li><strong>Para residentes:</strong> Un solo lugar para enterarse de todo, pedir comida al vecino, reservar el salon comunal, pagar la cuota y votar en asamblea</li>
+  <li><strong>Para administradores:</strong> Gestion digital completa del conjunto con tracking, SLA y reportes</li>
+  <li><strong>Para tenderos/vecinos:</strong> Canal de venta directa dentro de su comunidad</li>
+</ul>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-number">106</div><div class="stat-label">Archivos Dart</div></div>
+  <div class="stat-card"><div class="stat-number">15</div><div class="stat-label">Modulos</div></div>
+  <div class="stat-card"><div class="stat-number">17</div><div class="stat-label">Modelos de datos</div></div>
+  <div class="stat-card"><div class="stat-number">8</div><div class="stat-label">Repositorios</div></div>
+</div>
+
+<h3>Roadmap por Fases</h3>
+<table>
+  <tr><th>Fase</th><th>Contenido</th><th>Estado</th></tr>
+  <tr><td>1 - MVP</td><td>Auth, Feed, Servicios entre vecinos, Servicios externos</td><td>Completada</td></tr>
+  <tr><td>2 - Marketplace</td><td>Tiendas, Carrito, Pedidos, Tracking, Pagos</td><td>Completada</td></tr>
+  <tr><td>3 - Monetizacion</td><td>Comision por estrato, patrocinados</td><td>Completada</td></tr>
+  <tr><td>4 - Admin Premium</td><td>Circulares, Multas, PQRS, Zonas, Finanzas, Asambleas</td><td>Completada</td></tr>
+  <tr><td>5 - Growth</td><td>Onboarding multi-conjunto, analytics avanzado</td><td>Estructura lista</td></tr>
+  <tr><td>6 - Scale</td><td>Cloud Functions Go, notificaciones push, offline</td><td>Estructura lista</td></tr>
+</table>
+</div>
+
+<!-- ==================== 2. STACK TECNOLOGICO ==================== -->
+<div class="section">
+<h1>2. Stack Tecnologico</h1>
+
+<table>
+  <tr><th>Capa</th><th>Tecnologia</th><th>Version</th><th>Uso</th></tr>
+  <tr><td>Frontend</td><td>Flutter</td><td>3.32+</td><td>UI multiplataforma (Android, iOS)</td></tr>
+  <tr><td>Lenguaje</td><td>Dart</td><td>3.8+</td><td>Logica de la app</td></tr>
+  <tr><td>State Management</td><td>Riverpod</td><td>flutter_riverpod</td><td>Manejo de estado reactivo</td></tr>
+  <tr><td>Routing</td><td>GoRouter</td><td>go_router</td><td>Navegacion declarativa con guards</td></tr>
+  <tr><td>Auth</td><td>Firebase Auth</td><td>-</td><td>Email/password + Google Sign-In</td></tr>
+  <tr><td>Base de datos</td><td>Cloud Firestore</td><td>-</td><td>NoSQL en tiempo real</td></tr>
+  <tr><td>Almacenamiento</td><td>Firebase Storage</td><td>-</td><td>Imagenes y archivos</td></tr>
+  <tr><td>Push notifications</td><td>Firebase Cloud Messaging</td><td>-</td><td>Notificaciones push</td></tr>
+  <tr><td>Backend</td><td>Cloud Functions</td><td>Go</td><td>Logica de negocio server-side</td></tr>
+  <tr><td>Pagos</td><td>Wompi / MercadoPago</td><td>-</td><td>Pasarela de pagos Colombia</td></tr>
+  <tr><td>Analytics</td><td>Firebase Analytics</td><td>-</td><td>Metricas de uso</td></tr>
+</table>
+
+<h3>Dependencias principales (pubspec.yaml)</h3>
+<pre><code>dependencies:
+  flutter_riverpod        # State management
+  go_router               # Routing
+  firebase_core           # Firebase base
+  firebase_auth           # Autenticacion
+  cloud_firestore         # Base de datos
+  firebase_storage        # Almacenamiento
+  firebase_messaging      # Push notifications
+  firebase_analytics      # Analytics
+  google_sign_in          # Login con Google
+  image_picker            # Selector de imagenes
+  cached_network_image    # Cache de imagenes
+  url_launcher            # Abrir URLs/WhatsApp
+  intl                    # Internacionalizacion
+  timeago                 # Fechas relativas</code></pre>
+</div>
+
+<!-- ==================== 3. ARQUITECTURA ==================== -->
+<div class="section">
+<h1>3. Arquitectura y Patrones</h1>
+
+<h3>Patron principal: Feature-First + Repository Pattern</h3>
+<p>Cada feature es un modulo autocontenido con sus propias pantallas, modelos, providers y repositorios.</p>
+
+<div class="flow">
+  <span class="flow-step">Screen (UI)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Provider (Estado)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Repository (Datos)</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Firebase</span>
+</div>
+
+<h3>Flujo de datos</h3>
+<ul>
+  <li><strong>Screen:</strong> Widget de Flutter que muestra la UI. Usa <code>ConsumerWidget</code> o <code>ConsumerStatefulWidget</code> de Riverpod.</li>
+  <li><strong>Provider:</strong> Expone datos reactivos. Usa <code>StreamProvider</code> para datos en tiempo real de Firestore y <code>StateNotifierProvider</code> para estado local mutable.</li>
+  <li><strong>Repository:</strong> Capa de abstraccion sobre Firebase. Traduce entre modelos Dart y documentos Firestore.</li>
+  <li><strong>Firebase:</strong> Backend as a Service. Firestore para datos, Storage para archivos, Auth para identidad.</li>
+</ul>
+
+<h3>Convenciones de codigo</h3>
+<table>
+  <tr><th>Elemento</th><th>Convencion</th><th>Ejemplo</th></tr>
+  <tr><td>Archivos</td><td>snake_case</td><td><code>post_model.dart</code></td></tr>
+  <tr><td>Clases</td><td>PascalCase</td><td><code>PostModel</code></td></tr>
+  <tr><td>Providers</td><td>camelCase + sufijo Provider</td><td><code>feedPostsProvider</code></td></tr>
+  <tr><td>Repositorios</td><td>PascalCase + sufijo Repository</td><td><code>FeedRepository</code></td></tr>
+  <tr><td>Modelos</td><td>PascalCase + sufijo Model</td><td><code>UserModel</code></td></tr>
+  <tr><td>Imports</td><td>Absolutos</td><td><code>package:vecindario_app/...</code></td></tr>
+</table>
+
+<h3>Inyeccion de dependencias</h3>
+<p>Todo se inyecta via Riverpod. Los repositorios se crean como <code>Provider</code> que reciben instancias de Firebase de otros providers:</p>
+<pre><code>final firestoreProvider = Provider((_) => FirebaseFirestore.instance);
+final feedRepositoryProvider = Provider((ref) =>
+  FeedRepository(ref.watch(firestoreProvider)));
+final feedPostsProvider = StreamProvider((ref) =>
+  ref.watch(feedRepositoryProvider).watchPosts(communityId));</code></pre>
+</div>
+
+<!-- ==================== 4. ESTRUCTURA DE ARCHIVOS ==================== -->
+<div class="section">
+<h1>4. Estructura de Archivos</h1>
+
+<pre><code>lib/
+  main.dart                          # Entry point
+  app.dart                           # Widget raiz (ProviderScope + MaterialApp)
+
+  core/
+    constants/
+      api_constants.dart             # URLs, timeouts, limites
+      app_colors.dart                # Paleta de colores
+      app_sizes.dart                 # Spacing, radios, dimensiones
+      app_strings.dart               # Textos, categorias, labels
+      firestore_paths.dart           # Rutas de colecciones Firestore
+    errors/
+      exceptions.dart                # Excepciones custom
+      failures.dart                  # Clases Failure para manejo de errores
+    extensions/
+      context_extensions.dart        # Extensions de BuildContext
+      datetime_extensions.dart       # Formateo de fechas en espanol
+      string_extensions.dart         # Utilidades de String
+    router/
+      app_router.dart                # Configuracion de GoRouter
+    theme/
+      app_theme.dart                 # ThemeData de Material 3
+      text_styles.dart               # Estilos de texto centralizados
+    utils/
+      image_utils.dart               # Picker de imagenes
+      logger.dart                    # Logger centralizado
+      validators.dart                # Validaciones de formularios
+
+  shared/
+    models/
+      user_model.dart                # Modelo de usuario
+      community_model.dart           # Modelo de comunidad
+      review_model.dart              # Modelo de resena
+    providers/
+      current_user_provider.dart     # Usuario actual + helpers
+      firebase_providers.dart        # Instancias de Firebase
+    repositories/
+      user_repository.dart           # CRUD de usuarios
+      community_repository.dart      # CRUD de comunidades
+    widgets/
+      cached_avatar.dart             # Avatar con cache
+      confirm_dialog.dart            # Dialogo de confirmacion
+      empty_state.dart               # Estado vacio
+      error_display.dart             # Display de error
+      image_picker_sheet.dart        # Bottom sheet para imagenes
+      loading_indicator.dart         # Indicador de carga
+
+  features/
+    auth/                            # Autenticacion
+    onboarding/                      # Pantalla de bienvenida
+    feed/                            # Muro comunitario
+    services/                        # Servicios entre vecinos
+    external_services/               # Directorio de externos
+    stores/                          # Marketplace
+    premium/                         # Modulo admin premium
+    admin/                           # Panel de administrador
+    profile/                         # Perfil y privacidad
+    notifications/                   # Centro de notificaciones
+    home/                            # Shell de navegacion
+
+  l10n/
+    app_localizations.dart           # Base i18n
+    app_localizations_en.dart        # Ingles
+    app_localizations_es.dart        # Espanol</code></pre>
+</div>
+
+<!-- ==================== 5. ROLES ==================== -->
+<div class="section">
+<h1>5. Sistema de Roles y Permisos</h1>
+
+<p>La app maneja 4 roles distintos, cada uno con diferentes niveles de acceso:</p>
+
+<table>
+  <tr><th>Rol</th><th>Enum</th><th>Acceso</th></tr>
+  <tr><td><strong>Residente</strong></td><td><code>UserRole.resident</code></td><td>Feed, servicios, tiendas, perfil. En premium: leer circulares, ver multas propias, crear PQRS, reservar zonas, ver estado de cuenta, votar en asambleas</td></tr>
+  <tr><td><strong>Administrador</strong></td><td><code>UserRole.admin</code></td><td>Todo lo del residente + panel admin, aprobacion de residentes, fijar posts. En premium: crear circulares con tracking, gestionar multas, responder PQRS, dashboard financiero, convocar asambleas</td></tr>
+  <tr><td><strong>Tendero</strong></td><td><code>UserRole.storeOwner</code></td><td>Todo lo del residente + gestionar su tienda, ver pedidos entrantes, actualizar estado de pedidos</td></tr>
+  <tr><td><strong>Externo</strong></td><td><code>UserRole.external_</code></td><td>Perfil visible en directorio de servicios externos</td></tr>
+</table>
+
+<h3>Flujo de verificacion</h3>
+<div class="flow">
+  <span class="flow-step">Registro</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Codigo invitacion</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Pantalla espera</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Admin aprueba</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Acceso completo</span>
+</div>
+
+<h3>Providers de rol</h3>
+<ul>
+  <li><code>isAdminProvider</code> &mdash; <code>true</code> si <code>user.role == admin</code></li>
+  <li><code>isVerifiedProvider</code> &mdash; <code>true</code> si el admin aprobo al residente</li>
+  <li><code>isPremiumProvider</code> &mdash; <code>true</code> si la comunidad tiene suscripcion activa</li>
+</ul>
+
+<div class="info-box">
+  <strong>Capa dual en Premium:</strong> Cada pantalla del modulo premium detecta <code>isAdmin</code> y renderiza la vista correspondiente. El admin ve herramientas de gestion; el residente ve la vista de consumo.
+</div>
+</div>
+
+<!-- ==================== 6. AUTH ==================== -->
+<div class="section">
+<h1>6. Modulo: Autenticacion y Onboarding</h1>
+
+<h3>Archivos (8 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/login_screen.dart</code></td><td>Login con email/password y Google</td></tr>
+  <tr><td><code>screens/register_screen.dart</code></td><td>Registro con nombre, email, telefono, password</td></tr>
+  <tr><td><code>screens/forgot_password_screen.dart</code></td><td>Recuperacion de contrasena</td></tr>
+  <tr><td><code>screens/join_community_screen.dart</code></td><td>Unirse con codigo de invitacion + torre/apto</td></tr>
+  <tr><td><code>screens/pending_approval_screen.dart</code></td><td>Pantalla de espera hasta aprobacion del admin</td></tr>
+  <tr><td><code>providers/auth_provider.dart</code></td><td>Provider del repositorio de auth y estado de Firebase Auth</td></tr>
+  <tr><td><code>providers/auth_notifier.dart</code></td><td>StateNotifier con logica de login/register/logout</td></tr>
+  <tr><td><code>repositories/auth_repository.dart</code></td><td>Capa de datos: Firebase Auth + Firestore</td></tr>
+</table>
+
+<h3>Flujo completo de ingreso</h3>
+<ol>
+  <li><strong>Onboarding:</strong> 3 pantallas de bienvenida (carrusel) la primera vez</li>
+  <li><strong>Login/Registro:</strong> Email+password o Google Sign-In</li>
+  <li><strong>Sin comunidad:</strong> Redirige a <code>/join-community</code> donde ingresa codigo de 6 caracteres</li>
+  <li><strong>Ingresa torre y apartamento:</strong> Se asocia a la comunidad</li>
+  <li><strong>Sin verificar:</strong> Ve pantalla de espera hasta que un admin lo apruebe</li>
+  <li><strong>Verificado:</strong> Acceso completo al feed y demas</li>
+</ol>
+
+<h3>Operaciones de AuthRepository</h3>
+<ul>
+  <li><code>signInWithEmail(email, password)</code> &mdash; Login con Firebase Auth</li>
+  <li><code>signUpWithEmail(email, password, displayName)</code> &mdash; Crea cuenta + documento en Firestore</li>
+  <li><code>signInWithGoogle()</code> &mdash; OAuth con Google</li>
+  <li><code>resetPassword(email)</code> &mdash; Envia email de recuperacion</li>
+  <li><code>signOut()</code> &mdash; Cierra sesion</li>
+</ul>
+
+<h3>Guards del router</h3>
+<p>El router tiene redirects automaticos basados en el estado del usuario:</p>
+<ul>
+  <li>No autenticado &rarr; <code>/login</code></li>
+  <li>Sin comunidad &rarr; <code>/join-community</code></li>
+  <li>No verificado &rarr; <code>/pending-approval</code></li>
+  <li>Todo OK &rarr; <code>/feed</code></li>
+</ul>
+</div>
+
+<!-- ==================== 7. FEED ==================== -->
+<div class="section">
+<h1>7. Modulo: Feed Comunitario</h1>
+
+<h3>Archivos (11 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/feed_screen.dart</code></td><td>Muro principal con posts</td></tr>
+  <tr><td><code>screens/create_post_screen.dart</code></td><td>Crear noticia, alerta o encuesta</td></tr>
+  <tr><td><code>models/post_model.dart</code></td><td>Modelo de publicacion</td></tr>
+  <tr><td><code>models/comment_model.dart</code></td><td>Modelo de comentario</td></tr>
+  <tr><td><code>providers/feed_provider.dart</code></td><td>Stream de posts de la comunidad</td></tr>
+  <tr><td><code>providers/comments_provider.dart</code></td><td>Stream de comentarios por post</td></tr>
+  <tr><td><code>providers/post_notifier.dart</code></td><td>Logica de creacion de posts</td></tr>
+  <tr><td><code>repositories/feed_repository.dart</code></td><td>CRUD completo de posts y comentarios</td></tr>
+  <tr><td><code>widgets/post_card.dart</code></td><td>Tarjeta de publicacion</td></tr>
+  <tr><td><code>widgets/poll_widget.dart</code></td><td>Widget de encuesta con votacion</td></tr>
+  <tr><td><code>widgets/image_carousel.dart</code></td><td>Carrusel de imagenes</td></tr>
+</table>
+
+<h3>Tipos de publicacion</h3>
+<table>
+  <tr><th>Tipo</th><th>Icono</th><th>Uso</th></tr>
+  <tr><td>Noticia (<code>PostType.news</code>)</td><td>Periodico</td><td>Noticias generales de la comunidad</td></tr>
+  <tr><td>Alerta (<code>PostType.alert</code>)</td><td>Megafono</td><td>Avisos urgentes (corte de agua, seguridad)</td></tr>
+  <tr><td>Encuesta (<code>PostType.poll</code>)</td><td>Grafica</td><td>Votaciones rapidas con opciones</td></tr>
+</table>
+
+<h3>Funcionalidades del feed</h3>
+<ul>
+  <li><strong>Posts fijados:</strong> Los admins pueden fijar posts al inicio del feed (<code>pinned: true</code>)</li>
+  <li><strong>Likes:</strong> Toggle like/unlike con lista de UIDs</li>
+  <li><strong>Comentarios:</strong> Stream en tiempo real por post</li>
+  <li><strong>Encuestas:</strong> Opciones con conteo de votos y prevencion de doble voto</li>
+  <li><strong>Imagenes:</strong> Hasta 4 imagenes por post con carrusel</li>
+  <li><strong>Pull to refresh:</strong> Recargar feed completo</li>
+  <li><strong>Banners promocionales:</strong> Se insertan cada 5 posts</li>
+</ul>
+
+<h3>Operaciones del FeedRepository</h3>
+<ul>
+  <li><code>watchPosts(communityId, limit)</code> &mdash; Stream ordenado: fijados primero, luego por fecha</li>
+  <li><code>createPost(communityId, post)</code></li>
+  <li><code>deletePost(communityId, postId)</code></li>
+  <li><code>toggleLike(communityId, postId, uid, isLiked)</code></li>
+  <li><code>pinPost(communityId, postId, pinned)</code></li>
+  <li><code>votePoll(communityId, postId, optionIndex, uid)</code></li>
+  <li><code>watchComments / addComment / deleteComment</code></li>
+</ul>
+</div>
+
+<!-- ==================== 8. SERVICIOS VECINOS ==================== -->
+<div class="section">
+<h1>8. Modulo: Servicios entre Vecinos</h1>
+
+<h3>Concepto</h3>
+<p>Los residentes pueden ofrecer servicios a otros vecinos del conjunto: comida casera, arreglos de ropa, clases de yoga, reparacion de celulares, etc. Es un marketplace de habilidades interno.</p>
+
+<h3>Archivos (9 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/services_screen.dart</code></td><td>Catalogo con filtro por categoria</td></tr>
+  <tr><td><code>screens/create_service_screen.dart</code></td><td>Formulario para publicar servicio</td></tr>
+  <tr><td><code>screens/service_detail_screen.dart</code></td><td>Detalle con galeria, resenas y contacto WhatsApp</td></tr>
+  <tr><td><code>models/service_model.dart</code></td><td>Modelo con categorias, precio, rating</td></tr>
+  <tr><td><code>providers/services_provider.dart</code></td><td>Stream de servicios + filtro por categoria</td></tr>
+  <tr><td><code>repositories/services_repository.dart</code></td><td>CRUD de servicios y resenas</td></tr>
+  <tr><td><code>widgets/service_card.dart</code></td><td>Tarjeta de servicio</td></tr>
+  <tr><td><code>widgets/rating_stars.dart</code></td><td>Componente de estrellas</td></tr>
+  <tr><td><code>widgets/category_chips.dart</code></td><td>Chips de filtro por categoria</td></tr>
+</table>
+
+<h3>8 Categorias de servicio</h3>
+<table>
+  <tr><th>Categoria</th><th>Enum</th><th>Icono</th></tr>
+  <tr><td>Comida</td><td><code>ServiceCategory.comida</code></td><td>restaurant</td></tr>
+  <tr><td>Belleza</td><td><code>ServiceCategory.belleza</code></td><td>spa</td></tr>
+  <tr><td>Tecnologia</td><td><code>ServiceCategory.tecnologia</code></td><td>computer</td></tr>
+  <tr><td>Mascotas</td><td><code>ServiceCategory.mascotas</code></td><td>pets</td></tr>
+  <tr><td>Hogar</td><td><code>ServiceCategory.hogar</code></td><td>cleaning_services</td></tr>
+  <tr><td>Manualidades</td><td><code>ServiceCategory.manualidades</code></td><td>brush</td></tr>
+  <tr><td>Salud</td><td><code>ServiceCategory.salud</code></td><td>health_and_safety</td></tr>
+  <tr><td>Ropa</td><td><code>ServiceCategory.ropa</code></td><td>checkroom</td></tr>
+</table>
+
+<h3>Contacto via WhatsApp</h3>
+<p>El boton principal del detalle abre WhatsApp con un mensaje pre-armado:</p>
+<pre><code>"Hola! Te contacto desde Vecindario por tu servicio: {titulo}"</code></pre>
+</div>
+
+<!-- ==================== 9. SERVICIOS EXTERNOS ==================== -->
+<div class="section">
+<h1>9. Modulo: Servicios Externos</h1>
+
+<h3>Concepto</h3>
+<p>Directorio de profesionales externos al conjunto que los residentes pueden recomendar: plomeros, electricistas, cerrajeros, etc. Los patrocinados aparecen destacados (modelo de monetizacion).</p>
+
+<h3>Archivos (5 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/external_services_screen.dart</code></td><td>Directorio con filtro y seccion de patrocinados</td></tr>
+  <tr><td><code>models/external_service_model.dart</code></td><td>Modelo con patrocinio, rating, categoria</td></tr>
+  <tr><td><code>providers/external_services_provider.dart</code></td><td>Stream de servicios + filtro</td></tr>
+  <tr><td><code>repositories/external_services_repository.dart</code></td><td>CRUD + resenas</td></tr>
+  <tr><td><code>widgets/external_service_card.dart</code></td><td>Tarjeta con badge "Patrocinado"</td></tr>
+</table>
+
+<h3>8 Categorias externas</h3>
+<p>Electricista, Plomero, Cerrajero, Aseo, Mudanzas, Pintura, Jardineria, Carpinteria</p>
+
+<h3>Sistema de recomendacion</h3>
+<p>Cualquier residente puede recomendar un profesional. El nombre del recomendador se muestra en la tarjeta como prueba social.</p>
+</div>
+
+<!-- ==================== 10. TIENDAS ==================== -->
+<div class="section">
+<h1>10. Modulo: Tiendas y Marketplace</h1>
+
+<h3>Concepto</h3>
+<p>Vecinos-tenderos pueden crear tiendas dentro de la app (comida, abarrotes, etc.). Los residentes navegan el catalogo, agregan al carrito y hacen pedidos con entrega puerta a puerta dentro del conjunto.</p>
+
+<h3>Archivos (16 archivos - el mas grande)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/stores_screen.dart</code></td><td>Lista de tiendas del conjunto</td></tr>
+  <tr><td><code>screens/store_detail_screen.dart</code></td><td>Menu de la tienda con carrito</td></tr>
+  <tr><td><code>screens/my_orders_screen.dart</code></td><td>Historial de pedidos del residente</td></tr>
+  <tr><td><code>screens/order_tracking_screen.dart</code></td><td>Seguimiento en tiempo real del pedido</td></tr>
+  <tr><td><code>models/store_model.dart</code></td><td>Modelo de tienda</td></tr>
+  <tr><td><code>models/store_item_model.dart</code></td><td>Modelo de producto</td></tr>
+  <tr><td><code>models/order_model.dart</code></td><td>Modelo de pedido + items</td></tr>
+  <tr><td><code>models/cart_model.dart</code></td><td>Modelo del carrito de compras</td></tr>
+  <tr><td><code>providers/stores_provider.dart</code></td><td>Stream de tiendas y productos</td></tr>
+  <tr><td><code>providers/cart_provider.dart</code></td><td>StateNotifier del carrito</td></tr>
+  <tr><td><code>providers/orders_provider.dart</code></td><td>Stream de pedidos</td></tr>
+  <tr><td><code>repositories/stores_repository.dart</code></td><td>CRUD de tiendas, items y pedidos</td></tr>
+  <tr><td><code>widgets/store_card.dart</code></td><td>Tarjeta de tienda con rating y tiempo</td></tr>
+  <tr><td><code>widgets/store_item_tile.dart</code></td><td>Tile de producto en el menu</td></tr>
+  <tr><td><code>widgets/checkout_bar.dart</code></td><td>Barra inferior de resumen + boton pagar</td></tr>
+  <tr><td><code>widgets/order_timeline.dart</code></td><td>Timeline visual del estado del pedido</td></tr>
+</table>
+
+<h3>Flujo de compra</h3>
+<div class="flow">
+  <span class="flow-step">Explorar tiendas</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Ver menu</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Agregar al carrito</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Checkout</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Tracking</span>
+</div>
+
+<h3>Estados del pedido</h3>
+<table>
+  <tr><th>Estado</th><th>Significado</th><th>Color</th></tr>
+  <tr><td><code>pending</code></td><td>Pendiente de confirmacion por el tendero</td><td>Naranja</td></tr>
+  <tr><td><code>confirmed</code></td><td>El tendero acepto y esta preparando</td><td>Azul</td></tr>
+  <tr><td><code>inTransit</code></td><td>En camino al apartamento</td><td>Morado</td></tr>
+  <tr><td><code>delivered</code></td><td>Entregado</td><td>Verde</td></tr>
+  <tr><td><code>cancelled</code></td><td>Cancelado</td><td>Gris</td></tr>
+</table>
+
+<h3>Comision por estrato</h3>
+<p>La app cobra una comision de servicio que varia segun el estrato socioeconomico del conjunto:</p>
+<table>
+  <tr><th>Estrato</th><th>Comision (COP)</th></tr>
+  <tr><td>1</td><td>$200</td></tr>
+  <tr><td>2</td><td>$200</td></tr>
+  <tr><td>3</td><td>$300</td></tr>
+  <tr><td>4</td><td>$350</td></tr>
+  <tr><td>5</td><td>$450</td></tr>
+  <tr><td>6</td><td>$500</td></tr>
+</table>
+
+<h3>Carrito de compras</h3>
+<p>Gestionado con <code>StateNotifierProvider</code>. Soporta:</p>
+<ul>
+  <li>Agregar/quitar productos</li>
+  <li>Incrementar/decrementar cantidades</li>
+  <li>Limpiar carrito</li>
+  <li>Conteo de items (badge en BottomNav)</li>
+  <li>Calculo automatico de subtotal + comision</li>
+</ul>
+</div>
+
+<!-- ==================== 11-16. PREMIUM ==================== -->
+<div class="section">
+<h1>11. Modulo Premium: Circulares</h1>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Vista de gestion</h4>
+    <ul>
+      <li>Crear circulares con prioridad (Urgente, Informativa, Requiere firma, General)</li>
+      <li>Adjuntar archivos</li>
+      <li>Ver % de lectura en tiempo real</li>
+      <li>Tracking de acuses de recibo firmados</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Vista de consumo</h4>
+    <ul>
+      <li>Lista de circulares ordenadas por fecha</li>
+      <li>Badge de "no leida" (punto azul)</li>
+      <li>Auto-marcar como leida al abrir</li>
+      <li>Firmar acuse de recibo si se requiere</li>
+      <li>Ver adjuntos</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Prioridades</h3>
+<table>
+  <tr><th>Prioridad</th><th>Color</th><th>Uso</th></tr>
+  <tr><td>Urgente</td><td>Rojo</td><td>Emergencias, cortes de servicio</td></tr>
+  <tr><td>Informativa</td><td>Azul</td><td>Noticias de administracion</td></tr>
+  <tr><td>Requiere firma</td><td>Morado</td><td>Documentos que necesitan acuse de recibo</td></tr>
+  <tr><td>General</td><td>Verde</td><td>Comunicados rutinarios</td></tr>
+</table>
+
+<h3>Modelo de datos: CircularModel</h3>
+<ul>
+  <li><code>readBy: List&lt;ReadReceipt&gt;</code> &mdash; Quien leyo y cuando</li>
+  <li><code>ackBy: List&lt;ReadReceipt&gt;</code> &mdash; Quien firmo acuse</li>
+  <li><code>readPercentage(totalMembers)</code> &mdash; Calcula % de lectura</li>
+  <li><code>ackPercentage(totalMembers)</code> &mdash; Calcula % de firmas</li>
+</ul>
+</div>
+
+<div class="section">
+<h1>12. Modulo Premium: Multas</h1>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Vista de gestion</h4>
+    <ul>
+      <li>Crear multa: monto, motivo, articulo del manual, evidencia fotografica</li>
+      <li>Ver todos las multas del conjunto</li>
+      <li>Revisar descargos presentados</li>
+      <li>Confirmar o anular multa</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Vista de consumo</h4>
+    <ul>
+      <li>Ver solo sus multas</li>
+      <li>Ver motivo, evidencia y articulo del manual</li>
+      <li>Presentar descargo (texto libre)</li>
+      <li>Ver dias restantes para descargo</li>
+      <li>Estado visual de la multa</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Flujo de una multa</h3>
+<div class="flow">
+  <span class="flow-step">Admin crea</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Notificada</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Residente presenta descargo</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">En descargo</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Admin confirma/anula</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Pagada o Anulada</span>
+</div>
+
+<h3>Estados de la multa</h3>
+<table>
+  <tr><th>Estado</th><th>Color</th><th>Descripcion</th></tr>
+  <tr><td>Notificada</td><td>Amarillo</td><td>Recien creada, pendiente de respuesta</td></tr>
+  <tr><td>En descargo</td><td>Naranja</td><td>El residente envio su version</td></tr>
+  <tr><td>Confirmada</td><td>Rojo</td><td>Admin confirmo despues del descargo</td></tr>
+  <tr><td>Pagada</td><td>Verde</td><td>El residente pago</td></tr>
+  <tr><td>Anulada</td><td>Gris</td><td>Admin acepto el descargo</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h1>13. Modulo Premium: PQRS</h1>
+<p>(Peticiones, Quejas, Reclamos y Sugerencias)</p>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Vista de gestion</h4>
+    <ul>
+      <li>Dashboard con conteo: Abiertos / En gestion / Resueltos</li>
+      <li>Ver todos los PQRS con nombre y unidad del residente</li>
+      <li>Indicador de SLA vencido</li>
+      <li>Responder y cambiar estado</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Vista de consumo</h4>
+    <ul>
+      <li>Crear solicitud: tipo + categoria + descripcion</li>
+      <li>Ver solo sus solicitudes</li>
+      <li>Ver estado actual y respuesta de la administracion</li>
+      <li>Adjuntar fotos</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Tipos de PQRS</h3>
+<table>
+  <tr><th>Tipo</th><th>Color</th><th>Uso</th></tr>
+  <tr><td>Peticion</td><td>Azul</td><td>Solicitar algo a la administracion</td></tr>
+  <tr><td>Queja</td><td>Rojo</td><td>Reportar una situacion negativa</td></tr>
+  <tr><td>Reclamo</td><td>Rojo</td><td>Exigir solucion a un problema</td></tr>
+  <tr><td>Sugerencia</td><td>Verde</td><td>Proponer mejoras</td></tr>
+</table>
+
+<h3>5 Categorias</h3>
+<p>Mantenimiento, Seguridad, Convivencia, Zonas comunes, Administracion</p>
+
+<h3>SLA (Service Level Agreement)</h3>
+<p>Cada PQRS tiene un <code>slaDeadline</code>. Si no se resuelve a tiempo, el badge "SLA vencido" aparece en rojo.</p>
+</div>
+
+<div class="section">
+<h1>14. Modulo Premium: Zonas Sociales</h1>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Vista de gestion</h4>
+    <ul>
+      <li>Configurar zonas: nombre, capacidad, tarifa, deposito, horarios, reglas</li>
+      <li>Ver reservas de todos los residentes</li>
+      <li>Devolver depositos</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Vista de consumo</h4>
+    <ul>
+      <li>Ver zonas disponibles con capacidad y tarifa</li>
+      <li>Ver calendario de disponibilidad</li>
+      <li>Reservar con pago</li>
+      <li>Ver sus reservas</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Tipos de zona (auto-deteccion de icono)</h3>
+<p>Piscina, BBQ/Asadero, Salon comunal, Cancha, Gimnasio, Salon de reuniones</p>
+
+<h3>Modelo de datos: AmenityModel</h3>
+<ul>
+  <li><code>hourlyRate</code> &mdash; Tarifa por hora en COP</li>
+  <li><code>deposit</code> &mdash; Deposito reembolsable (opcional)</li>
+  <li><code>maxBookingsPerMonth</code> &mdash; Limite de reservas mensuales por residente</li>
+  <li><code>availableDays</code> &mdash; Dias disponibles</li>
+  <li><code>hours</code> &mdash; Horario (ej: "8:00 - 22:00")</li>
+</ul>
+</div>
+
+<div class="section">
+<h1>15. Modulo Premium: Finanzas</h1>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Dashboard financiero</h4>
+    <ul>
+      <li>Resumen: ingresos, egresos, saldo</li>
+      <li>Lista de movimientos con categoria y fecha</li>
+      <li>Cada movimiento con tipo (ingreso/egreso), icono y color</li>
+      <li>Exportar a PDF</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Estado de cuenta</h4>
+    <ul>
+      <li>Saldo actual (positivo = debe, negativo = a favor)</li>
+      <li>Indicador visual: verde "Estas al dia" o rojo con saldo</li>
+      <li>Historial de cobros y pagos</li>
+      <li>Boton "Pagar cuota pendiente"</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Modelo: FinanceEntryModel</h3>
+<ul>
+  <li><code>type</code> &mdash; income o expense</li>
+  <li><code>category</code> &mdash; Categoria libre (administracion, mantenimiento, etc.)</li>
+  <li><code>receiptURL</code> &mdash; Comprobante adjunto</li>
+  <li><code>approvedByUid</code> &mdash; Quien aprobo el movimiento</li>
+</ul>
+
+<h3>Modelo: AccountStatementModel</h3>
+<ul>
+  <li><code>unitNumber</code> &mdash; Apartamento</li>
+  <li><code>balance</code> &mdash; Saldo (&le;0 = al dia, >0 = debe)</li>
+  <li><code>items</code> &mdash; Lista de <code>StatementItem</code> (concepto, monto, fecha, estado paid/pending)</li>
+</ul>
+</div>
+
+<div class="section">
+<h1>16. Modulo Premium: Asambleas</h1>
+
+<div class="dual-col">
+  <div>
+    <h4><span class="badge badge-admin">Admin</span> Vista de gestion</h4>
+    <ul>
+      <li>Convocar asamblea: titulo, fecha, lugar, link virtual</li>
+      <li>Definir orden del dia (agenda)</li>
+      <li>Crear votaciones con opciones</li>
+      <li>Ver quorum en tiempo real</li>
+      <li>Adjuntar acta en PDF</li>
+    </ul>
+  </div>
+  <div>
+    <h4><span class="badge badge-resident">Residente</span> Vista de participacion</h4>
+    <ul>
+      <li>Ver convocatorias con fecha, lugar y agenda</li>
+      <li>Badge "EN VIVO" cuando la asamblea esta activa</li>
+      <li>Votar en tiempo real (botones por opcion)</li>
+      <li>Ver resultados con barra de progreso y %</li>
+      <li>Ver conteo total de votos</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Modelo: AssemblyModel</h3>
+<ul>
+  <li><code>status</code> &mdash; convened (convocada), active (en vivo), closed (cerrada)</li>
+  <li><code>votes: List&lt;VoteItem&gt;</code> &mdash; Lista de votaciones</li>
+  <li><code>attendees</code> &mdash; Lista de UIDs presentes</li>
+  <li><code>actaPdfURL</code> &mdash; Acta en PDF una vez cerrada</li>
+</ul>
+
+<h3>Modelo: VoteItem</h3>
+<ul>
+  <li><code>topic</code> &mdash; Tema de la votacion</li>
+  <li><code>options</code> &mdash; Opciones (ej: "A favor", "En contra", "Abstencion")</li>
+  <li><code>results</code> &mdash; Mapa opcion &rarr; lista de UIDs que votaron</li>
+  <li><code>hasVoted(uid)</code> &mdash; Previene doble voto</li>
+  <li><code>percentageFor(option)</code> &mdash; Calcula % de cada opcion</li>
+</ul>
+
+<h3>Votacion en tiempo real</h3>
+<p>Usa <code>FirebaseFirestore.runTransaction()</code> para garantizar atomicidad. Cuando un residente vota, los demas ven los resultados actualizarse instantaneamente via Firestore streams.</p>
+</div>
+
+<!-- ==================== 17. ADMIN ==================== -->
+<div class="section">
+<h1>17. Modulo: Administracion</h1>
+
+<h3>Archivos (2 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/admin_panel_screen.dart</code></td><td>Dashboard del admin: stats + acciones rapidas</td></tr>
+  <tr><td><code>screens/pending_approvals_screen.dart</code></td><td>Lista de residentes pendientes de aprobacion</td></tr>
+</table>
+
+<h3>Dashboard del admin</h3>
+<ul>
+  <li><strong>Estadisticas:</strong> Cantidad de residentes pendientes, posts en el feed</li>
+  <li><strong>Acciones rapidas:</strong>
+    <ul>
+      <li>Aprobar residentes pendientes</li>
+      <li>Configuracion de comunidad</li>
+      <li>Crear post fijado</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>Aprobacion de residentes</h3>
+<p>Cuando un nuevo vecino se registra y usa el codigo de invitacion, queda con <code>verified: false</code>. El admin ve la lista de pendientes con nombre, email, torre y apartamento, y puede aprobar o rechazar.</p>
+</div>
+
+<!-- ==================== 18. PERFIL ==================== -->
+<div class="section">
+<h1>18. Modulo: Perfil y Privacidad</h1>
+
+<h3>Archivos (3 archivos)</h3>
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>screens/profile_screen.dart</code></td><td>Perfil principal con menu de opciones</td></tr>
+  <tr><td><code>screens/edit_profile_screen.dart</code></td><td>Editar nombre, telefono, foto</td></tr>
+  <tr><td><code>screens/privacy_screen.dart</code></td><td>Privacidad, exportacion y eliminacion de datos</td></tr>
+</table>
+
+<h3>Secciones del perfil</h3>
+<ul>
+  <li><strong>Header:</strong> Avatar, nombre, email, torre/apartamento</li>
+  <li><strong>Cuenta:</strong> Editar perfil</li>
+  <li><strong>Administracion:</strong> Panel admin (solo si es admin)</li>
+  <li><strong>Vecindario Admin:</strong> Acceso al modulo premium</li>
+  <li><strong>Configuracion:</strong> Notificaciones, Privacidad</li>
+  <li><strong>Legal:</strong> Terminos, Politica de privacidad</li>
+  <li><strong>Cerrar sesion</strong></li>
+</ul>
+
+<h3>Cumplimiento Ley 1581/2012 (Habeas Data Colombia)</h3>
+<p>La pantalla de privacidad ofrece:</p>
+<ul>
+  <li><strong>Conocer:</strong> Que datos tenemos y como los usamos</li>
+  <li><strong>Actualizar:</strong> Corregir datos personales</li>
+  <li><strong>Exportar:</strong> Descargar todos tus datos en formato legible</li>
+  <li><strong>Eliminar:</strong> Solicitar eliminacion completa de la cuenta</li>
+</ul>
+
+<div class="warning-box">
+  <strong>Importante:</strong> La eliminacion de cuenta crea un documento en <code>deletionRequests</code> que se procesa en Cloud Functions (Go). La data se anonimiza, no se borra fisicamente, para mantener integridad referencial.
+</div>
+</div>
+
+<!-- ==================== 19. MODELOS ==================== -->
+<div class="section">
+<h1>19. Modelos de Datos Completos</h1>
+
+<p>Resumen de los 17 modelos del proyecto con sus campos principales:</p>
+
+<h3>UserModel</h3>
+<table>
+  <tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr>
+  <tr><td>id</td><td>String</td><td>Firebase UID</td></tr>
+  <tr><td>displayName</td><td>String</td><td>Nombre completo</td></tr>
+  <tr><td>email</td><td>String</td><td>Correo electronico</td></tr>
+  <tr><td>phone</td><td>String</td><td>Telefono (10 digitos)</td></tr>
+  <tr><td>photoURL</td><td>String?</td><td>URL de foto de perfil</td></tr>
+  <tr><td>communityId</td><td>String?</td><td>ID de la comunidad</td></tr>
+  <tr><td>role</td><td>UserRole</td><td>resident / admin / storeOwner / external_</td></tr>
+  <tr><td>estrato</td><td>int?</td><td>Estrato socioeconomico (1-6)</td></tr>
+  <tr><td>verified</td><td>bool</td><td>Aprobado por admin</td></tr>
+  <tr><td>tower</td><td>String?</td><td>Torre o bloque</td></tr>
+  <tr><td>apartment</td><td>String?</td><td>Numero de apartamento</td></tr>
+  <tr><td>createdAt</td><td>DateTime</td><td>Fecha de registro</td></tr>
+  <tr><td>deletedAt</td><td>DateTime?</td><td>Soft delete (Ley 1581)</td></tr>
+</table>
+
+<h3>CommunityModel</h3>
+<table>
+  <tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr>
+  <tr><td>id</td><td>String</td><td>ID del conjunto</td></tr>
+  <tr><td>name</td><td>String</td><td>Nombre del conjunto</td></tr>
+  <tr><td>address</td><td>String</td><td>Direccion</td></tr>
+  <tr><td>city</td><td>String</td><td>Ciudad</td></tr>
+  <tr><td>estrato</td><td>int</td><td>Estrato del conjunto (1-6)</td></tr>
+  <tr><td>adminUid</td><td>String</td><td>UID del administrador</td></tr>
+  <tr><td>inviteCode</td><td>String</td><td>Codigo de invitacion (6 chars)</td></tr>
+  <tr><td>memberCount</td><td>int</td><td>Numero de residentes</td></tr>
+  <tr><td>createdAt</td><td>DateTime</td><td>Fecha de creacion</td></tr>
+</table>
+
+<h3>PostModel</h3>
+<table>
+  <tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr>
+  <tr><td>type</td><td>PostType</td><td>news / alert / poll</td></tr>
+  <tr><td>text</td><td>String</td><td>Contenido del post</td></tr>
+  <tr><td>imageURLs</td><td>List&lt;String&gt;</td><td>Hasta 4 imagenes</td></tr>
+  <tr><td>pinned</td><td>bool</td><td>Fijado al inicio (admin)</td></tr>
+  <tr><td>likes</td><td>int</td><td>Conteo de likes</td></tr>
+  <tr><td>likedBy</td><td>List&lt;String&gt;</td><td>UIDs de quienes dieron like</td></tr>
+  <tr><td>pollOptions</td><td>List&lt;PollOption&gt;?</td><td>Opciones de encuesta</td></tr>
+</table>
+
+<h3>OrderModel</h3>
+<table>
+  <tr><th>Campo</th><th>Tipo</th><th>Descripcion</th></tr>
+  <tr><td>items</td><td>List&lt;OrderItemModel&gt;</td><td>Productos del pedido</td></tr>
+  <tr><td>subtotal</td><td>int</td><td>Subtotal en COP</td></tr>
+  <tr><td>serviceFee</td><td>int</td><td>Comision segun estrato</td></tr>
+  <tr><td>total</td><td>int</td><td>Total a pagar</td></tr>
+  <tr><td>status</td><td>OrderStatus</td><td>pending/confirmed/inTransit/delivered/cancelled</td></tr>
+  <tr><td>buyerApartment</td><td>String?</td><td>Apto del comprador</td></tr>
+</table>
+
+<div class="info-box">
+  Los demas modelos (ServiceModel, StoreModel, StoreItemModel, CartModel, ExternalServiceModel, CircularModel, FineModel, AmenityModel, BookingModel, FinanceEntryModel, AccountStatementModel, AssemblyModel, VoteItem, PqrsModel, ReviewModel) estan documentados en sus secciones correspondientes.
+</div>
+</div>
+
+<!-- ==================== 20. FIRESTORE ==================== -->
+<div class="section">
+<h1>20. Base de Datos Firestore</h1>
+
+<h3>Colecciones principales</h3>
+<pre><code>users/                         &rarr; UserModel
+communities/                   &rarr; CommunityModel
+services/                      &rarr; ServiceModel
+stores/                        &rarr; StoreModel
+  stores/{id}/items/           &rarr; StoreItemModel
+orders/                        &rarr; OrderModel
+external_services/             &rarr; ExternalServiceModel
+reviews/                       &rarr; ReviewModel
+deletionRequests/              &rarr; Solicitudes de eliminacion
+consents/                      &rarr; Consentimientos GDPR
+subscriptions/                 &rarr; Suscripciones premium
+auditLogs/                     &rarr; Logs de auditoria</code></pre>
+
+<h3>Subcolecciones por comunidad</h3>
+<pre><code>communities/{communityId}/
+  posts/                       &rarr; PostModel
+    posts/{postId}/comments/   &rarr; CommentModel
+  circulars/                   &rarr; CircularModel
+  fines/                       &rarr; FineModel
+  amenities/                   &rarr; AmenityModel
+  bookings/                    &rarr; BookingModel
+  finances/                    &rarr; FinanceEntryModel
+  budgets/                     &rarr; Presupuestos
+  account_statements/          &rarr; AccountStatementModel
+  manual_versions/             &rarr; Versiones del manual
+  assemblies/                  &rarr; AssemblyModel
+  pqrs/                        &rarr; PqrsModel</code></pre>
+
+<div class="info-box">
+  <strong>Patron de seguridad:</strong> Todas las subcolecciones de comunidad estan bajo <code>communities/{id}/</code>. Las Security Rules de Firestore deben validar que el usuario pertenece a esa comunidad antes de permitir lectura/escritura.
+</div>
+</div>
+
+<!-- ==================== 21. ROUTER ==================== -->
+<div class="section">
+<h1>21. Sistema de Navegacion (Router)</h1>
+
+<h3>Rutas publicas (sin auth)</h3>
+<table>
+  <tr><th>Ruta</th><th>Pantalla</th></tr>
+  <tr><td><code>/onboarding</code></td><td>OnboardingScreen</td></tr>
+  <tr><td><code>/login</code></td><td>LoginScreen</td></tr>
+  <tr><td><code>/register</code></td><td>RegisterScreen</td></tr>
+  <tr><td><code>/forgot-password</code></td><td>ForgotPasswordScreen</td></tr>
+  <tr><td><code>/join-community</code></td><td>JoinCommunityScreen</td></tr>
+  <tr><td><code>/pending-approval</code></td><td>PendingApprovalScreen</td></tr>
+</table>
+
+<h3>Shell con BottomNavigation (4 tabs)</h3>
+<table>
+  <tr><th>Tab</th><th>Ruta</th><th>Pantalla</th></tr>
+  <tr><td>Noticias</td><td><code>/feed</code></td><td>FeedScreen</td></tr>
+  <tr><td>Vecinos</td><td><code>/services</code></td><td>ServicesScreen</td></tr>
+  <tr><td>Tiendas</td><td><code>/stores</code></td><td>StoresScreen</td></tr>
+  <tr><td>Servicios</td><td><code>/external-services</code></td><td>ExternalServicesScreen</td></tr>
+</table>
+
+<h3>Rutas anidadas</h3>
+<table>
+  <tr><th>Ruta</th><th>Pantalla</th></tr>
+  <tr><td><code>/feed/create</code></td><td>CreatePostScreen</td></tr>
+  <tr><td><code>/stores/:storeId</code></td><td>StoreDetailScreen</td></tr>
+  <tr><td><code>/stores/orders</code></td><td>MyOrdersScreen</td></tr>
+  <tr><td><code>/stores/order/:orderId</code></td><td>OrderTrackingScreen</td></tr>
+</table>
+
+<h3>Rutas globales</h3>
+<table>
+  <tr><th>Ruta</th><th>Pantalla</th></tr>
+  <tr><td><code>/profile</code></td><td>ProfileScreen</td></tr>
+  <tr><td><code>/profile/privacy</code></td><td>PrivacyScreen</td></tr>
+  <tr><td><code>/notifications</code></td><td>NotificationsScreen</td></tr>
+  <tr><td><code>/admin</code></td><td>AdminPanelScreen</td></tr>
+  <tr><td><code>/admin/pending</code></td><td>PendingApprovalsScreen</td></tr>
+</table>
+
+<h3>Rutas premium</h3>
+<table>
+  <tr><th>Ruta</th><th>Pantalla</th></tr>
+  <tr><td><code>/premium</code></td><td>PremiumDashboardScreen</td></tr>
+  <tr><td><code>/premium/circulars</code></td><td>CircularsScreen</td></tr>
+  <tr><td><code>/premium/fines</code></td><td>FinesScreen</td></tr>
+  <tr><td><code>/premium/pqrs</code></td><td>PqrsScreen</td></tr>
+  <tr><td><code>/premium/amenities</code></td><td>AmenitiesScreen</td></tr>
+  <tr><td><code>/premium/finances</code></td><td>FinancesScreen</td></tr>
+  <tr><td><code>/premium/assemblies</code></td><td>AssembliesScreen</td></tr>
+</table>
+</div>
+
+<!-- ==================== 22. THEME ==================== -->
+<div class="section">
+<h1>22. Sistema de Diseno (Theme)</h1>
+
+<h3>Paleta de colores</h3>
+<table>
+  <tr><th>Nombre</th><th>Hex</th><th>Uso</th></tr>
+  <tr><td>Primary</td><td style="background:#2D5BE3;color:white;text-align:center">#2D5BE3</td><td>Botones, links, elementos activos</td></tr>
+  <tr><td>Secondary</td><td style="background:#4CAF50;color:white;text-align:center">#4CAF50</td><td>Exito, verificado</td></tr>
+  <tr><td>Error</td><td style="background:#E53935;color:white;text-align:center">#E53935</td><td>Errores, alertas</td></tr>
+  <tr><td>Warning</td><td style="background:#FF9800;color:white;text-align:center">#FF9800</td><td>Advertencias, pendientes</td></tr>
+  <tr><td>Info</td><td style="background:#2196F3;color:white;text-align:center">#2196F3</td><td>Informacion</td></tr>
+  <tr><td>Background</td><td style="background:#F5F7FA;text-align:center">#F5F7FA</td><td>Fondo general</td></tr>
+  <tr><td>Surface</td><td style="background:#FFFFFF;border:1px solid #e2e8f0;text-align:center">#FFFFFF</td><td>Cards, modals</td></tr>
+</table>
+
+<h3>Escala tipografica</h3>
+<table>
+  <tr><th>Estilo</th><th>Tamano</th><th>Peso</th><th>Uso</th></tr>
+  <tr><td>heading1</td><td>28px</td><td>Bold (700)</td><td>Titulos principales</td></tr>
+  <tr><td>heading2</td><td>22px</td><td>Bold (700)</td><td>Subtitulos</td></tr>
+  <tr><td>heading3</td><td>18px</td><td>SemiBold (600)</td><td>Secciones</td></tr>
+  <tr><td>bodyLarge</td><td>16px</td><td>Regular (400)</td><td>Cuerpo destacado</td></tr>
+  <tr><td>bodyMedium</td><td>14px</td><td>Regular (400)</td><td>Cuerpo principal</td></tr>
+  <tr><td>bodySmall</td><td>12px</td><td>Regular (400)</td><td>Texto secundario</td></tr>
+  <tr><td>caption</td><td>11px</td><td>Regular (400)</td><td>Metadata, timestamps</td></tr>
+  <tr><td>button</td><td>16px</td><td>SemiBold (600)</td><td>Texto de botones</td></tr>
+</table>
+
+<h3>Escala de spacing</h3>
+<table>
+  <tr><th>Token</th><th>Valor</th><th>Uso</th></tr>
+  <tr><td>xxs</td><td>2px</td><td>Microespaciado</td></tr>
+  <tr><td>xs</td><td>4px</td><td>Separaciones minimas</td></tr>
+  <tr><td>sm</td><td>8px</td><td>Padding interno</td></tr>
+  <tr><td>md</td><td>16px</td><td>Padding estandar</td></tr>
+  <tr><td>lg</td><td>24px</td><td>Separaciones de seccion</td></tr>
+  <tr><td>xl</td><td>32px</td><td>Margenes amplios</td></tr>
+  <tr><td>xxl</td><td>48px</td><td>Espaciado mayor</td></tr>
+</table>
+</div>
+
+<!-- ==================== 23. UTILS ==================== -->
+<div class="section">
+<h1>23. Utilidades y Extensions</h1>
+
+<h3>Validadores (<code>core/utils/validators.dart</code>)</h3>
+<table>
+  <tr><th>Validador</th><th>Regla</th></tr>
+  <tr><td><code>validateEmail</code></td><td>Formato valido de email</td></tr>
+  <tr><td><code>validatePassword</code></td><td>Minimo 8 caracteres</td></tr>
+  <tr><td><code>validateConfirmPassword</code></td><td>Debe coincidir con password</td></tr>
+  <tr><td><code>validateName</code></td><td>Minimo 2 caracteres</td></tr>
+  <tr><td><code>validatePhone</code></td><td>Exactamente 10 digitos</td></tr>
+  <tr><td><code>validateInviteCode</code></td><td>6 caracteres alfanumericos</td></tr>
+  <tr><td><code>validatePrice</code></td><td>Numero positivo</td></tr>
+  <tr><td><code>validateTower</code></td><td>Campo requerido</td></tr>
+  <tr><td><code>validateApartment</code></td><td>Campo requerido</td></tr>
+</table>
+
+<h3>Extensions de DateTime</h3>
+<table>
+  <tr><th>Extension</th><th>Ejemplo de salida</th></tr>
+  <tr><td><code>timeAgoText</code></td><td>"hace 2 horas", "hace 3 dias"</td></tr>
+  <tr><td><code>formatDate</code></td><td>"15/03/2026"</td></tr>
+  <tr><td><code>formatDateTime</code></td><td>"15/03/2026 14:30"</td></tr>
+  <tr><td><code>formatDateLong</code></td><td>"15 de marzo, 2026"</td></tr>
+  <tr><td><code>formatDateShort</code></td><td>"15 mar"</td></tr>
+  <tr><td><code>smartDate</code></td><td>"Hoy" / "Ayer" / "hace 3 dias" / "15/03/2026"</td></tr>
+</table>
+
+<h3>Extensions de String</h3>
+<table>
+  <tr><th>Extension</th><th>Ejemplo</th></tr>
+  <tr><td><code>capitalize</code></td><td>"hola" &rarr; "Hola"</td></tr>
+  <tr><td><code>toTitleCase</code></td><td>"juan perez" &rarr; "Juan Perez"</td></tr>
+  <tr><td><code>truncate(20)</code></td><td>"texto largo..." &rarr; "texto largo..."</td></tr>
+  <tr><td><code>formatPhoneColombia</code></td><td>"3001234567" &rarr; "+57 300 123 4567"</td></tr>
+  <tr><td><code>whatsappNumber</code></td><td>"3001234567" &rarr; "573001234567"</td></tr>
+</table>
+
+<h3>Extensions de BuildContext</h3>
+<ul>
+  <li><code>context.showSnackBar('mensaje')</code></li>
+  <li><code>context.showErrorSnackBar('error')</code></li>
+  <li><code>context.showSuccessSnackBar('exito')</code></li>
+  <li><code>context.screenWidth</code> / <code>context.screenHeight</code></li>
+  <li><code>context.isSmallScreen</code> (< 360px)</li>
+</ul>
+
+<h3>Formateo de moneda</h3>
+<p>Funcion <code>formatCOP(amount)</code> en <code>order_model.dart</code>:</p>
+<pre><code>formatCOP(350000) → "\$350.000"
+formatCOP(1500)   → "\$1.500"</code></pre>
+</div>
+
+<!-- ==================== 24. i18n ==================== -->
+<div class="section">
+<h1>24. Internacionalizacion</h1>
+
+<p>El proyecto soporta Espanol (principal) e Ingles, usando el sistema de localizacion de Flutter:</p>
+
+<table>
+  <tr><th>Archivo</th><th>Funcion</th></tr>
+  <tr><td><code>l10n/app_localizations.dart</code></td><td>Clase base abstracta con 15+ claves</td></tr>
+  <tr><td><code>l10n/app_localizations_es.dart</code></td><td>Traducciones en espanol</td></tr>
+  <tr><td><code>l10n/app_localizations_en.dart</code></td><td>Traducciones en ingles</td></tr>
+</table>
+
+<h3>Claves principales</h3>
+<pre><code>appTitle          → "Vecindario" / "Vecindario"
+login             → "Iniciar sesion" / "Log in"
+register          → "Crear cuenta" / "Create account"
+feed              → "Noticias" / "News"
+services          → "Vecinos" / "Neighbors"
+stores            → "Tiendas" / "Stores"
+profile           → "Perfil" / "Profile"
+notifications     → "Notificaciones" / "Notifications"
+...</code></pre>
+</div>
+
+<!-- ==================== 25. PLANES ==================== -->
+<div class="section">
+<h1>25. Planes de Suscripcion</h1>
+
+<p>El modulo premium se activa por comunidad con 3 planes:</p>
+
+<table>
+  <tr><th>Feature</th><th>Starter</th><th>Professional</th><th>Enterprise</th></tr>
+  <tr><td>Circulares</td><td>Si</td><td>Si</td><td>Si</td></tr>
+  <tr><td>PQRS</td><td>Si</td><td>Si</td><td>Si</td></tr>
+  <tr><td>Manual de convivencia</td><td>Si</td><td>Si</td><td>Si</td></tr>
+  <tr><td>Multas</td><td>Si</td><td>Si</td><td>Si</td></tr>
+  <tr><td>Zonas sociales</td><td>-</td><td>Si</td><td>Si</td></tr>
+  <tr><td>Finanzas y pagos</td><td>-</td><td>Si</td><td>Si</td></tr>
+  <tr><td>Asambleas y votaciones</td><td>-</td><td>-</td><td>Si</td></tr>
+  <tr><td>Reportes avanzados</td><td>-</td><td>-</td><td>Si</td></tr>
+  <tr><td>API de integracion</td><td>-</td><td>-</td><td>Si</td></tr>
+</table>
+
+<h3>Logica de activacion</h3>
+<pre><code>// Documento en Firestore: subscriptions/{communityId}
+{
+  "status": "active" | "trial" | "expired",
+  "plan": "starter" | "professional" | "enterprise",
+  "expiresAt": Timestamp
+}
+
+// Provider que lo lee:
+isPremiumProvider → true si status == "active" || "trial"
+subscriptionPlanProvider → el plan actual</code></pre>
+
+<p>Si la comunidad no tiene suscripcion, la pantalla premium muestra un icono de candado con mensaje.</p>
+</div>
+
+<!-- ==================== 26. LEGAL ==================== -->
+<div class="section">
+<h1>26. Cumplimiento Legal - Ley 1581/2012</h1>
+
+<p>Vecindario cumple con la Ley de Proteccion de Datos Personales de Colombia (Habeas Data):</p>
+
+<h3>Derechos implementados</h3>
+<table>
+  <tr><th>Derecho</th><th>Implementacion</th></tr>
+  <tr><td><strong>Conocer</strong></td><td>Pantalla de privacidad explica que datos se recopilan</td></tr>
+  <tr><td><strong>Actualizar</strong></td><td>Editar perfil permite modificar nombre, telefono, foto</td></tr>
+  <tr><td><strong>Rectificar</strong></td><td>El usuario puede corregir sus datos en cualquier momento</td></tr>
+  <tr><td><strong>Suprimir</strong></td><td>Boton "Eliminar mi cuenta" en pantalla de privacidad</td></tr>
+  <tr><td><strong>Revocar</strong></td><td>El usuario puede revocar consentimiento y cerrar cuenta</td></tr>
+  <tr><td><strong>Portabilidad</strong></td><td>Boton "Exportar mis datos" genera archivo con toda la info</td></tr>
+</table>
+
+<h3>Flujo de eliminacion</h3>
+<div class="flow">
+  <span class="flow-step">Usuario solicita</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Dialogo de confirmacion</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Se crea deletionRequest</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Cloud Function anonimiza datos</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Se desloguea</span>
+</div>
+
+<h3>Colecciones de compliance</h3>
+<ul>
+  <li><code>deletionRequests/</code> &mdash; Solicitudes de eliminacion pendientes</li>
+  <li><code>consents/</code> &mdash; Registros de consentimiento</li>
+  <li><code>auditLogs/</code> &mdash; Logs de acceso a datos sensibles</li>
+</ul>
+
+<div class="warning-box">
+  <strong>Soft delete:</strong> Los datos no se borran fisicamente sino que se anonimizan (displayName &rarr; "Usuario eliminado", email &rarr; deleted_{timestamp}@...) para mantener la integridad de posts, resenas y pedidos historicos.
+</div>
+</div>
+
+<!-- ==================== 27. COMANDOS ==================== -->
+<div class="section">
+<h1>27. Comandos de Desarrollo</h1>
+
+<h3>Setup inicial</h3>
+<pre><code># 1. Instalar dependencias
+flutter pub get
+
+# 2. Configurar Firebase (requiere proyecto Firebase creado)
+dart pub global activate flutterfire_cli
+flutterfire configure --project=TU-PROYECTO-ID
+
+# 3. Descomentar en main.dart (lineas Firebase.initializeApp)
+
+# 4. Ejecutar
+flutter run</code></pre>
+
+<h3>Generacion de codigo</h3>
+<pre><code># Generar una vez (freezed, riverpod, json_serializable)
+dart run build_runner build
+
+# Watch mode (regenera automaticamente al guardar)
+dart run build_runner watch</code></pre>
+
+<h3>Calidad</h3>
+<pre><code># Analisis estatico
+flutter analyze
+
+# Tests
+flutter test
+
+# Formateo
+dart format lib/</code></pre>
+
+<h3>Build para produccion</h3>
+<pre><code># Android APK
+flutter build apk --release
+
+# Android App Bundle (Play Store)
+flutter build appbundle --release
+
+# iOS (requiere Mac)
+flutter build ios --release</code></pre>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <p>Vecindario &middot; Tu comunidad, conectada</p>
+  <p>Documento generado el 4 de abril de 2026</p>
+  <p>106 archivos Dart &middot; 15 modulos &middot; Flutter 3.32+ &middot; Firebase &middot; Go</p>
+</footer>
+
+</body>
+</html>

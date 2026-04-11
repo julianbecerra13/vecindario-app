@@ -1,0 +1,256 @@
+{
+  "version": "2.10",
+  "children": [
+    {
+      "type": "text",
+      "id": "9hii31or",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "01-dashboard-admin",
+      "x": 0,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/01_dashboard_admin.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "hboj2ufg",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "02-circulares",
+      "x": 425,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/02_circulares.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "4vo8094o",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "03-finanzas",
+      "x": 850,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/03_finanzas.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "6jrhwyr1",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "04-estado-cuenta",
+      "x": 1275,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/04_estado_cuenta.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "d9zccdjo",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "text",
+      "id": "vexwv7zl",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "06-multa",
+      "x": 2125,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/06_multa.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "1o39ceh7",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "07-pqrs",
+      "x": 2550,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/07_pqrs.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "jo11mccw",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "08-votacion",
+      "x": 2975,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/08_votacion.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "xtr745yp",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "09-manual",
+      "x": 3400,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/09_manual.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "text",
+      "id": "drkt7yzx",
+      "x": 0,
+      "y": 0,
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "fontWeight": "normal"
+    },
+    {
+      "type": "frame",
+      "id": "10-planes",
+      "x": 3825,
+      "y": 0,
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/10_planes.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    },
+    {
+      "type": "frame",
+      "id": "OYj4d",
+      "x": 1700,
+      "y": 0,
+      "name": "Reserva Zona Social",
+      "clip": true,
+      "width": 375,
+      "height": 812,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./assets/05_reserva_zona.png",
+        "mode": "fill"
+      },
+      "layout": "none"
+    }
+  ]
+}

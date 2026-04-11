@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "606807280271",
+    "project_id": "vecindario-app-a746b",
+    "storage_bucket": "vecindario-app-a746b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606807280271:android:2f9c0d03123b66158a7efa",
+        "android_client_info": {
+          "package_name": "com.vecindario.vecindario_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606807280271-92feheb100j2q2j3j2532lrsrrktiq0q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vecindario.vecindario_app",
+            "certificate_hash": "4fcec6616abd48205b84eb617878115a7816beb9"
+          }
+        },
+        {
+          "client_id": "606807280271-vhgkv9pn39o1jbih6sgq28e8q6lkhrmj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_ZhKg5tdurcLqtedmKQqCZOE5X-gnB-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606807280271-vhgkv9pn39o1jbih6sgq28e8q6lkhrmj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "606807280271-0dp7grhhsqshms6klu3a9l74h1kbptuh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vecindario.vecindarioApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

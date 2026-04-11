@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vecindario Admin — Wireframes Módulo Premium</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: #0a0a0f; color: #e0e0e0; padding: 40px 20px 80px; }
+  h1 { text-align: center; font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  h1 span { color: #10b981; }
+  .subtitle { text-align: center; color: #6b7280; font-size: 14px; margin-bottom: 48px; }
+  .section-title { font-size: 13px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
+  .section-desc { text-align: center; color: #9ca3af; font-size: 13px; margin-bottom: 32px; max-width: 720px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .row { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+
+  .phone { width: 280px; min-height: 520px; background: #111118; border-radius: 32px; border: 2px solid #1e1e2e; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); flex-shrink: 0; }
+  .phone-label { text-align: center; font-size: 11px; color: #6b7280; margin-top: 12px; font-weight: 600; }
+  .statusbar { display: flex; justify-content: space-between; padding: 8px 20px 4px; font-size: 11px; color: #6b7280; font-weight: 600; }
+  .header { padding: 8px 16px 10px; border-bottom: 1px solid #1e1e2e; }
+  .header-sm { font-size: 10px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .header-lg { font-size: 16px; font-weight: 700; color: #f3f4f6; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
+
+  .content { padding: 0 0 52px; overflow: hidden; }
+
+  .bottombar-admin { position: absolute; bottom: 0; left: 0; right: 0; display: flex; background: #111118; border-top: 1px solid #1e1e2e; padding: 6px 0 10px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 8px; color: #4b5563; }
+  .tab.active { color: #10b981; }
+  .tab-icon { font-size: 15px; }
+
+  .wf-section-header { padding: 10px 12px 4px; font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  .wf-card { margin: 6px 12px; padding: 10px; background: #1a1a24; border-radius: 12px; border: 1px solid #2a2a3a; }
+  .wf-btn { margin-top: 8px; width: 100%; padding: 7px 0; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; font-size: 10px; font-weight: 700; text-align: center; }
+  .wf-input { width: 100%; padding: 8px 10px; background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 8px; margin-bottom: 6px; font-size: 10px; color: #6b7280; }
+
+  .flow-arrow { display: flex; align-items: center; justify-content: center; font-size: 28px; color: #2a2a3a; align-self: center; }
+
+  /* Circular item */
+  .circular-item { padding: 10px 12px; border-bottom: 1px solid #1a1a24; }
+  .circular-badge { display: inline-block; font-size: 7px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .circular-title { font-size: 12px; font-weight: 700; color: #e5e7eb; margin-top: 4px; }
+  .circular-preview { font-size: 9px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
+  .circular-meta { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: #6b7280; }
+  .read-bar { height: 3px; background: #2a2a3a; border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .read-fill { height: 100%; border-radius: 2px; }
+
+  /* Fine */
+  .fine-status { display: inline-block; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+  /* Finance chart mockup */
+  .chart-bar { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0 8px; margin-top: 8px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+  .bar { border-radius: 3px 3px 0 0; width: 100%; }
+  .bar-label { font-size: 7px; color: #6b7280; }
+
+  /* Calendar */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 4px 12px; }
+  .cal-day { text-align: center; font-size: 9px; color: #6b7280; padding: 4px 0; }
+  .cal-day.header { font-weight: 700; color: #4b5563; font-size: 8px; }
+  .cal-day.booked { background: rgba(239,68,68,0.15); color: #ef4444; border-radius: 4px; }
+  .cal-day.available { background: rgba(16,185,129,0.15); color: #10b981; border-radius: 4px; cursor: pointer; }
+  .cal-day.selected { background: #10b981; color: white; border-radius: 4px; font-weight: 700; }
+  .cal-day.empty { color: transparent; }
+
+  /* PQRS */
+  .pqrs-item { padding: 8px 12px; border-bottom: 1px solid #1a1a24; }
+  .pqrs-type { font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+
+  /* Stat card */
+  .stat-row { display: flex; gap: 6px; margin: 6px 12px; }
+  .stat-card { flex: 1; padding: 10px 8px; background: #1a1a24; border-radius: 8px; text-align: center; border: 1px solid #2a2a3a; }
+  .stat-value { font-size: 18px; font-weight: 700; }
+  .stat-label { font-size: 7px; color: #6b7280; margin-top: 2px; }
+
+  .premium-badge { display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
+
+  @media (max-width: 768px) {
+    .row { gap: 24px; }
+    .phone { width: 260px; min-height: 480px; }
+    .flow-arrow { transform: rotate(90deg); font-size: 22px; }
+    body { padding: 24px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>VECINDARIO <span>ADMIN</span></h1>
+<p class="subtitle">Módulo Premium B2B — Gestión de Propiedad Horizontal &nbsp;·&nbsp; Wireframes v2.0</p>
+
+<!-- ========== ADMIN DASHBOARD ========== -->
+<div class="section-title">Dashboard Administración</div>
+<p class="section-desc">Vista principal del administrador del conjunto con acceso a todos los módulos premium. Tabs expandidos cuando el conjunto tiene suscripción activa.</p>
+
+<div class="row">
+  <!-- Admin Home -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:41</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div>
+            <div class="header-sm">⭐ Vecindario Admin</div>
+            <div class="header-lg">Torres del Parque</div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <span class="premium-badge">PRO</span>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-value" style="color:#3b82f6;">127</div>
+            <div class="stat-label">Residentes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#f59e0b;">4</div>
+            <div class="stat-label">PQRS abiertos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#10b981;">$4.2M</div>
+            <div class="stat-label">Recaudo mes</div>
+          </div>
+        </div>
+
+        <div class="wf-section-header">Acciones rápidas</div>
+
+        <div class="wf-card" style="display:flex; gap:8px; align-items:center; cursor:pointer;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(59,130,246,0.15); display:flex; align-items:center; justify-content:center; font-size:16px;">📢</div>
+          <div style="flex:1;">
+            <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Nueva Circular</div>
+            <div style="font-size:9px; color:#6b7280;">Enviar comunicado oficial</div>
+          </div>
+          <span style="color:#4b5563;">›</span>
+        </div>
+
+        <div class="wf-card" style="display:flex; gap:8px; align-items:center; cursor:pointer;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(239,68,68,0.15); display:flex; align-items:center; justify-content:center; font-size:16px;">⚠️</div>
+          <div style="flex:1;">
+            <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Registrar Multa</div>
+            <div style="font-size:9px; color:#6b7280;">Crear sanción con evidencia</div>
+          </div>
+          <span style="color:#4b5563;">›</span>
+        </div>
+
+        <div class="wf-card" style="display:flex; gap:8px; align-items:center; cursor:pointer;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center; font-size:16px;">💰</div>
+          <div style="flex:1;">
+            <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Finanzas</div>
+            <div style="font-size:9px; color:#6b7280;">Presupuesto y ejecución</div>
+          </div>
+          <span style="color:#4b5563;">›</span>
+        </div>
+
+        <div class="wf-card" style="display:flex; gap:8px; align-items:center; cursor:pointer;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(139,92,246,0.15); display:flex; align-items:center; justify-content:center; font-size:16px;">🗳️</div>
+          <div style="flex:1;">
+            <div style="font-size:11px; font-weight:700; color:#e5e7eb;">Convocar Asamblea</div>
+            <div style="font-size:9px; color:#6b7280;">Crear convocatoria con agenda</div>
+          </div>
+          <span style="color:#4b5563;">›</span>
+        </div>
+
+        <div class="wf-section-header">Solicitudes pendientes (3)</div>
+        <div class="wf-card" style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:28px; border-radius:50%; background:#1e1e2e; display:flex; align-items:center; justify-content:center; font-size:14px;">👨</div>
+          <div style="flex:1;">
+            <div style="font-size:10px; font-weight:700; color:#e5e7eb;">Juan Pérez</div>
+            <div style="font-size:8px; color:#6b7280;">T3 · Apto 501 · 2h</div>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <div style="padding:4px 8px; background:#10b981; border-radius:4px; font-size:8px; color:white; font-weight:700;">✓</div>
+            <div style="padding:4px 8px; background:#2a2a3a; border-radius:4px; font-size:8px; color:#9ca3af;">✕</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottombar-admin">
+        <div class="tab active"><span class="tab-icon">🏠</span>Inicio</div>
+        <div class="tab"><span class="tab-icon">📢</span>Circulares</div>
+        <div class="tab"><span class="tab-icon">💰</span>Finanzas</div>
+        <div class="tab"><span class="tab-icon">🏊</span>Zonas</div>
+        <div class="tab"><span class="tab-icon">📋</span>PQRS</div>
+      </div>
+    </div>
+    <div class="phone-label">🏠 Dashboard Admin</div>
+  </div>
+
+  <!-- Circulares -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:42</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div class="header-lg">Circulares</div>
+          <div style="padding:5px 10px; background:linear-gradient(135deg, #3b82f6, #2563eb); border-radius:8px; font-size:9px; color:white; font-weight:700;">+ Nueva</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="circular-item">
+          <div>
+            <span class="circular-badge" style="background:rgba(239,68,68,0.15); color:#ef4444;">🔴 Urgente</span>
+            <span style="font-size:8px; color:#6b7280; margin-left:4px;">Hace 2h</span>
+          </div>
+          <div class="circular-title">Corte de agua programado</div>
+          <div class="circular-preview">Se informa que el día jueves 3 de abril se realizará mantenimiento del tanque...</div>
+          <div class="circular-meta">
+            <span>📎 1 adjunto</span>
+            <span style="color:#10b981;">87% leído</span>
+          </div>
+          <div class="read-bar"><div class="read-fill" style="width:87%; background:#10b981;"></div></div>
+        </div>
+
+        <div class="circular-item">
+          <div>
+            <span class="circular-badge" style="background:rgba(59,130,246,0.15); color:#3b82f6;">ℹ️ Info</span>
+            <span style="font-size:8px; color:#6b7280; margin-left:4px;">Hace 1d</span>
+          </div>
+          <div class="circular-title">Horarios de Semana Santa</div>
+          <div class="circular-preview">La administración y portería tendrán horario especial durante Semana Santa...</div>
+          <div class="circular-meta">
+            <span>Sin adjuntos</span>
+            <span style="color:#f59e0b;">62% leído</span>
+          </div>
+          <div class="read-bar"><div class="read-fill" style="width:62%; background:#f59e0b;"></div></div>
+        </div>
+
+        <div class="circular-item">
+          <div>
+            <span class="circular-badge" style="background:rgba(139,92,246,0.15); color:#8b5cf6;">✍️ Requiere firma</span>
+            <span style="font-size:8px; color:#6b7280; margin-left:4px;">Hace 3d</span>
+          </div>
+          <div class="circular-title">Nuevo reglamento de mascotas</div>
+          <div class="circular-preview">Se aprobó en asamblea extraordinaria la modificación del capítulo VII del manual...</div>
+          <div class="circular-meta">
+            <span>📎 PDF Manual v3.2</span>
+            <span style="color:#ef4444;">41% firmado</span>
+          </div>
+          <div class="read-bar"><div class="read-fill" style="width:41%; background:#8b5cf6;"></div></div>
+        </div>
+
+        <div class="circular-item">
+          <div>
+            <span class="circular-badge" style="background:rgba(16,185,129,0.15); color:#10b981;">✅ Informativo</span>
+            <span style="font-size:8px; color:#6b7280; margin-left:4px;">Hace 5d</span>
+          </div>
+          <div class="circular-title">Balance financiero de marzo</div>
+          <div class="circular-preview">Se publica el balance financiero del mes de marzo 2026 para consulta de todos...</div>
+          <div class="circular-meta">
+            <span>📎 Balance_Mar2026.pdf</span>
+            <span style="color:#10b981;">93% leído</span>
+          </div>
+          <div class="read-bar"><div class="read-fill" style="width:93%; background:#10b981;"></div></div>
+        </div>
+      </div>
+      <div class="bottombar-admin">
+        <div class="tab"><span class="tab-icon">🏠</span>Inicio</div>
+        <div class="tab active"><span class="tab-icon">📢</span>Circulares</div>
+        <div class="tab"><span class="tab-icon">💰</span>Finanzas</div>
+        <div class="tab"><span class="tab-icon">🏊</span>Zonas</div>
+        <div class="tab"><span class="tab-icon">📋</span>PQRS</div>
+      </div>
+    </div>
+    <div class="phone-label">📢 Circulares con tracking</div>
+  </div>
+</div>
+
+<!-- ========== FINANZAS ========== -->
+<div class="section-title">Finanzas Transparentes</div>
+<p class="section-desc">Los residentes ven el presupuesto y ejecución del conjunto. Cada uno ve su estado de cuenta individual y puede pagar en línea.</p>
+
+<div class="row">
+  <!-- Finance Dashboard (admin view) -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:43</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div class="header-lg">💰 Finanzas</div>
+          <div style="padding:4px 8px; background:#1a1a24; border:1px solid #2a2a3a; border-radius:6px; font-size:9px; color:#9ca3af;">Mar 2026 ▾</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-value" style="color:#10b981; font-size:16px;">$18.4M</div>
+            <div class="stat-label">Ingresos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#ef4444; font-size:16px;">$15.1M</div>
+            <div class="stat-label">Egresos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:#3b82f6; font-size:16px;">$3.3M</div>
+            <div class="stat-label">Saldo</div>
+          </div>
+        </div>
+
+        <div class="wf-section-header">Presupuesto vs. Ejecución</div>
+        <div class="wf-card">
+          <div class="chart-bar">
+            <div class="bar-col">
+              <div class="bar" style="height:70%; background:#3b82f6;"></div>
+              <div class="bar" style="height:60%; background:#10b981; margin-top:-60%;opacity:0.5;height:55%;margin-top:0;"></div>
+              <div class="bar-label">Nómina</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar" style="height:45%; background:#3b82f6;"></div>
+              <div class="bar" style="height:40%; background:#10b981;margin-top:0;opacity:0.5;"></div>
+              <div class="bar-label">Mant.</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar" style="height:30%; background:#3b82f6;"></div>
+              <div class="bar" style="height:35%; background:#ef4444;margin-top:0;opacity:0.5;"></div>
+              <div class="bar-label">Servicios</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar" style="height:20%; background:#3b82f6;"></div>
+              <div class="bar" style="height:15%; background:#10b981;margin-top:0;opacity:0.5;"></div>
+              <div class="bar-label">Seguros</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar" style="height:15%; background:#3b82f6;"></div>
+              <div class="bar" style="height:10%; background:#10b981;margin-top:0;opacity:0.5;"></div>
+              <div class="bar-label">Otros</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; justify-content:center; margin-top:8px;">
+            <div style="display:flex; align-items:center; gap:4px; font-size:8px; color:#6b7280;">
+              <div style="width:8px; height:8px; border-radius:2px; background:#3b82f6;"></div> Presupuesto
+            </div>
+            <div style="display:flex; align-items:center; gap:4px; font-size:8px; color:#6b7280;">
+              <div style="width:8px; height:8px; border-radius:2px; background:#10b981;"></div> Ejecutado
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-section-header">Cartera</div>
+        <div class="wf-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:10px; color:#6b7280;">Tasa de recaudo</div>
+              <div style="font-size:18px; font-weight:700; color:#10b981;">89%</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; color:#6b7280;">Cartera morosa</div>
+              <div style="font-size:18px; font-weight:700; color:#ef4444;">$2.1M</div>
+            </div>
+          </div>
+          <div class="read-bar" style="margin-top:8px;"><div class="read-fill" style="width:89%; background:#10b981;"></div></div>
+          <div style="font-size:8px; color:#6b7280; margin-top:4px;">14 unidades al día · 3 en mora</div>
+        </div>
+
+        <div class="wf-btn" style="margin:8px 12px; width:calc(100% - 24px);">📄 Exportar Reporte PDF</div>
+      </div>
+      <div class="bottombar-admin">
+        <div class="tab"><span class="tab-icon">🏠</span>Inicio</div>
+        <div class="tab"><span class="tab-icon">📢</span>Circulares</div>
+        <div class="tab active"><span class="tab-icon">💰</span>Finanzas</div>
+        <div class="tab"><span class="tab-icon">🏊</span>Zonas</div>
+        <div class="tab"><span class="tab-icon">📋</span>PQRS</div>
+      </div>
+    </div>
+    <div class="phone-label">💰 Dashboard Financiero (Admin)</div>
+  </div>
+
+  <!-- Resident account statement -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:44</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#60a5fa; font-size:12px;">←</span>
+            <div class="header-lg">Mi Estado de Cuenta</div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-card" style="border-color:rgba(16,185,129,0.3);">
+          <div style="text-align:center;">
+            <div style="font-size:9px; color:#6b7280;">Saldo actual</div>
+            <div style="font-size:28px; font-weight:700; color:#10b981;">$0</div>
+            <div style="font-size:9px; color:#10b981;">✅ Estás al día</div>
+          </div>
+        </div>
+
+        <div style="margin:8px 12px;">
+          <div class="wf-btn" style="padding:10px 0; font-size:12px;">💳 Pagar cuota de abril — $320.000</div>
+        </div>
+
+        <div class="wf-section-header">Historial</div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24;">
+          <div style="display:flex; justify-content:space-between;">
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#e5e7eb;">Cuota marzo 2026</div>
+              <div style="font-size:8px; color:#6b7280;">Pagado el 5 mar · PSE</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; font-weight:700; color:#10b981;">-$320.000</div>
+              <span class="fine-status" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:7px;">Pagado</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24;">
+          <div style="display:flex; justify-content:space-between;">
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#e5e7eb;">Reserva Salón Social</div>
+              <div style="font-size:8px; color:#6b7280;">22 feb · Wompi</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; font-weight:700; color:#f59e0b;">-$80.000</div>
+              <span class="fine-status" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:7px;">Depósito devuelto</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24;">
+          <div style="display:flex; justify-content:space-between;">
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#e5e7eb;">Cuota febrero 2026</div>
+              <div style="font-size:8px; color:#6b7280;">Pagado el 3 feb · PSE</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; font-weight:700; color:#10b981;">-$320.000</div>
+              <span class="fine-status" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:7px;">Pagado</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24;">
+          <div style="display:flex; justify-content:space-between;">
+            <div>
+              <div style="font-size:10px; font-weight:600; color:#ef4444;">Multa — Ruido excesivo</div>
+              <div style="font-size:8px; color:#6b7280;">Art. 23 · 18 ene</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; font-weight:700; color:#ef4444;">-$150.000</div>
+              <span class="fine-status" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:7px;">Pagada</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">📊 Estado de Cuenta (Residente)</div>
+  </div>
+</div>
+
+<!-- ========== ZONAS SOCIALES + MULTAS ========== -->
+<div class="section-title">Zonas Sociales y Multas</div>
+<p class="section-desc">Reserva de zonas comunes con calendario en tiempo real y pago integrado. Gestión de multas con flujo de descargos.</p>
+
+<div class="row">
+  <!-- Amenity booking -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:45</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#60a5fa; font-size:12px;">←</span>
+            <div class="header-lg">🏊 Salón Social</div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-card">
+          <div style="display:flex; justify-content:space-between; font-size:10px;">
+            <span style="color:#6b7280;">Capacidad: <strong style="color:#e5e7eb;">40 personas</strong></span>
+            <span style="color:#6b7280;">Tarifa: <strong style="color:#10b981;">$80.000</strong></span>
+          </div>
+          <div style="font-size:9px; color:#6b7280; margin-top:4px;">Depósito: $50.000 (reembolsable)</div>
+        </div>
+
+        <div class="wf-section-header">Abril 2026</div>
+        <div class="cal-grid">
+          <div class="cal-day header">Lu</div><div class="cal-day header">Ma</div><div class="cal-day header">Mi</div><div class="cal-day header">Ju</div><div class="cal-day header">Vi</div><div class="cal-day header">Sa</div><div class="cal-day header">Do</div>
+          <div class="cal-day empty">·</div><div class="cal-day empty">·</div><div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day available">3</div><div class="cal-day booked">4</div><div class="cal-day booked">5</div>
+          <div class="cal-day available">6</div><div class="cal-day available">7</div><div class="cal-day available">8</div><div class="cal-day available">9</div><div class="cal-day available">10</div><div class="cal-day booked">11</div><div class="cal-day selected">12</div>
+          <div class="cal-day available">13</div><div class="cal-day available">14</div><div class="cal-day available">15</div><div class="cal-day available">16</div><div class="cal-day available">17</div><div class="cal-day booked">18</div><div class="cal-day available">19</div>
+          <div class="cal-day available">20</div><div class="cal-day available">21</div><div class="cal-day available">22</div><div class="cal-day available">23</div><div class="cal-day available">24</div><div class="cal-day booked">25</div><div class="cal-day available">26</div>
+          <div class="cal-day available">27</div><div class="cal-day available">28</div><div class="cal-day available">29</div><div class="cal-day available">30</div><div class="cal-day empty">·</div><div class="cal-day empty">·</div><div class="cal-day empty">·</div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:center; margin:8px 0; font-size:8px; color:#6b7280;">
+          <span style="display:flex; align-items:center; gap:3px;"><div style="width:8px; height:8px; border-radius:2px; background:rgba(16,185,129,0.3);"></div> Disponible</span>
+          <span style="display:flex; align-items:center; gap:3px;"><div style="width:8px; height:8px; border-radius:2px; background:rgba(239,68,68,0.3);"></div> Reservado</span>
+          <span style="display:flex; align-items:center; gap:3px;"><div style="width:8px; height:8px; border-radius:2px; background:#10b981;"></div> Seleccionado</span>
+        </div>
+
+        <div class="wf-card" style="border-color:rgba(16,185,129,0.3);">
+          <div style="font-size:10px; font-weight:700; color:#e5e7eb; margin-bottom:6px;">📅 Domingo 12 de abril</div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#6b7280;">
+            <span>Horario: 10am - 10pm</span>
+            <span>Apto 402 · Torre 1</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:8px; padding-top:6px; border-top:1px solid #2a2a3a;">
+            <span style="color:#6b7280;">Alquiler + depósito</span>
+            <span style="font-weight:700; color:#10b981;">$130.000</span>
+          </div>
+        </div>
+
+        <div style="margin:0 12px;">
+          <div class="wf-btn" style="padding:10px 0; font-size:12px;">💳 Pagar y Reservar</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">🏊 Reserva de Zona Social</div>
+  </div>
+
+  <!-- Fine detail -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:46</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#60a5fa; font-size:12px;">←</span>
+            <div class="header-lg">⚠️ Detalle de Multa</div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-card" style="border-color:rgba(239,68,68,0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="fine-status" style="background:rgba(245,158,11,0.15); color:#f59e0b;">En descargo</span>
+            <span style="font-size:9px; color:#6b7280;">Multa #0042</span>
+          </div>
+          <div style="font-size:14px; font-weight:700; color:#ef4444; margin:8px 0 4px;">$200.000 COP</div>
+          <div style="font-size:9px; color:#6b7280;">Torre 2 · Apto 801</div>
+        </div>
+
+        <div class="wf-section-header">Motivo</div>
+        <div style="padding:0 12px;">
+          <div style="font-size:11px; color:#e5e7eb; font-weight:600;">Ruido excesivo en horario nocturno</div>
+          <div style="font-size:10px; color:#9ca3af; margin-top:4px; line-height:1.5;">Evento con música a alto volumen después de las 10pm el sábado 28 de marzo, incumpliendo el horario de silencio.</div>
+        </div>
+
+        <div class="wf-section-header">Artículo del manual</div>
+        <div class="wf-card" style="background:rgba(139,92,246,0.05); border-color:rgba(139,92,246,0.2);">
+          <div style="font-size:10px; color:#8b5cf6; font-weight:700;">📖 Art. 23 — Horarios de silencio</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:4px; line-height:1.4;">"Queda prohibido generar ruidos que perturben la tranquilidad de los residentes entre las 10:00pm y las 7:00am..."</div>
+        </div>
+
+        <div class="wf-section-header">Evidencia</div>
+        <div style="display:flex; gap:6px; padding:0 12px;">
+          <div style="width:60px; height:60px; border-radius:8px; background:#1e1e2e; display:flex; align-items:center; justify-content:center; font-size:24px;">📷</div>
+          <div style="width:60px; height:60px; border-radius:8px; background:#1e1e2e; display:flex; align-items:center; justify-content:center; font-size:24px;">📷</div>
+        </div>
+
+        <div class="wf-section-header">Descargo del residente</div>
+        <div class="wf-card" style="border-color:rgba(245,158,11,0.2);">
+          <div style="font-size:9px; color:#f59e0b; font-weight:600; margin-bottom:4px;">⏱ Plazo: 2 días restantes</div>
+          <div style="font-size:10px; color:#e5e7eb; line-height:1.5;">"Lamentamos lo ocurrido. El evento terminó a las 10:30pm y bajamos el volumen cuando se nos notificó..."</div>
+        </div>
+
+        <div style="display:flex; gap:6px; padding:0 12px; margin-top:6px;">
+          <div style="flex:1; padding:8px 0; text-align:center; background:#ef4444; border-radius:8px; font-size:10px; color:white; font-weight:700;">Confirmar Multa</div>
+          <div style="flex:1; padding:8px 0; text-align:center; background:#2a2a3a; border-radius:8px; font-size:10px; color:#10b981; font-weight:700;">Anular</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">⚠️ Gestión de Multa</div>
+  </div>
+
+  <!-- PQRS -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:47</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div class="header-lg">📋 PQRS</div>
+          <div style="padding:5px 10px; background:linear-gradient(135deg, #10b981, #059669); border-radius:8px; font-size:9px; color:white; font-weight:700;">+ Nuevo</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stat-row">
+          <div class="stat-card" style="padding:6px;">
+            <div class="stat-value" style="color:#f59e0b; font-size:16px;">4</div>
+            <div class="stat-label">Abiertos</div>
+          </div>
+          <div class="stat-card" style="padding:6px;">
+            <div class="stat-value" style="color:#3b82f6; font-size:16px;">2</div>
+            <div class="stat-label">En gestión</div>
+          </div>
+          <div class="stat-card" style="padding:6px;">
+            <div class="stat-value" style="color:#10b981; font-size:16px;">23</div>
+            <div class="stat-label">Resueltos</div>
+          </div>
+          <div class="stat-card" style="padding:6px;">
+            <div class="stat-value" style="color:#9ca3af; font-size:16px;">2.3d</div>
+            <div class="stat-label">Tiempo avg</div>
+          </div>
+        </div>
+
+        <div class="pqrs-item">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="pqrs-type" style="background:rgba(239,68,68,0.15); color:#ef4444;">Queja</span>
+            <span style="font-size:8px; color:#6b7280;">Hace 3h</span>
+          </div>
+          <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin-top:4px;">Filtración en parqueadero</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:2px;">Hay una gotera en el P2, puesto 45. Está cayendo agua sobre los carros.</div>
+          <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-size:8px; color:#6b7280;">🏷 Mantenimiento</span>
+            <span class="fine-status" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:7px;">En gestión</span>
+          </div>
+        </div>
+
+        <div class="pqrs-item">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="pqrs-type" style="background:rgba(59,130,246,0.15); color:#3b82f6;">Petición</span>
+            <span style="font-size:8px; color:#6b7280;">Hace 1d</span>
+          </div>
+          <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin-top:4px;">Instalar cámaras en lobby</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:2px;">Solicitamos la instalación de cámaras adicionales en el lobby de la torre 3.</div>
+          <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-size:8px; color:#6b7280;">🏷 Seguridad</span>
+            <span class="fine-status" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-size:7px;">Recibido</span>
+          </div>
+        </div>
+
+        <div class="pqrs-item">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="pqrs-type" style="background:rgba(16,185,129,0.15); color:#10b981;">Sugerencia</span>
+            <span style="font-size:8px; color:#6b7280;">Hace 2d</span>
+          </div>
+          <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin-top:4px;">Horario extendido de gym</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:2px;">Sería posible abrir el gimnasio desde las 5am en vez de las 6am?</div>
+          <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-size:8px; color:#6b7280;">🏷 Zonas comunes</span>
+            <span class="fine-status" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:7px;">Resuelto ✓</span>
+          </div>
+        </div>
+
+        <div class="pqrs-item">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="pqrs-type" style="background:rgba(239,68,68,0.15); color:#ef4444;">Reclamo</span>
+            <span style="font-size:8px; color:#6b7280;">Hace 3d</span>
+          </div>
+          <div style="font-size:11px; font-weight:700; color:#e5e7eb; margin-top:4px;">Cobro incorrecto en cuota</div>
+          <div style="font-size:9px; color:#9ca3af; margin-top:2px;">Me cobraron doble la cuota extraordinaria de febrero. Solicito revisión.</div>
+          <div style="display:flex; justify-content:space-between; margin-top:6px;">
+            <span style="font-size:8px; color:#6b7280;">🏷 Administración</span>
+            <span class="fine-status" style="background:rgba(16,185,129,0.15); color:#10b981; font-size:7px;">Resuelto ✓</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottombar-admin">
+        <div class="tab"><span class="tab-icon">🏠</span>Inicio</div>
+        <div class="tab"><span class="tab-icon">📢</span>Circulares</div>
+        <div class="tab"><span class="tab-icon">💰</span>Finanzas</div>
+        <div class="tab"><span class="tab-icon">🏊</span>Zonas</div>
+        <div class="tab active"><span class="tab-icon">📋</span>PQRS</div>
+      </div>
+    </div>
+    <div class="phone-label">📋 PQRS con SLA</div>
+  </div>
+</div>
+
+<!-- ========== ASAMBLEA + MANUAL ========== -->
+<div class="section-title">Asambleas y Manual de Convivencia</div>
+<p class="section-desc">Votaciones en tiempo real durante asambleas con delegación de voto digital. Manual de convivencia siempre accesible y vinculado a las multas.</p>
+
+<div class="row">
+  <!-- Assembly voting -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>10:15</span><span>···</span></div>
+      <div class="header">
+        <div>
+          <div class="header-sm">🔴 En vivo</div>
+          <div class="header-lg">Asamblea Ordinaria 2026</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="wf-card" style="border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.05);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:10px; color:#ef4444; font-weight:700;">🔴 Votación activa</div>
+            <div style="font-size:9px; color:#6b7280;">Punto 3 de 7</div>
+          </div>
+        </div>
+
+        <div style="padding:8px 12px;">
+          <div style="font-size:13px; font-weight:700; color:#e5e7eb; margin-bottom:4px;">¿Aprobar cuota extraordinaria de $200.000 para reparación de fachada?</div>
+          <div style="font-size:9px; color:#6b7280;">Quórum: 67% (85 de 127 unidades presentes)</div>
+        </div>
+
+        <div style="padding:0 12px;">
+          <div style="padding:12px; margin-bottom:6px; background:rgba(16,185,129,0.1); border:2px solid #10b981; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:13px; font-weight:700; color:#10b981;">✓ A favor</div>
+              <div style="font-size:9px; color:#6b7280;">Tu voto</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:20px; font-weight:700; color:#10b981;">72%</div>
+              <div style="font-size:8px; color:#6b7280;">61 votos</div>
+            </div>
+          </div>
+          <div style="padding:12px; margin-bottom:6px; background:#1a1a24; border:1px solid #2a2a3a; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; color:#ef4444;">En contra</div>
+            <div style="text-align:right;">
+              <div style="font-size:20px; font-weight:700; color:#ef4444;">21%</div>
+              <div style="font-size:8px; color:#6b7280;">18 votos</div>
+            </div>
+          </div>
+          <div style="padding:12px; background:#1a1a24; border:1px solid #2a2a3a; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:13px; color:#f59e0b;">Abstención</div>
+            <div style="text-align:right;">
+              <div style="font-size:20px; font-weight:700; color:#f59e0b;">7%</div>
+              <div style="font-size:8px; color:#6b7280;">6 votos</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-card" style="margin-top:8px;">
+          <div style="font-size:9px; color:#6b7280;">Orden del día</div>
+          <div style="font-size:9px; color:#10b981; margin-top:4px;">✓ 1. Verificación quórum</div>
+          <div style="font-size:9px; color:#10b981;">✓ 2. Lectura acta anterior</div>
+          <div style="font-size:9px; color:#e5e7eb; font-weight:700;">→ 3. Cuota extraordinaria fachada</div>
+          <div style="font-size:9px; color:#6b7280;">4. Nuevo reglamento mascotas</div>
+          <div style="font-size:9px; color:#6b7280;">5. Elección comité convivencia</div>
+          <div style="font-size:9px; color:#6b7280;">6. Proposiciones y varios</div>
+          <div style="font-size:9px; color:#6b7280;">7. Cierre</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">🗳 Votación en Vivo</div>
+  </div>
+
+  <!-- Manual de convivencia -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:48</span><span>···</span></div>
+      <div class="header">
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#60a5fa; font-size:12px;">←</span>
+            <div class="header-lg">📖 Manual de Convivencia</div>
+          </div>
+          <div style="font-size:9px; color:#6b7280;">v3.2</div>
+        </div>
+      </div>
+      <div class="content">
+        <div style="margin:8px 12px;">
+          <div class="wf-input" style="margin-bottom:0;">🔍 Buscar en el manual...</div>
+        </div>
+
+        <div class="wf-section-header">Capítulos</div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">I. Disposiciones Generales</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 1 — 8</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">II. Uso de Zonas Comunes</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 9 — 18</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">III. Parqueaderos</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 19 — 22</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center; background:rgba(139,92,246,0.05);">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#8b5cf6;">IV. Horarios y Ruido</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 23 — 28 · <span style="color:#f59e0b;">3 multas vinculadas</span></div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">V. Mudanzas y Obras</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 29 — 35</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">VI. Seguridad</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 36 — 42</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; border-bottom:1px solid #1a1a24; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">VII. Mascotas</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 43 — 50 · <span style="color:#ef4444;">Actualizado 28 mar</span></div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+
+        <div style="padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; font-weight:600; color:#e5e7eb;">VIII. Sanciones y Multas</div>
+            <div style="font-size:8px; color:#6b7280;">Arts. 51 — 58</div>
+          </div>
+          <span style="color:#4b5563; font-size:14px;">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">📖 Manual de Convivencia</div>
+  </div>
+
+  <!-- Pricing -->
+  <div>
+    <div class="phone">
+      <div class="statusbar"><span>9:50</span><span>···</span></div>
+      <div class="header">
+        <div class="header-lg" style="text-align:center;">Planes Vecindario Admin</div>
+      </div>
+      <div class="content">
+        <div style="text-align:center; padding:8px 16px 0; font-size:10px; color:#9ca3af; line-height:1.5;">
+          Digitaliza la gestión de tu conjunto. Primer mes gratis.
+        </div>
+
+        <div class="wf-card" style="margin-top:10px;">
+          <div style="font-size:12px; font-weight:700; color:#e5e7eb;">Starter</div>
+          <div style="font-size:9px; color:#6b7280;">1 – 50 unidades</div>
+          <div style="font-size:22px; font-weight:700; color:#10b981; margin:6px 0;">$150.000<span style="font-size:10px; color:#6b7280;">/mes</span></div>
+          <div style="font-size:9px; color:#9ca3af; line-height:1.6;">
+            ✓ Circulares con tracking<br>
+            ✓ PQRS con SLA<br>
+            ✓ Manual de convivencia<br>
+            ✓ Gestión de multas<br>
+            ✗ <span style="color:#4b5563;">Zonas sociales</span><br>
+            ✗ <span style="color:#4b5563;">Finanzas</span>
+          </div>
+        </div>
+
+        <div class="wf-card" style="border-color:rgba(16,185,129,0.4); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:8px; right:-16px; background:#10b981; color:white; font-size:7px; font-weight:700; padding:2px 20px; transform:rotate(45deg);">POPULAR</div>
+          <div style="font-size:12px; font-weight:700; color:#e5e7eb;">Profesional</div>
+          <div style="font-size:9px; color:#6b7280;">51 – 150 unidades</div>
+          <div style="font-size:22px; font-weight:700; color:#10b981; margin:6px 0;">$350.000<span style="font-size:10px; color:#6b7280;">/mes</span></div>
+          <div style="font-size:9px; color:#9ca3af; line-height:1.6;">
+            ✓ Todo de Starter<br>
+            ✓ Reserva zonas sociales<br>
+            ✓ Pagos en línea<br>
+            ✓ Dashboard financiero<br>
+            ✓ Estado de cuenta individual<br>
+            ✗ <span style="color:#4b5563;">Asambleas/votaciones</span>
+          </div>
+          <div class="wf-btn" style="margin-top:6px;">Probar gratis 30 días</div>
+        </div>
+
+        <div class="wf-card">
+          <div style="font-size:12px; font-weight:700; color:#e5e7eb;">Enterprise</div>
+          <div style="font-size:9px; color:#6b7280;">151+ unidades</div>
+          <div style="font-size:22px; font-weight:700; color:#10b981; margin:6px 0;">$600.000<span style="font-size:10px; color:#6b7280;">/mes</span></div>
+          <div style="font-size:9px; color:#9ca3af; line-height:1.6;">
+            ✓ Todo de Profesional<br>
+            ✓ Asambleas + votaciones<br>
+            ✓ Reportes PDF automáticos<br>
+            ✓ API contable (Siigo)<br>
+            ✓ Soporte prioritario
+          </div>
+        </div>
+
+        <div style="text-align:center; padding:8px; font-size:9px; color:#6b7280;">
+          20% descuento pago anual (2 meses gratis)
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">💎 Planes y Precios</div>
+  </div>
+</div>
+
+</body>
+</html>
