@@ -8,6 +8,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -164,15 +165,46 @@ class _CircularCard extends ConsumerWidget {
                       text: '${circular.attachmentURLs.length} adjunto(s)',
                     ),
                   const Spacer(),
-                  // Admin ve % de lectura
-                  if (isAdmin)
-                    Text(
-                      '${circular.readBy.length} lecturas',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.success,
-                      ),
-                    )
-                  else if (!isRead)
+                  if (isAdmin) ...[
+                    Builder(builder: (context) {
+                      final community = ref.watch(currentCommunityProvider).value;
+                      final total = community?.memberCount ?? 1;
+                      final readCount = circular.readBy.length;
+                      final pct = (readCount / total).clamp(0.0, 1.0);
+                      final pctInt = (pct * 100).round();
+                      final color = pctInt >= 80
+                          ? AppColors.success
+                          : pctInt >= 50
+                              ? AppColors.warning
+                              : AppColors.error;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '$pctInt% leído',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: color,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          SizedBox(
+                            width: 80,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(2),
+                              child: LinearProgressIndicator(
+                                value: pct,
+                                backgroundColor: AppColors.border,
+                                color: color,
+                                minHeight: 4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ] else if (!isRead)
                     Container(
                       width: 8,
                       height: 8,

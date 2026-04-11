@@ -62,6 +62,7 @@ class OrderModel {
   final int serviceFee;
   final int total;
   final OrderStatus status;
+  final String paymentMethod;
   final String? note;
   final DateTime createdAt;
   final DateTime? confirmedAt;
@@ -79,6 +80,7 @@ class OrderModel {
     required this.serviceFee,
     required this.total,
     this.status = OrderStatus.pending,
+    this.paymentMethod = 'cash',
     this.note,
     required this.createdAt,
     this.confirmedAt,
@@ -102,6 +104,7 @@ class OrderModel {
       serviceFee: data['serviceFee'] ?? 0,
       total: data['total'] ?? 0,
       status: OrderStatus.fromString(data['status'] ?? 'pending'),
+      paymentMethod: data['paymentMethod'] ?? 'cash',
       note: data['note'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       confirmedAt: (data['confirmedAt'] as Timestamp?)?.toDate(),
@@ -120,6 +123,7 @@ class OrderModel {
     'serviceFee': serviceFee,
     'total': total,
     'status': status.name,
+    'paymentMethod': paymentMethod,
     'note': note,
     'createdAt': Timestamp.fromDate(createdAt),
     if (confirmedAt != null) 'confirmedAt': Timestamp.fromDate(confirmedAt!),

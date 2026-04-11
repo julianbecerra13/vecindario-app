@@ -6,6 +6,8 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
+import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -150,21 +152,45 @@ class _AmenityCard extends StatelessWidget {
 }
 
 /// Pantalla de reserva con calendario
-class _AmenityBookingSheet extends StatefulWidget {
+class _AmenityBookingSheet extends ConsumerStatefulWidget {
   final AmenityModel amenity;
 
   const _AmenityBookingSheet({required this.amenity});
 
   @override
-  State<_AmenityBookingSheet> createState() => _AmenityBookingSheetState();
+  ConsumerState<_AmenityBookingSheet> createState() => _AmenityBookingSheetState();
 }
 
-class _AmenityBookingSheetState extends State<_AmenityBookingSheet> {
+class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
   DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
   DateTime? _selectedDate;
+  Set<int> _bookedDays = {};
 
-  // Simula reservas existentes (en prod vendría de Firestore)
-  final Set<int> _bookedDays = {4, 5, 11, 18, 25};
+  @override
+  void initState() {
+    super.initState();
+    _loadBookings();
+  }
+
+  Future<void> _loadBookings() async {
+    final communityId = ref.read(currentCommunityIdProvider);
+    if (communityId == null) return;
+    final bookings = await ref
+        .read(premiumRepositoryProvider)
+        .watchBookings(communityId, widget.amenity.id)
+        .first;
+    if (mounted) {
+      setState(() {
+        _bookedDays = bookings
+            .where((b) =>
+                b.status == BookingStatus.confirmed &&
+                b.date.year == _currentMonth.year &&
+                b.date.month == _currentMonth.month)
+            .map((b) => b.date.day)
+            .toSet();
+      });
+    }
+  }
 
   void _prevMonth() {
     setState(() {
@@ -400,12 +426,48 @@ class _AmenityBookingSheetState extends State<_AmenityBookingSheet> {
               width: double.infinity,
               height: 48,
               child: FilledButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Reserva solicitada')),
-                  );
-                },
+                onPressed: _selectedDate == null
+                    ? null
+                    : () async {
+                        final communityId = ref.read(currentCommunityIdProvider);
+                        final user = ref.read(currentUserProvider).value;
+                        if (communityId == null || user == null) return;
+
+                        final booking = BookingModel(
+                          id: '',
+                          amenityId: widget.amenity.id,
+                          amenityName: widget.amenity.name,
+                          residentUid: user.id,
+                          residentName: user.displayName,
+                          date: _selectedDate!,
+                          startTime: widget.amenity.hours ?? '8:00',
+                          endTime: '22:00',
+                          totalPaid: widget.amenity.totalCost,
+                          depositPaid: widget.amenity.deposit,
+                          createdAt: DateTime.now(),
+                        );
+                        await ref
+                            .read(premiumRepositoryProvider)
+                            .createBooking(communityId, booking);
+
+                        // Abrir pago
+                        final paymentService = ref.read(paymentServiceProvider);
+                        await paymentService.startPayment(
+                          reference: PaymentService.generateReference(
+                              PaymentType.booking, widget.amenity.id),
+                          amountCOP: widget.amenity.totalCost,
+                          customerEmail: user.email,
+                          type: PaymentType.booking,
+                        );
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Reserva creada')),
+                          );
+                        }
+                      },
                 icon: const Icon(Icons.credit_card),
                 label: const Text('Pagar y Reservar', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
                 style: FilledButton.styleFrom(

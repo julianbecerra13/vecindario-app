@@ -61,6 +61,41 @@ class UserRepository {
     });
   }
 
+  // --- Consentimientos ---
+  Future<Map<String, bool>> getConsents(String uid) async {
+    final doc = await _firestore
+        .collection(FirestorePaths.users)
+        .doc(uid)
+        .collection('consents')
+        .doc('preferences')
+        .get();
+    if (!doc.exists || doc.data() == null) {
+      return {
+        'pushNotifications': true,
+        'emailMarketing': false,
+        'analytics': true,
+      };
+    }
+    final data = doc.data()!;
+    return {
+      'pushNotifications': data['pushNotifications'] ?? true,
+      'emailMarketing': data['emailMarketing'] ?? false,
+      'analytics': data['analytics'] ?? true,
+    };
+  }
+
+  Future<void> updateConsents(String uid, Map<String, bool> consents) async {
+    await _firestore
+        .collection(FirestorePaths.users)
+        .doc(uid)
+        .collection('consents')
+        .doc('preferences')
+        .set({
+      ...consents,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
   Stream<List<UserModel>> watchPendingResidents(String communityId) {
     return _firestore
         .collection(FirestorePaths.users)

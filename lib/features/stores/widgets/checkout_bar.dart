@@ -9,6 +9,7 @@ class CheckoutBar extends StatelessWidget {
   final int estrato;
   final VoidCallback onCheckout;
   final bool isLoading;
+  final String? paymentLabel;
 
   const CheckoutBar({
     super.key,
@@ -17,6 +18,7 @@ class CheckoutBar extends StatelessWidget {
     required this.estrato,
     required this.onCheckout,
     this.isLoading = false,
+    this.paymentLabel,
   });
 
   int get total => subtotal + serviceFee;
@@ -80,7 +82,7 @@ class CheckoutBar extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        'Pedir \u00b7 ${formatCOP(total)}',
+                        '${paymentLabel ?? "Pedir"} \u00b7 ${formatCOP(total)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

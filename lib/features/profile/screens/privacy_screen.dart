@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/core/utils/logger.dart';
+import 'package:vecindario_app/features/auth/repositories/auth_repository.dart';
+import 'package:vecindario_app/features/auth/providers/auth_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 class PrivacyScreen extends ConsumerStatefulWidget {
@@ -17,6 +21,42 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
   bool _pushEnabled = true;
   bool _emailEnabled = false;
   bool _analyticsEnabled = true;
+  bool _consentsLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConsents();
+  }
+
+  Future<void> _loadConsents() async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+    try {
+      final consents =
+          await ref.read(userRepositoryProvider).getConsents(user.id);
+      if (mounted) {
+        setState(() {
+          _pushEnabled = consents['pushNotifications'] ?? true;
+          _emailEnabled = consents['emailMarketing'] ?? false;
+          _analyticsEnabled = consents['analytics'] ?? true;
+          _consentsLoaded = true;
+        });
+      }
+    } catch (e) {
+      AppLogger.error('Error cargando consentimientos', e);
+    }
+  }
+
+  Future<void> _updateConsent(String key, bool value) async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+    await ref.read(userRepositoryProvider).updateConsents(user.id, {
+      'pushNotifications': _pushEnabled,
+      'emailMarketing': _emailEnabled,
+      'analytics': _analyticsEnabled,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +71,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              border:
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
             ),
             child: const Row(
               children: [
@@ -51,7 +92,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                       SizedBox(height: 2),
                       Text(
                         'Tienes derecho a conocer, actualizar, rectificar y suprimir tus datos personales.',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                        style: TextStyle(
+                            fontSize: 12, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -83,9 +125,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.edit,
             title: 'Editar información personal',
             subtitle: 'Nombre, teléfono, foto de perfil',
-            onTap: () {
-              // Navegar a editar perfil
-            },
+            onTap: () {},
           ),
 
           const SizedBox(height: AppSizes.lg),
@@ -97,21 +137,30 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.notifications,
             title: 'Notificaciones push',
             value: _pushEnabled,
-            onChanged: (v) => setState(() => _pushEnabled = v),
+            onChanged: (v) {
+              setState(() => _pushEnabled = v);
+              _updateConsent('pushNotifications', v);
+            },
           ),
           const Divider(height: 1),
           _ConsentToggle(
             icon: Icons.email,
             title: 'Email de novedades',
             value: _emailEnabled,
-            onChanged: (v) => setState(() => _emailEnabled = v),
+            onChanged: (v) {
+              setState(() => _emailEnabled = v);
+              _updateConsent('emailMarketing', v);
+            },
           ),
           const Divider(height: 1),
           _ConsentToggle(
             icon: Icons.bar_chart,
             title: 'Datos de uso (analytics)',
             value: _analyticsEnabled,
-            onChanged: (v) => setState(() => _analyticsEnabled = v),
+            onChanged: (v) {
+              setState(() => _analyticsEnabled = v);
+              _updateConsent('analytics', v);
+            },
           ),
 
           const SizedBox(height: AppSizes.lg),
@@ -123,18 +172,14 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.description,
             title: 'Política de privacidad',
             subtitle: 'Tratamiento de datos personales',
-            onTap: () {
-              // Abrir política de privacidad
-            },
+            onTap: () {},
           ),
           const Divider(height: 1),
           _PrivacyAction(
             icon: Icons.assignment,
             title: 'Términos de uso',
             subtitle: 'Condiciones del servicio',
-            onTap: () {
-              // Abrir términos de uso
-            },
+            onTap: () {},
           ),
 
           const SizedBox(height: AppSizes.lg),
@@ -153,7 +198,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.warning_amber, color: AppColors.error, size: 20),
+                    Icon(Icons.warning_amber,
+                        color: AppColors.error, size: 20),
                     SizedBox(width: AppSizes.sm),
                     Text(
                       'Esta acción es irreversible',
@@ -168,32 +214,40 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 const SizedBox(height: AppSizes.sm),
                 const Text(
                   'Después de 15 días no podrás recuperar tu cuenta.',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: TextStyle(
+                      fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: AppSizes.md),
                 const Text(
                   'Se eliminará:',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style:
+                      TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
                 _DeleteItem(text: 'Tu perfil y foto', isDelete: true),
-                _DeleteItem(text: 'Documentos de verificación', isDelete: true),
+                _DeleteItem(
+                    text: 'Documentos de verificación', isDelete: true),
                 _DeleteItem(text: 'Tokens y sesiones', isDelete: true),
                 const SizedBox(height: AppSizes.sm),
                 const Text(
                   'Se anonimizará:',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style:
+                      TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
-                _DeleteItem(text: 'Posts → "Usuario eliminado"', isDelete: false),
-                _DeleteItem(text: 'Reseñas → "Usuario eliminado"', isDelete: false),
-                _DeleteItem(text: 'Pedidos → uid → null', isDelete: false),
+                _DeleteItem(
+                    text: 'Posts → "Usuario eliminado"', isDelete: false),
+                _DeleteItem(
+                    text: 'Reseñas → "Usuario eliminado"', isDelete: false),
+                _DeleteItem(
+                    text: 'Pedidos → uid → null', isDelete: false),
                 const SizedBox(height: AppSizes.md),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () => _showDeleteAccountDialog(context),
-                    icon: const Icon(Icons.delete_forever, color: AppColors.error),
+                    icon: const Icon(Icons.delete_forever,
+                        color: AppColors.error),
                     label: const Text(
                       'Eliminar mi cuenta (15 días de gracia)',
                       style: TextStyle(color: AppColors.error),
@@ -214,74 +268,113 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
 
   void _showDeleteAccountDialog(BuildContext context) {
     final passwordController = TextEditingController();
-    final otpController = TextEditingController();
+    bool isLoading = false;
+    String? errorText;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Eliminar Cuenta',
-          style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '¿Estás seguro? Después de 15 días esta acción no se puede deshacer.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppSizes.md),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confirma tu contraseña',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text(
+            'Eliminar Cuenta',
+            style: TextStyle(
+                color: AppColors.error, fontWeight: FontWeight.w700),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '¿Estás seguro? Después de 15 días esta acción no se puede deshacer.',
+                style: TextStyle(
+                    fontSize: 13, color: AppColors.textSecondary),
               ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            TextField(
-              controller: otpController,
-              keyboardType: TextInputType.number,
-              maxLength: 6,
-              decoration: const InputDecoration(
-                labelText: 'Código OTP (enviado a tu teléfono)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.sms),
-                counterText: '',
+              const SizedBox(height: AppSizes.md),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Confirma tu contraseña',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock),
+                  errorText: errorText,
+                ),
               ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      final password = passwordController.text;
+                      if (password.isEmpty) {
+                        setDialogState(
+                            () => errorText = 'Ingresa tu contraseña');
+                        return;
+                      }
+
+                      setDialogState(() {
+                        isLoading = true;
+                        errorText = null;
+                      });
+
+                      try {
+                        // Reautenticar con contraseña real
+                        final firebaseUser =
+                            FirebaseAuth.instance.currentUser!;
+                        final credential =
+                            EmailAuthProvider.credential(
+                          email: firebaseUser.email!,
+                          password: password,
+                        );
+                        await firebaseUser
+                            .reauthenticateWithCredential(credential);
+
+                        // Contraseña correcta — proceder con eliminación
+                        Navigator.pop(ctx);
+                        final user =
+                            ref.read(currentUserProvider).value;
+                        if (user != null) {
+                          ref
+                              .read(userRepositoryProvider)
+                              .requestAccountDeletion(user.id);
+                          if (context.mounted) {
+                            context.showSnackBar(
+                              'Tu cuenta será eliminada en 15 días. Puedes reactivarla iniciando sesión.',
+                            );
+                          }
+                        }
+                      } on FirebaseAuthException catch (e) {
+                        setDialogState(() {
+                          isLoading = false;
+                          errorText = e.code == 'wrong-password'
+                              ? 'Contraseña incorrecta'
+                              : 'Error de autenticación';
+                        });
+                      } catch (e) {
+                        setDialogState(() {
+                          isLoading = false;
+                          errorText = 'Error inesperado';
+                        });
+                      }
+                    },
+              style:
+                  FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: isLoading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Text('Eliminar mi cuenta'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (passwordController.text.isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('Ingresa tu contraseña')),
-                );
-                return;
-              }
-              Navigator.pop(ctx);
-              final user = ref.read(currentUserProvider).value;
-              if (user != null) {
-                ref.read(userRepositoryProvider).requestAccountDeletion(user.id);
-                if (context.mounted) {
-                  context.showSnackBar(
-                    'Tu cuenta será eliminada en 15 días. Puedes reactivarla iniciando sesión.',
-                  );
-                }
-              }
-            },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Eliminar mi cuenta'),
-          ),
-        ],
       ),
     );
   }
@@ -326,7 +419,8 @@ class _PrivacyAction extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(subtitle, style: AppTextStyles.caption),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+      trailing:
+          const Icon(Icons.chevron_right, color: AppColors.textHint),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
     );

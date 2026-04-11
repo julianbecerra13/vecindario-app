@@ -7,6 +7,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/admin/screens/admin_panel_screen.dart';
 import 'package:vecindario_app/shared/models/user_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
@@ -17,6 +18,7 @@ class PendingApprovalsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingAsync = ref.watch(pendingResidentsProvider);
+    final communityId = ref.watch(currentCommunityIdProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Solicitudes pendientes')),
@@ -35,25 +37,37 @@ class PendingApprovalsScreen extends ConsumerWidget {
             itemBuilder: (_, i) => _ApprovalCard(
               user: residents[i],
               onApprove: () async {
-                await ref
-                    .read(userRepositoryProvider)
-                    .updateUser(residents[i].id, {'verified': true});
-                if (context.mounted) {
-                  context.showSuccessSnackBar(
-                    '${residents[i].displayName} aprobado',
-                  );
+                if (communityId == null) return;
+                try {
+                  await ref.read(cloudFunctionsProvider).approveResident(
+                        residents[i].id,
+                        communityId,
+                      );
+                  if (context.mounted) {
+                    context.showSuccessSnackBar(
+                      '${residents[i].displayName} aprobado',
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    context.showErrorSnackBar('Error al aprobar: $e');
+                  }
                 }
               },
               onReject: () async {
-                await ref
-                    .read(userRepositoryProvider)
-                    .updateUser(residents[i].id, {
-                  'communityId': null,
-                  'tower': null,
-                  'apartment': null,
-                });
-                if (context.mounted) {
-                  context.showSnackBar('Solicitud rechazada');
+                if (communityId == null) return;
+                try {
+                  await ref.read(cloudFunctionsProvider).rejectResident(
+                        residents[i].id,
+                        communityId,
+                      );
+                  if (context.mounted) {
+                    context.showSnackBar('Solicitud rechazada');
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    context.showErrorSnackBar('Error al rechazar: $e');
+                  }
                 }
               },
             ),
