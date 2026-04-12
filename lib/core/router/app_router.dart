@@ -39,6 +39,7 @@ import 'package:vecindario_app/features/profile/screens/terms_screen.dart';
 import 'package:vecindario_app/features/profile/screens/privacy_policy_screen.dart';
 import 'package:vecindario_app/features/stores/screens/store_panel_screen.dart';
 import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
+import 'package:vecindario_app/features/super_admin/screens/super_admin_panel_screen.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -59,10 +60,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && isAuthRoute) {
         final user = currentUser.valueOrNull;
         if (user == null) return null;
+        // Super admin no necesita comunidad
+        if (user.role.toValue() == 'super_admin') return '/super-admin';
         if (user.communityId == null) return '/join-community';
         if (!user.verified) return '/pending-approval';
         return '/feed';
       }
+
+      // Guard: rutas admin solo para admins
+      if (isLoggedIn) {
+        final user = currentUser.valueOrNull;
+        final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
+            state.matchedLocation.startsWith('/premium');
+        if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
+          return '/feed';
+        }
+      }
+
       return null;
     },
     routes: [
@@ -268,6 +282,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/premium/plans',
         builder: (_, __) => const SubscriptionPlansScreen(),
+      ),
+      GoRoute(
+        path: '/super-admin',
+        builder: (_, __) => const SuperAdminPanelScreen(),
       ),
     ],
   );

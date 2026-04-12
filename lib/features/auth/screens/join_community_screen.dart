@@ -26,6 +26,8 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
   final _towerController = TextEditingController();
   final _apartmentController = TextEditingController();
   bool _isLoading = false;
+  String _primaryLabel = 'Torre / Bloque';
+  String _secondaryLabel = 'Número de apartamento';
 
   @override
   void dispose() {
@@ -48,6 +50,22 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
     }
     if (value.isEmpty && index > 0) {
       _codeFocusNodes[index - 1].requestFocus();
+    }
+    // Auto-buscar comunidad cuando se completan los 6 dígitos
+    final code = _code;
+    if (code.length == 6) {
+      _lookupCommunity(code);
+    }
+  }
+
+  Future<void> _lookupCommunity(String code) async {
+    final repo = ref.read(communityRepositoryProvider);
+    final community = await repo.getCommunityByInviteCode(code);
+    if (community != null && mounted) {
+      setState(() {
+        _primaryLabel = community.unitType.primaryLabel;
+        _secondaryLabel = community.unitType.secondaryLabel;
+      });
     }
   }
 
@@ -185,8 +203,8 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
               TextFormField(
                 controller: _towerController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  hintText: 'Torre / Bloque',
+                decoration: InputDecoration(
+                  hintText: _primaryLabel,
                 ),
               ),
               const SizedBox(height: AppSizes.md),
@@ -194,8 +212,8 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
                 controller: _apartmentController,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _handleJoin(),
-                decoration: const InputDecoration(
-                  hintText: 'Número de apartamento',
+                decoration: InputDecoration(
+                  hintText: _secondaryLabel,
                 ),
               ),
               const SizedBox(height: AppSizes.xl),

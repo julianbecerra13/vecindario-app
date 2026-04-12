@@ -1,5 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Tipo de unidad habitacional del conjunto
+enum UnitType {
+  apartment('Torre + Apartamento', 'Torre / Bloque', 'Apartamento'),
+  house('Casa', 'Manzana / Sector', 'Número de casa'),
+  lot('Lote', 'Sector', 'Número de lote');
+
+  final String label;
+  final String primaryLabel; // Label del campo principal (torre o manzana)
+  final String secondaryLabel; // Label del campo secundario (apto o casa)
+  const UnitType(this.label, this.primaryLabel, this.secondaryLabel);
+
+  static UnitType fromString(String value) {
+    return UnitType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => UnitType.apartment,
+    );
+  }
+}
+
 class CommunityModel {
   final String id;
   final String name;
@@ -9,6 +28,7 @@ class CommunityModel {
   final String adminUid;
   final String inviteCode;
   final int memberCount;
+  final UnitType unitType;
   final DateTime createdAt;
 
   const CommunityModel({
@@ -20,6 +40,7 @@ class CommunityModel {
     required this.adminUid,
     required this.inviteCode,
     this.memberCount = 0,
+    this.unitType = UnitType.apartment,
     required this.createdAt,
   });
 
@@ -33,6 +54,7 @@ class CommunityModel {
       adminUid: data['adminUid'] ?? '',
       inviteCode: data['inviteCode'] ?? '',
       memberCount: data['memberCount'] ?? 0,
+      unitType: UnitType.fromString(data['unitType'] ?? 'apartment'),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -46,6 +68,7 @@ class CommunityModel {
       'adminUid': adminUid,
       'inviteCode': inviteCode,
       'memberCount': memberCount,
+      'unitType': unitType.name,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }
@@ -57,6 +80,7 @@ class CommunityModel {
     int? estrato,
     String? inviteCode,
     int? memberCount,
+    UnitType? unitType,
   }) {
     return CommunityModel(
       id: id,
@@ -67,6 +91,7 @@ class CommunityModel {
       adminUid: adminUid,
       inviteCode: inviteCode ?? this.inviteCode,
       memberCount: memberCount ?? this.memberCount,
+      unitType: unitType ?? this.unitType,
       createdAt: createdAt,
     );
   }

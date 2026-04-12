@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
+import 'package:vecindario_app/shared/models/user_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
@@ -51,7 +52,18 @@ class ProfileScreen extends ConsumerWidget {
                 title: 'Editar perfil',
                 onTap: () => context.push('/profile/edit'),
               ),
-              // Admin
+              // Super Admin (plataforma)
+              if (user.role == UserRole.superAdmin) ...[
+                const Divider(),
+                _SectionTitle('Plataforma'),
+                _SettingsTile(
+                  icon: Icons.shield,
+                  title: 'Super Admin Panel',
+                  subtitle: 'Gestionar comunidades y clientes',
+                  onTap: () => context.push('/super-admin'),
+                ),
+              ],
+              // Admin (conjunto)
               if (isAdmin) ...[
                 const Divider(),
                 _SectionTitle('Administración'),
@@ -61,15 +73,28 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.push('/admin'),
                 ),
               ],
-              // Vecindario Admin (premium)
-              const Divider(),
-              _SectionTitle('Vecindario Admin'),
-              _SettingsTile(
-                icon: Icons.business,
-                title: 'Gestión del Conjunto',
-                subtitle: 'Circulares, multas, zonas sociales, PQRS',
-                onTap: () => context.push('/premium'),
-              ),
+              // Vecindario Admin (solo visible para admin)
+              if (isAdmin) ...[
+                const Divider(),
+                _SectionTitle('Vecindario Admin'),
+                _SettingsTile(
+                  icon: Icons.business,
+                  title: 'Gestión del Conjunto',
+                  subtitle: 'Circulares, multas, zonas sociales, PQRS',
+                  onTap: () => context.push('/premium'),
+                ),
+              ],
+              // Store panel (solo para store_owner)
+              if (user.role == UserRole.storeOwner) ...[
+                const Divider(),
+                _SectionTitle('Mi Tienda'),
+                _SettingsTile(
+                  icon: Icons.storefront,
+                  title: 'Panel de tienda',
+                  subtitle: 'Gestionar pedidos y catálogo',
+                  onTap: () => context.push('/store-panel'),
+                ),
+              ],
               const Divider(),
               _SectionTitle('Configuración'),
               _SettingsTile(
@@ -88,12 +113,12 @@ class ProfileScreen extends ConsumerWidget {
               _SettingsTile(
                 icon: Icons.description_outlined,
                 title: 'Términos de uso',
-                onTap: () {},
+                onTap: () => context.push('/profile/terms'),
               ),
               _SettingsTile(
                 icon: Icons.privacy_tip_outlined,
                 title: 'Política de privacidad',
-                onTap: () {},
+                onTap: () => context.push('/profile/privacy-policy'),
               ),
               const SizedBox(height: AppSizes.lg),
               Padding(
