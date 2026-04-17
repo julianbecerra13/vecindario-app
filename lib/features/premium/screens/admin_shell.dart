@@ -10,6 +10,8 @@ import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/providers/premium_provider.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
+import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 import 'package:go_router/go_router.dart';
 
 /// Shell del módulo Admin con 5 tabs según wireframe:
@@ -165,13 +167,31 @@ class _AdminHomePage extends ConsumerWidget {
                         ),
                       ),
                       title: Text(user.displayName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                      subtitle: Text('T${user.tower} · Apto ${user.apartment}', style: AppTextStyles.caption),
+                      subtitle: Text('T${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}', style: AppTextStyles.caption),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _MiniButton(icon: Icons.check, color: AppColors.success, onTap: () {}),
+                          _MiniButton(
+                            icon: Icons.check,
+                            color: AppColors.success,
+                            onTap: () async {
+                              final communityId = ref.read(currentCommunityIdProvider);
+                              if (communityId != null) {
+                                await ref.read(cloudFunctionsProvider).approveResident(user.id, communityId);
+                              }
+                            },
+                          ),
                           const SizedBox(width: 4),
-                          _MiniButton(icon: Icons.close, color: AppColors.textHint, onTap: () {}),
+                          _MiniButton(
+                            icon: Icons.close,
+                            color: AppColors.textHint,
+                            onTap: () async {
+                              final communityId = ref.read(currentCommunityIdProvider);
+                              if (communityId != null) {
+                                await ref.read(cloudFunctionsProvider).rejectResident(user.id, communityId);
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -186,11 +206,6 @@ class _AdminHomePage extends ConsumerWidget {
       ),
     );
   }
-}
-
-class _PendingUser {
-  final String id, displayName, tower, apartment;
-  const _PendingUser({required this.id, required this.displayName, required this.tower, required this.apartment});
 }
 
 class _StatCard extends StatelessWidget {

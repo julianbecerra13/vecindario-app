@@ -40,7 +40,7 @@ final isVerifiedProvider = Provider<bool>((ref) {
 final isAdminProvider = Provider<bool>((ref) {
   final userAsync = ref.watch(currentUserProvider);
   return userAsync.whenOrNull(
-        data: (user) => user?.role == UserRole.admin,
+        data: (user) => user?.role == UserRole.admin || user?.role == UserRole.superAdmin,
       ) ??
       false;
 });

@@ -35,6 +35,7 @@ import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/assemblies/screens/assemblies_screen.dart';
 import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dart';
 import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
+import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
 import 'package:vecindario_app/features/premium/circulars/screens/create_circular_screen.dart';
 import 'package:vecindario_app/features/premium/fines/screens/create_fine_screen.dart';
 import 'package:vecindario_app/features/premium/fines/screens/fine_detail_screen.dart';
@@ -80,7 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         // Guard: /admin y /premium solo para admin o super_admin
         final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
             state.matchedLocation.startsWith('/premium');
-        if (isAdminRoute && isLoading) return '/feed';
+        if (isAdminRoute && isLoading) return null;
         if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
           return '/feed';
         }
@@ -279,6 +280,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/premium',
         builder: (_, __) => const AdminShell(),
+      ),
+      GoRoute(
+        path: '/premium/dashboard',
+        builder: (_, __) => const PremiumDashboardScreen(),
       ),
       GoRoute(
         path: '/premium/circulars',

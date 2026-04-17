@@ -8,6 +8,7 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 
@@ -23,7 +24,7 @@ class AdminPanelScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingAsync = ref.watch(pendingResidentsProvider);
-    final communityAsync = ref.watch(communityProvider);
+    final communityAsync = ref.watch(currentCommunityProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -174,7 +175,7 @@ class AdminPanelScreen extends ConsumerWidget {
                                   children: [
                                     Text(user.displayName, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
                                     Text(
-                                      'Torre ${user.tower} · Apto ${user.apartment}',
+                                      'Torre ${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}',
                                       style: AppTextStyles.caption,
                                     ),
                                   ],
