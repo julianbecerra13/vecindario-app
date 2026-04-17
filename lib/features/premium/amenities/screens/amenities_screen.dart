@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
@@ -162,9 +163,9 @@ class _AmenityBookingSheet extends ConsumerStatefulWidget {
 }
 
 class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
-  DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
+  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDate;
-  Set<int> _bookedDays = {};
+  Set<DateTime> _bookedDays = {};
 
   @override
   void initState() {
@@ -182,35 +183,15 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
     if (mounted) {
       setState(() {
         _bookedDays = bookings
-            .where((b) =>
-                b.status == BookingStatus.confirmed &&
-                b.date.year == _currentMonth.year &&
-                b.date.month == _currentMonth.month)
-            .map((b) => b.date.day)
+            .where((b) => b.status == BookingStatus.confirmed)
+            .map((b) => DateTime(b.date.year, b.date.month, b.date.day))
             .toSet();
       });
     }
   }
 
-  void _prevMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
-      _selectedDate = null;
-    });
-  }
-
-  void _nextMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
-      _selectedDate = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final daysInMonth = DateUtils.getDaysInMonth(_currentMonth.year, _currentMonth.month);
-    final firstWeekday = DateTime(_currentMonth.year, _currentMonth.month, 1).weekday; // 1=Mon
-    final monthName = _monthName(_currentMonth.month);
     final totalCost = widget.amenity.hourlyRate + (widget.amenity.deposit ?? 0);
 
     return DraggableScrollableSheet(
@@ -275,102 +256,92 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
           ),
           const SizedBox(height: AppSizes.md),
 
-          // Navegación mes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: _prevMonth,
-                icon: const Icon(Icons.chevron_left),
-              ),
-              Text(
-                '$monthName ${_currentMonth.year}',
-                style: AppTextStyles.heading3,
-              ),
-              IconButton(
-                onPressed: _nextMonth,
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.sm),
-
-          // Header días
-          Row(
-            children: ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']
-                .map((d) => Expanded(
-                      child: Center(
-                        child: Text(
-                          d,
-                          style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ))
-                .toList(),
-          ),
-          const SizedBox(height: 6),
-
-          // Grid calendario
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1,
-              crossAxisSpacing: 3,
-              mainAxisSpacing: 3,
-            ),
-            itemCount: firstWeekday - 1 + daysInMonth,
-            itemBuilder: (_, index) {
-              if (index < firstWeekday - 1) return const SizedBox.shrink();
-              final day = index - (firstWeekday - 1) + 1;
-              final date = DateTime(_currentMonth.year, _currentMonth.month, day);
-              final isBooked = _bookedDays.contains(day);
-              final isPast = date.isBefore(DateTime.now().subtract(const Duration(days: 1)));
-              final isSelected = _selectedDate != null &&
-                  _selectedDate!.day == day &&
-                  _selectedDate!.month == _currentMonth.month;
-
-              Color bgColor;
-              Color textColor;
-              if (isSelected) {
-                bgColor = AppColors.success;
-                textColor = Colors.white;
-              } else if (isBooked) {
-                bgColor = AppColors.error.withValues(alpha: 0.15);
-                textColor = AppColors.error;
-              } else if (isPast) {
-                bgColor = Colors.transparent;
-                textColor = AppColors.textHint;
-              } else {
-                bgColor = AppColors.success.withValues(alpha: 0.1);
-                textColor = AppColors.success;
-              }
-
-              return GestureDetector(
-                onTap: (isBooked || isPast)
-                    ? null
-                    : () => setState(() => _selectedDate = date),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '$day',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: textColor,
-                    ),
-                  ),
-                ),
-              );
+          TableCalendar(
+            firstDay: DateTime.now(),
+            lastDay: DateTime.now().add(const Duration(days: 365)),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) =>
+                _selectedDate != null && isSameDay(_selectedDate!, day),
+            enabledDayPredicate: (day) {
+              final normalized = DateTime(day.year, day.month, day.day);
+              return !_bookedDays.contains(normalized) &&
+                  !day.isBefore(DateTime.now().subtract(const Duration(days: 1)));
             },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDate = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            onPageChanged: (focusedDay) {
+              setState(() {
+                _focusedDay = focusedDay;
+                _selectedDate = null;
+              });
+              _loadBookings();
+            },
+            calendarStyle: CalendarStyle(
+              outsideDaysVisible: false,
+              selectedDecoration: const BoxDecoration(
+                color: AppColors.success,
+                shape: BoxShape.circle,
+              ),
+              selectedTextStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+              todayDecoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+              todayTextStyle: const TextStyle(color: AppColors.success, fontSize: 12),
+              defaultDecoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              defaultTextStyle: const TextStyle(color: AppColors.success, fontSize: 12),
+              weekendDecoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              weekendTextStyle: const TextStyle(color: AppColors.success, fontSize: 12),
+              disabledDecoration: const BoxDecoration(shape: BoxShape.circle),
+              disabledTextStyle: const TextStyle(color: AppColors.textHint, fontSize: 12),
+            ),
+            calendarBuilders: CalendarBuilders(
+              disabledBuilder: (context, day, focusedDay) {
+                final normalized = DateTime(day.year, day.month, day.day);
+                if (_bookedDays.contains(normalized)) {
+                  return Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: const TextStyle(color: AppColors.error, fontSize: 12),
+                      ),
+                    ),
+                  );
+                }
+                return null;
+              },
+              headerTitleBuilder: (context, day) => Center(
+                child: Text(
+                  '${_monthName(day.month)} ${day.year}',
+                  style: AppTextStyles.heading3,
+                ),
+              ),
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+            ),
           ),
-          const SizedBox(height: AppSizes.sm),
-
+          const SizedBox(height: AppSizes.xs),
           // Leyenda
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
