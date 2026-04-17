@@ -11,6 +11,7 @@ import 'package:vecindario_app/features/premium/providers/premium_provider.dart'
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -64,7 +65,7 @@ class _AdminHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final communityAsync = ref.watch(communityProvider);
+    final communityAsync = ref.watch(currentCommunityProvider);
     final plan = ref.watch(subscriptionPlanProvider).value;
     final pendingAsync = ref.watch(pendingResidentsProvider);
     final pqrsAsync = ref.watch(allPqrsProvider);
