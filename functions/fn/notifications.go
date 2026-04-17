@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -158,24 +159,198 @@ func sendNotification(ctx context.Context, e cloudevents.Event) error {
 
 // onNewCircular — Trigger cuando se crea una circular nueva
 func onNewCircular(ctx context.Context, e cloudevents.Event) error {
-	log.Println("OnNewCircular triggered — notificar a toda la comunidad")
+	fs, msg, err := initFirebase(ctx)
+	if err != nil {
+		return fmt.Errorf("initFirebase: %v", err)
+	}
+	defer fs.Close()
+
+	// Parsear datos del evento
+	var data map[string]interface{}
+	if err := e.DataAs(&data); err != nil {
+		return fmt.Errorf("DataAs: %v", err)
+	}
+
+	documentID := e.Subject[strings.LastIndex(e.Subject, "/")+1:]
+	pathParts := strings.Split(e.Subject, "/")
+	if len(pathParts) < 4 {
+		return fmt.Errorf("invalid path")
+	}
+	communityID := pathParts[1]
+
+	// Obtener la circular
+	doc, err := fs.Collection("communities").Doc(communityID).Collection("circulars").Doc(documentID).Get(ctx)
+	if err != nil {
+		return fmt.Errorf("get circular: %v", err)
+	}
+
+	title := doc.Data()["title"].(string)
+	description := doc.Data()["description"].(string)
+
+	// Notificar a todos los miembros verificados de la comunidad
+	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("verified", "==", true).Documents(ctx)
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Printf("Error iterando usuarios: %v", err)
+			continue
+		}
+		uid := doc.Ref.ID
+		sendPushToUser(ctx, fs, msg, uid, "Nueva Circular: "+title, description, "/premium/circulars")
+	}
+
 	return nil
 }
 
 // onNewPost — Trigger cuando se crea un post fijado
 func onNewPost(ctx context.Context, e cloudevents.Event) error {
-	log.Println("OnNewPost triggered")
+	fs, msg, err := initFirebase(ctx)
+	if err != nil {
+		return fmt.Errorf("initFirebase: %v", err)
+	}
+	defer fs.Close()
+
+	pathParts := strings.Split(e.Subject, "/")
+	if len(pathParts) < 4 {
+		return fmt.Errorf("invalid path")
+	}
+	communityID := pathParts[1]
+	postID := pathParts[3]
+
+	// Obtener el post
+	doc, err := fs.Collection("communities").Doc(communityID).Collection("posts").Doc(postID).Get(ctx)
+	if err != nil {
+		return fmt.Errorf("get post: %v", err)
+	}
+
+	isPinned := doc.Data()["isPinned"].(bool)
+	if !isPinned {
+		return nil // Solo notificar si está fijado
+	}
+
+	title := doc.Data()["title"].(string)
+	authorUID := doc.Data()["authorUid"].(string)
+
+	// Obtener autor para nombre
+	authorDoc, err := fs.Collection("users").Doc(authorUID).Get(ctx)
+	if err != nil {
+		authorUID = "Vecino"
+	} else {
+		authorUID = authorDoc.Data()["displayName"].(string)
+	}
+
+	// Notificar a todos los miembros verificados
+	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("verified", "==", true).Documents(ctx)
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Printf("Error iterando usuarios: %v", err)
+			continue
+		}
+		uid := doc.Ref.ID
+		sendPushToUser(ctx, fs, msg, uid, "Post fijado de "+authorUID, title, "/feed/"+postID)
+	}
+
 	return nil
 }
 
 // onOrderStatusChange — Trigger cuando cambia el estado de un pedido
 func onOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
-	log.Println("OnOrderStatusChange triggered")
-	return nil
+	fs, msg, err := initFirebase(ctx)
+	if err != nil {
+		return fmt.Errorf("initFirebase: %v", err)
+	}
+	defer fs.Close()
+
+	pathParts := strings.Split(e.Subject, "/")
+	if len(pathParts) < 2 {
+		return fmt.Errorf("invalid path")
+	}
+	orderID := pathParts[len(pathParts)-1]
+
+	// Obtener la orden
+	doc, err := fs.Collection("orders").Doc(orderID).Get(ctx)
+	if err != nil {
+		return fmt.Errorf("get order: %v", err)
+	}
+
+	buyerUID := doc.Data()["buyerUid"].(string)
+	status := doc.Data()["status"].(string)
+
+	var title, body string
+	switch status {
+	case "confirmed":
+		title = "Pedido Confirmado"
+		body = "Tu pedido ha sido confirmado"
+	case "preparing":
+		title = "Preparando tu Pedido"
+		body = "Tu pedido está siendo preparado"
+	case "ready":
+		title = "Pedido Listo"
+		body = "Tu pedido está listo para retirar"
+	case "completed":
+		title = "Pedido Completado"
+		body = "Tu pedido ha sido entregado"
+	case "cancelled":
+		title = "Pedido Cancelado"
+		body = "Tu pedido ha sido cancelado"
+	default:
+		return nil
+	}
+
+	return sendPushToUser(ctx, fs, msg, buyerUID, title, body, "/stores/orders")
 }
 
 // onNewPQRS — Trigger cuando se crea un PQRS (notificar admin)
 func onNewPQRS(ctx context.Context, e cloudevents.Event) error {
-	log.Println("OnNewPQRS triggered — notificar admin")
+	fs, msg, err := initFirebase(ctx)
+	if err != nil {
+		return fmt.Errorf("initFirebase: %v", err)
+	}
+	defer fs.Close()
+
+	pathParts := strings.Split(e.Subject, "/")
+	if len(pathParts) < 4 {
+		return fmt.Errorf("invalid path")
+	}
+	communityID := pathParts[1]
+	pqrsID := pathParts[3]
+
+	// Obtener el PQRS
+	doc, err := fs.Collection("communities").Doc(communityID).Collection("pqrs").Doc(pqrsID).Get(ctx)
+	if err != nil {
+		return fmt.Errorf("get pqrs: %v", err)
+	}
+
+	title := doc.Data()["title"].(string)
+	pqrsType := doc.Data()["type"].(string)
+
+	// Notificar a todos los admins de la comunidad
+	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("role", "==", "admin").Documents(ctx)
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Printf("Error iterando admins: %v", err)
+			continue
+		}
+		uid := doc.Ref.ID
+		sendPushToUser(ctx, fs, msg, uid, "Nuevo PQRS: "+pqrsType, title, "/premium/pqrs")
+	}
+
 	return nil
 }
