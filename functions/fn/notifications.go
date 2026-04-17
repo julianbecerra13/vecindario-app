@@ -171,8 +171,9 @@ func onNewCircular(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("DataAs: %v", err)
 	}
 
-	documentID := e.Subject[strings.LastIndex(e.Subject, "/")+1:]
-	pathParts := strings.Split(e.Subject, "/")
+	subject := e.Subject()
+	documentID := subject[strings.LastIndex(subject, "/")+1:]
+	pathParts := strings.Split(subject, "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -215,7 +216,7 @@ func onNewPost(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -272,7 +273,7 @@ func onOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 2 {
 		return fmt.Errorf("invalid path")
 	}
@@ -319,7 +320,7 @@ func onNewPQRS(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
