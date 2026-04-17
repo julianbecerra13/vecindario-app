@@ -8,8 +8,20 @@ final feedRepositoryProvider = Provider<FeedRepository>((ref) {
   return FeedRepository(ref.watch(firestoreProvider));
 });
 
+final feedSearchProvider = StateProvider<String>((ref) => '');
+
 final feedPostsProvider = StreamProvider<List<PostModel>>((ref) {
   final communityId = ref.watch(currentCommunityIdProvider);
   if (communityId == null) return Stream.value([]);
-  return ref.watch(feedRepositoryProvider).watchPosts(communityId);
+
+  final search = ref.watch(feedSearchProvider).toLowerCase().trim();
+
+  return ref.watch(feedRepositoryProvider).watchPosts(communityId).map((posts) {
+    if (search.isEmpty) return posts;
+    return posts
+        .where((p) =>
+            p.text.toLowerCase().contains(search) ||
+            p.authorName.toLowerCase().contains(search))
+        .toList();
+  });
 });

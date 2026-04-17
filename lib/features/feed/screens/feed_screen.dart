@@ -20,11 +20,32 @@ final currentCommunityProvider = StreamProvider((ref) {
   return ref.watch(communityRepositoryProvider).watchCommunity(communityId);
 });
 
-class FeedScreen extends ConsumerWidget {
+class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends ConsumerState<FeedScreen> {
+  late TextEditingController _searchController;
+  bool _showSearch = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final WidgetRef ref = this.ref;
     final postsAsync = ref.watch(feedPostsProvider);
     final communityAsync = ref.watch(currentCommunityProvider);
     final userAsync = ref.watch(currentUserProvider);
@@ -32,30 +53,62 @@ class FeedScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: AppSizes.md,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'MI COMUNIDAD',
-              style: AppTextStyles.caption.copyWith(
-                letterSpacing: 1,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            communityAsync.when(
-              data: (community) => Text(
-                community?.name ?? 'Vecindario',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
+        title: _showSearch
+            ? TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Buscar en el feed...',
+                  border: InputBorder.none,
+                  hintStyle: const TextStyle(fontSize: 14),
                 ),
+                onChanged: (value) {
+                  ref.read(feedSearchProvider.notifier).state = value;
+                },
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'MI COMUNIDAD',
+                    style: AppTextStyles.caption.copyWith(
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  communityAsync.when(
+                    data: (community) => Text(
+                      community?.name ?? 'Vecindario',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    loading: () => const Text('Cargando...', style: TextStyle(fontSize: 16)),
+                    error: (_, __) => const Text('Vecindario', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
               ),
-              loading: () => const Text('Cargando...', style: TextStyle(fontSize: 16)),
-              error: (_, __) => const Text('Vecindario', style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
         actions: [
+          if (_showSearch)
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                setState(() {
+                  _showSearch = false;
+                  _searchController.clear();
+                  ref.read(feedSearchProvider.notifier).state = '';
+                });
+              },
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                setState(() {
+                  _showSearch = true;
+                });
+              },
+            ),
           Builder(builder: (context) {
             final unread = ref.watch(unreadCountProvider);
             return Stack(

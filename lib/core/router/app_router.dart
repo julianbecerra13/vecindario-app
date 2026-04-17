@@ -16,6 +16,7 @@ import 'package:vecindario_app/features/notifications/screens/notifications_scre
 import 'package:vecindario_app/features/onboarding/screens/onboarding_screen.dart';
 import 'package:vecindario_app/features/profile/screens/privacy_screen.dart';
 import 'package:vecindario_app/features/profile/screens/profile_screen.dart';
+import 'package:vecindario_app/features/profile/screens/edit_profile_screen.dart';
 import 'package:vecindario_app/features/services/screens/services_screen.dart';
 import 'package:vecindario_app/features/stores/screens/stores_screen.dart';
 import 'package:vecindario_app/features/stores/screens/store_detail_screen.dart';
@@ -71,8 +72,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn) {
         final user = currentUser.valueOrNull;
         final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
-            state.matchedLocation.startsWith('/premium');
+            state.matchedLocation.startsWith('/premium') ||
+            state.matchedLocation.startsWith('/super-admin');
         if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
+          return '/feed';
+        }
+
+        // Guard: store-panel solo para storeOwner
+        final isStorePanel = state.matchedLocation.startsWith('/store-panel');
+        if (isStorePanel && user != null && user.role.toValue() != 'store_owner') {
           return '/feed';
         }
       }
@@ -191,6 +199,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
         routes: [
+          GoRoute(
+            path: 'edit',
+            builder: (_, __) => const EditProfileScreen(),
+          ),
           GoRoute(
             path: 'privacy',
             builder: (_, __) => const PrivacyScreen(),
