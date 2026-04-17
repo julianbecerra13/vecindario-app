@@ -7,8 +7,6 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/utils/logger.dart';
-import 'package:vecindario_app/features/auth/repositories/auth_repository.dart';
-import 'package:vecindario_app/features/auth/providers/auth_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 class PrivacyScreen extends ConsumerStatefulWidget {
@@ -22,7 +20,6 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
   bool _pushEnabled = true;
   bool _emailEnabled = false;
   bool _analyticsEnabled = true;
-  bool _consentsLoaded = false;
 
   @override
   void initState() {
@@ -41,7 +38,6 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           _pushEnabled = consents['pushNotifications'] ?? true;
           _emailEnabled = consents['emailMarketing'] ?? false;
           _analyticsEnabled = consents['analytics'] ?? true;
-          _consentsLoaded = true;
         });
       }
     } catch (e) {

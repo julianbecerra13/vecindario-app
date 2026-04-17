@@ -147,6 +147,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'services_fab',
         onPressed: () => context.push('/services/create'),
         icon: const Icon(Icons.add),
         label: const Text('Ofrecer'),

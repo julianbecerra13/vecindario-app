@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
-import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/utils/validators.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 

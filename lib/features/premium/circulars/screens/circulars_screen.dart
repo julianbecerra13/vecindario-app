@@ -8,7 +8,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 

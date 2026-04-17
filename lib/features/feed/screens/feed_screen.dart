@@ -7,18 +7,12 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/widgets/post_card.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/error_display.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
-import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
 import 'package:vecindario_app/features/notifications/providers/notification_providers.dart';
-
-final currentCommunityProvider = StreamProvider((ref) {
-  final communityId = ref.watch(currentCommunityIdProvider);
-  if (communityId == null) return Stream.value(null);
-  return ref.watch(communityRepositoryProvider).watchCommunity(communityId);
-});
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -204,6 +198,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'feed_fab',
         onPressed: () => context.push('/feed/create'),
         child: const Icon(Icons.edit),
       ),

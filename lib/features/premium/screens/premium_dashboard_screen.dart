@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
-import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_provider.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';

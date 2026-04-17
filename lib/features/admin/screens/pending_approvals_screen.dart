@@ -4,7 +4,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
-import 'package:vecindario_app/features/admin/screens/admin_panel_screen.dart';
+import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:vecindario_app/shared/models/user_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/services/cloud_functions_service.dart';

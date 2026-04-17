@@ -9,9 +9,7 @@ import 'package:vecindario_app/features/premium/amenities/screens/amenities_scre
 import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/providers/premium_provider.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
-import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/providers/firebase_providers.dart';
-import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
+import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:go_router/go_router.dart';
 
 /// Shell del módulo Admin con 5 tabs según wireframe:
@@ -189,33 +187,6 @@ class _AdminHomePage extends ConsumerWidget {
     );
   }
 }
-
-// Necesitamos importar estos providers que ya existen
-final communityProvider = StreamProvider((ref) {
-  final communityId = ref.watch(currentCommunityIdProvider);
-  if (communityId == null) return Stream.value(null);
-  return ref.watch(communityRepositoryProvider).watchCommunity(communityId);
-});
-
-final pendingResidentsProvider = StreamProvider((ref) {
-  final communityId = ref.watch(currentCommunityIdProvider);
-  if (communityId == null) return Stream.value([]);
-  final firestore = ref.watch(firestoreProvider);
-  return firestore
-      .collection('users')
-      .where('communityId', isEqualTo: communityId)
-      .where('verified', isEqualTo: false)
-      .snapshots()
-      .map((snap) => snap.docs.map((doc) {
-            final data = doc.data();
-            return _PendingUser(
-              id: doc.id,
-              displayName: data['displayName'] ?? '',
-              tower: data['tower'] ?? '',
-              apartment: data['apartment'] ?? '',
-            );
-          }).toList());
-});
 
 class _PendingUser {
   final String id, displayName, tower, apartment;

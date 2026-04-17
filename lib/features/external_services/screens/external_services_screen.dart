@@ -133,6 +133,7 @@ class ExternalServicesScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'external_services_fab',
         onPressed: () => context.push('/external-services/recommend'),
         icon: const Icon(Icons.recommend),
         label: const Text('Recomendar'),
