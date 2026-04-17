@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )
@@ -23,7 +24,7 @@ var slaByCategoryHours = map[string]int{
 }
 
 // assignPQRS — Auto-asigna al área responsable según categoría y calcula deadline SLA
-func assignPQRS(ctx context.Context, e interface{}) error {
+func assignPQRS(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return err

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )
@@ -15,7 +16,7 @@ func init() {
 
 // calculateRatings — Trigger cuando se crea/actualiza una reseña
 // Recalcula el promedio de rating del target (service, store, external_service)
-func calculateRatings(ctx context.Context, e interface{}) error {
+func calculateRatings(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

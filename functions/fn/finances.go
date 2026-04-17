@@ -1,13 +1,11 @@
 package fn
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )

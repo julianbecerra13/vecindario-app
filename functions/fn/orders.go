@@ -1,7 +1,6 @@
 package fn
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 )
 

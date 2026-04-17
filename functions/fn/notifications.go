@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -150,31 +151,31 @@ func sendPushToCommunity(ctx context.Context, fs *firestore.Client, msg *messagi
 }
 
 // sendNotification — Trigger genérico cuando se crea un doc en users/{uid}/notifications
-func sendNotification(ctx context.Context, e interface{}) error {
+func sendNotification(ctx context.Context, e cloudevents.Event) error {
 	log.Println("SendNotification triggered")
 	return nil
 }
 
 // onNewCircular — Trigger cuando se crea una circular nueva
-func onNewCircular(ctx context.Context, e interface{}) error {
+func onNewCircular(ctx context.Context, e cloudevents.Event) error {
 	log.Println("OnNewCircular triggered — notificar a toda la comunidad")
 	return nil
 }
 
 // onNewPost — Trigger cuando se crea un post fijado
-func onNewPost(ctx context.Context, e interface{}) error {
+func onNewPost(ctx context.Context, e cloudevents.Event) error {
 	log.Println("OnNewPost triggered")
 	return nil
 }
 
 // onOrderStatusChange — Trigger cuando cambia el estado de un pedido
-func onOrderStatusChange(ctx context.Context, e interface{}) error {
+func onOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 	log.Println("OnOrderStatusChange triggered")
 	return nil
 }
 
 // onNewPQRS — Trigger cuando se crea un PQRS (notificar admin)
-func onNewPQRS(ctx context.Context, e interface{}) error {
+func onNewPQRS(ctx context.Context, e cloudevents.Event) error {
 	log.Println("OnNewPQRS triggered — notificar admin")
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )
@@ -19,7 +20,7 @@ func init() {
 // processAccountDeletion — Ejecutar diariamente (Cloud Scheduler)
 // Busca deletion_requests con status=pending y createdAt > 15 días
 // Anonimiza posts, reseñas, pedidos y elimina datos personales
-func processAccountDeletion(ctx context.Context, e interface{}) error {
+func processAccountDeletion(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err
@@ -192,7 +193,7 @@ func deleteUserData(ctx context.Context, fs *firestore.Client, uid string) error
 
 // processDataExport — Genera un JSON con todos los datos del usuario
 // Trigger: Firestore onCreate en data_export_requests
-func processDataExport(ctx context.Context, e interface{}) error {
+func processDataExport(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

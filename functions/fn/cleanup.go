@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )
@@ -16,7 +17,7 @@ func init() {
 
 // cleanupVerificationDocs — Scheduled diario (Cloud Scheduler)
 // Elimina documentos de verificación de Storage con más de 30 días tras aprobación
-func cleanupVerificationDocs(ctx context.Context, e interface{}) error {
+func cleanupVerificationDocs(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

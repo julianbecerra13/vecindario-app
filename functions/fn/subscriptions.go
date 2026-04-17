@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
 )
@@ -24,7 +25,7 @@ var planPrices = map[string]int64{
 
 // billSubscription — Scheduled mensual (Cloud Scheduler)
 // Cobra suscripción B2B a cada comunidad con plan activo
-func billSubscription(ctx context.Context, e interface{}) error {
+func billSubscription(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err
