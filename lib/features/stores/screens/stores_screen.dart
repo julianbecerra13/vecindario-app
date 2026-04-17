@@ -9,7 +9,7 @@ import 'package:vecindario_app/features/stores/widgets/store_card.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/error_display.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
-import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
+import 'package:vecindario_app/shared/providers/community_provider.dart';
 
 class StoresScreen extends ConsumerWidget {
   const StoresScreen({super.key});

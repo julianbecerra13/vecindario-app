@@ -10,11 +10,22 @@ import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
+final ownerStoreIdProvider = FutureProvider<String?>((ref) async {
+  final user = ref.watch(currentUserProvider).value;
+  if (user == null) return null;
+
+  // Buscar la tienda donde ownerUid == user.id
+  final storesRepo = ref.watch(storesRepositoryProvider);
+  final stores = await storesRepo.getStoresForOwner(user.id).first;
+  return stores.isNotEmpty ? stores.first.id : null;
+});
+
 final storeOrdersProvider = StreamProvider<List<OrderModel>>((ref) {
   final user = ref.watch(currentUserProvider).value;
-  if (user == null) return Stream.value([]);
-  // El store_owner tiene su storeId como el doc donde ownerUid == uid
-  return ref.watch(storesRepositoryProvider).watchStoreOrders(user.id);
+  final storeId = ref.watch(ownerStoreIdProvider).value;
+
+  if (user == null || storeId == null) return Stream.value([]);
+  return ref.watch(storesRepositoryProvider).watchStoreOrders(storeId);
 });
 
 class StorePanelScreen extends ConsumerWidget {

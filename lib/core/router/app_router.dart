@@ -9,8 +9,10 @@ import 'package:vecindario_app/features/auth/screens/pending_approval_screen.dar
 import 'package:vecindario_app/features/auth/screens/phone_verification_screen.dart';
 import 'package:vecindario_app/features/auth/screens/register_screen.dart';
 import 'package:vecindario_app/features/external_services/screens/external_services_screen.dart';
+import 'package:vecindario_app/features/external_services/screens/recommend_external_service_screen.dart';
 import 'package:vecindario_app/features/feed/screens/create_post_screen.dart';
 import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
+import 'package:vecindario_app/features/feed/screens/feed_detail_screen.dart';
 import 'package:vecindario_app/features/home/screens/home_shell.dart';
 import 'package:vecindario_app/features/notifications/screens/notifications_screen.dart';
 import 'package:vecindario_app/features/onboarding/screens/onboarding_screen.dart';
@@ -18,6 +20,8 @@ import 'package:vecindario_app/features/profile/screens/privacy_screen.dart';
 import 'package:vecindario_app/features/profile/screens/profile_screen.dart';
 import 'package:vecindario_app/features/profile/screens/edit_profile_screen.dart';
 import 'package:vecindario_app/features/services/screens/services_screen.dart';
+import 'package:vecindario_app/features/services/screens/create_service_screen.dart';
+import 'package:vecindario_app/features/services/screens/service_detail_screen.dart';
 import 'package:vecindario_app/features/stores/screens/stores_screen.dart';
 import 'package:vecindario_app/features/stores/screens/store_detail_screen.dart';
 import 'package:vecindario_app/features/stores/screens/order_tracking_screen.dart';
@@ -71,22 +75,26 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Guard: rutas admin solo para admins
       if (isLoggedIn) {
         final user = currentUser.valueOrNull;
+        final isLoading = currentUser.isLoading;
 
         // Guard: /admin y /premium solo para admin o super_admin
         final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
             state.matchedLocation.startsWith('/premium');
+        if (isAdminRoute && isLoading) return '/feed';
         if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: /super-admin exclusivo para super_admin de plataforma
         final isSuperAdminRoute = state.matchedLocation.startsWith('/super-admin');
+        if (isSuperAdminRoute && isLoading) return '/feed';
         if (isSuperAdminRoute && user != null && user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: store-panel solo para storeOwner
         final isStorePanel = state.matchedLocation.startsWith('/store-panel');
+        if (isStorePanel && isLoading) return '/feed';
         if (isStorePanel && user != null && user.role.toValue() != 'store_owner') {
           return '/feed';
         }
@@ -143,6 +151,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'create',
                     builder: (_, __) => const CreatePostScreen(),
                   ),
+                  GoRoute(
+                    path: ':postId',
+                    builder: (_, state) => FeedDetailScreen(
+                      postId: state.pathParameters['postId'] ?? '',
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -153,6 +167,18 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/services',
                 builder: (_, __) => const ServicesScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'create',
+                    builder: (_, __) => const CreateServiceScreen(),
+                  ),
+                  GoRoute(
+                    path: ':serviceId',
+                    builder: (_, state) => ServiceDetailScreen(
+                      serviceId: state.pathParameters['serviceId'] ?? '',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -164,25 +190,25 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (_, __) => const StoresScreen(),
                 routes: [
                   GoRoute(
-                    path: ':storeId',
-                    builder: (_, state) => StoreDetailScreen(
-                      storeId: state.pathParameters['storeId']!,
-                    ),
-                  ),
-                  GoRoute(
                     path: 'orders',
                     builder: (_, __) => const MyOrdersScreen(),
                   ),
                   GoRoute(
                     path: 'order/:orderId',
                     builder: (_, state) => OrderTrackingScreen(
-                      orderId: state.pathParameters['orderId']!,
+                      orderId: state.pathParameters['orderId'] ?? '',
                     ),
                   ),
                   GoRoute(
                     path: 'rate/:orderId',
                     builder: (_, state) => RateOrderScreen(
-                      orderId: state.pathParameters['orderId']!,
+                      orderId: state.pathParameters['orderId'] ?? '',
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':storeId',
+                    builder: (_, state) => StoreDetailScreen(
+                      storeId: state.pathParameters['storeId'] ?? '',
                     ),
                   ),
                 ],
@@ -195,6 +221,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/external-services',
                 builder: (_, __) => const ExternalServicesScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'recommend',
+                    builder: (_, __) => const RecommendExternalServiceScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -267,7 +299,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/premium/fines/:fineId',
         builder: (_, state) => FineDetailScreen(
-          fineId: state.pathParameters['fineId']!,
+          fineId: state.pathParameters['fineId'] ?? '',
         ),
       ),
       GoRoute(

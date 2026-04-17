@@ -113,4 +113,14 @@ class StoresRepository {
 
     await batch.commit();
   }
+
+  Stream<List<StoreModel>> getStoresForOwner(String ownerUid) {
+    return _firestore
+        .collection(FirestorePaths.stores)
+        .where('ownerUid', isEqualTo: ownerUid)
+        .snapshots()
+        .map((snap) => snap.docs
+            .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
+            .toList());
+  }
 }

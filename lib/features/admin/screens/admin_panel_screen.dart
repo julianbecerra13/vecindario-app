@@ -8,19 +8,8 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
-
-final pendingResidentsProvider = StreamProvider((ref) {
-  final communityId = ref.watch(currentCommunityIdProvider);
-  if (communityId == null) return Stream.value([]);
-  return ref.watch(userRepositoryProvider).watchPendingResidents(communityId);
-});
-
-final communityProvider = StreamProvider((ref) {
-  final communityId = ref.watch(currentCommunityIdProvider);
-  if (communityId == null) return Stream.value(null);
-  return ref.watch(communityRepositoryProvider).watchCommunity(communityId);
-});
+import 'package:vecindario_app/shared/providers/firebase_providers.dart';
+import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 
 class AdminPanelScreen extends ConsumerWidget {
   const AdminPanelScreen({super.key});
