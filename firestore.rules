@@ -39,6 +39,37 @@ service cloud.firestore {
         && !request.resource.data.diff(resource.data).affectedKeys()
             .hasAny(['verified', 'role']);
       allow delete: if false;
+
+      // Notificaciones del usuario
+      match /notifications/{notificationId} {
+        allow read: if isOwner(uid);
+        allow create: if false;
+        allow update: if isOwner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        allow delete: if false;
+      }
+
+      // Consentimientos y preferencias
+      match /consents/{consentId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid);
+        allow update: if isOwner(uid);
+        allow delete: if false;
+      }
+
+      // Preferencias de privacidad
+      match /consents/preferences {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid);
+        allow update: if isOwner(uid);
+        allow delete: if false;
+      }
+    }
+
+    // --- Colecciones de Grupo (collection group queries) ---
+    match /{path=**}/fines/{fineId} {
+      allow read: if isCommunityAdmin(path[1])
+        || (isVerifiedMember(path[1])
+            && resource.data.residentUid == request.auth.uid);
     }
 
     // --- Comunidades ---
@@ -64,6 +95,14 @@ service cloud.firestore {
         allow create: if isVerifiedMember(communityId)
           && request.resource.data.authorUid == request.auth.uid;
         allow delete: if isOwner(resource.data.authorUid) || isCommunityAdmin(communityId);
+      }
+
+      // Reportes de posts
+      match /posts/{postId}/reports/{reportId} {
+        allow read: if isCommunityAdmin(communityId);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.reporterUid == request.auth.uid;
+        allow delete: if false;
       }
 
       // --- Colecciones Premium (Vecindario Admin) ---
@@ -221,12 +260,13 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // --- Consentimientos ---
-    match /consents/{consentId} {
-      allow read: if isOwner(consentId);
-      allow create: if isOwner(consentId);
-      allow update: if isOwner(consentId);
-      allow delete: if false;
+    // --- Solicitudes de exportación de datos ---
+    match /data_export_requests/{requestId} {
+      allow create: if isAuthenticated()
+        && request.resource.data.uid == request.auth.uid;
+      allow read: if isAuthenticated()
+        && resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
     }
 
     // --- Suscripciones (solo backend) ---

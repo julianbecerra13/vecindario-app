@@ -22,8 +22,9 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "communityId", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" },
         { "fieldPath": "category", "order": "ASCENDING" },
-        { "fieldPath": "active", "order": "ASCENDING" }
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
@@ -109,6 +110,14 @@
       "fields": [
         { "fieldPath": "communityId", "order": "ASCENDING" },
         { "fieldPath": "verified", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "items",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "available", "order": "ASCENDING" },
+        { "fieldPath": "sortOrder", "order": "ASCENDING" }
       ]
     }
   ],
