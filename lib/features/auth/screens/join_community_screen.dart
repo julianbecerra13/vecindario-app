@@ -5,12 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/repositories/community_repository.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
-
-final communityRepositoryProvider = Provider<CommunityRepository>((ref) {
-  return CommunityRepository(ref.watch(firestoreProvider));
-});
 
 class JoinCommunityScreen extends ConsumerStatefulWidget {
   const JoinCommunityScreen({super.key});
