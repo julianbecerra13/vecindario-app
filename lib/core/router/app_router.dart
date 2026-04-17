@@ -71,10 +71,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Guard: rutas admin solo para admins
       if (isLoggedIn) {
         final user = currentUser.valueOrNull;
+
+        // Guard: /admin y /premium solo para admin o super_admin
         final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
-            state.matchedLocation.startsWith('/premium') ||
-            state.matchedLocation.startsWith('/super-admin');
+            state.matchedLocation.startsWith('/premium');
         if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
+          return '/feed';
+        }
+
+        // Guard: /super-admin exclusivo para super_admin de plataforma
+        final isSuperAdminRoute = state.matchedLocation.startsWith('/super-admin');
+        if (isSuperAdminRoute && user != null && user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
