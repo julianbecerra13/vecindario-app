@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/vecindario/functions/internal/middleware"
 )
 
 func init() {
@@ -49,6 +50,11 @@ func sendCircular(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer fs.Close()
+
+	// Rate limiting
+	if !middleware.NewRateLimiter(fs).Middleware(callerUID, w, r) {
+		return
+	}
 
 	// Verificar que sea admin de la comunidad
 	callerDoc, err := fs.Collection("users").Doc(callerUID).Get(ctx)

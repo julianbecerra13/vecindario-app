@@ -9,6 +9,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/vecindario/functions/internal/middleware"
 	"google.golang.org/api/iterator"
 )
 
@@ -52,6 +53,11 @@ func bookAmenity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer fs.Close()
+
+	// Rate limiting
+	if !middleware.NewRateLimiter(fs).Middleware(callerUID, w, r) {
+		return
+	}
 
 	// Verificar que el usuario esté verificado
 	userDoc, err := fs.Collection("users").Doc(callerUID).Get(ctx)
@@ -172,6 +178,11 @@ func refundDeposit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer fs.Close()
+
+	// Rate limiting
+	if !middleware.NewRateLimiter(fs).Middleware(callerUID, w, r) {
+		return
+	}
 
 	// Verificar admin
 	callerDoc, err := fs.Collection("users").Doc(callerUID).Get(ctx)
