@@ -54,3 +54,8 @@ final servicesListProvider = StreamProvider<List<ServiceModel>>((ref) {
     return filtered;
   });
 });
+
+final serviceDetailProvider =
+    FutureProvider.family<ServiceModel?, String>((ref, serviceId) async {
+  return ref.read(servicesRepositoryProvider).getService(serviceId);
+});

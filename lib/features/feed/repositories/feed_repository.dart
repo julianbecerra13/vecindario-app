@@ -20,6 +20,15 @@ class FeedRepository {
             .toList());
   }
 
+  Future<PostModel?> getPost(String communityId, String postId) async {
+    final doc = await _firestore
+        .collection(FirestorePaths.posts(communityId))
+        .doc(postId)
+        .get();
+    if (!doc.exists) return null;
+    return PostModel.fromFirestore(doc.data()!, doc.id);
+  }
+
   Future<void> createPost(String communityId, PostModel post) async {
     await _firestore
         .collection(FirestorePaths.posts(communityId))

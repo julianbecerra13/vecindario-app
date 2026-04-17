@@ -25,3 +25,10 @@ final feedPostsProvider = StreamProvider<List<PostModel>>((ref) {
         .toList();
   });
 });
+
+final postDetailProvider =
+    FutureProvider.family<PostModel?, String>((ref, postId) async {
+  final communityId = ref.watch(currentCommunityIdProvider);
+  if (communityId == null) return null;
+  return ref.read(feedRepositoryProvider).getPost(communityId, postId);
+});
