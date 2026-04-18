@@ -11,6 +11,7 @@ import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
+import 'package:vecindario_app/features/premium/providers/premium_provider.dart';
 
 class AdminPanelScreen extends ConsumerWidget {
   const AdminPanelScreen({super.key});
@@ -25,6 +26,8 @@ class AdminPanelScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingAsync = ref.watch(pendingResidentsProvider);
     final communityAsync = ref.watch(currentCommunityProvider);
+    final isPremium = ref.watch(isPremiumProvider).value ?? false;
+    final plan = ref.watch(subscriptionPlanProvider).value;
 
     return Scaffold(
       appBar: AppBar(
@@ -140,6 +143,10 @@ class AdminPanelScreen extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: AppSizes.lg),
+
+          // Acceso a Vecindario Admin (hub con todos los módulos premium)
+          _VecindarioAdminBanner(isPremium: isPremium, plan: plan),
           const SizedBox(height: AppSizes.lg),
 
           // Solicitudes pendientes
@@ -258,7 +265,7 @@ class AdminPanelScreen extends ConsumerWidget {
             color: AppColors.textSecondary,
             title: 'Configuración de comunidad',
             subtitle: 'Nombre, código de invitación, estrato',
-            onTap: () {},
+            onTap: () => context.push('/admin/settings'),
           ),
           _ActionTile(
             icon: Icons.push_pin,
@@ -268,6 +275,150 @@ class AdminPanelScreen extends ConsumerWidget {
             onTap: () => context.push('/feed/create'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _VecindarioAdminBanner extends StatelessWidget {
+  final bool isPremium;
+  final String? plan;
+
+  const _VecindarioAdminBanner({required this.isPremium, required this.plan});
+
+  @override
+  Widget build(BuildContext context) {
+    if (isPremium) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push('/premium/dashboard'),
+          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          child: Container(
+            padding: const EdgeInsets.all(AppSizes.md),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF10B981), Color(0xFF059669)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.dashboard_customize,
+                      color: Colors.white, size: 22),
+                ),
+                const SizedBox(width: AppSizes.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Vecindario Admin',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (plan != null) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                plan!.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Circulares, multas, finanzas, asambleas, manual y más',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios,
+                    color: Colors.white, size: 14),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => context.push('/premium/plans'),
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+        child: Container(
+          padding: const EdgeInsets.all(AppSizes.md),
+          decoration: BoxDecoration(
+            color: AppColors.success.withValues(alpha: 0.08),
+            border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.rocket_launch,
+                    color: AppColors.success, size: 22),
+              ),
+              const SizedBox(width: AppSizes.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Activa Vecindario Admin',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.success,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '30 días gratis: circulares, multas, finanzas, asambleas',
+                      style: AppTextStyles.caption,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios,
+                  color: AppColors.success, size: 14),
+            ],
+          ),
+        ),
       ),
     );
   }

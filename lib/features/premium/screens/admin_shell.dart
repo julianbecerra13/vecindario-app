@@ -66,9 +66,13 @@ class _AdminHomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final communityAsync = ref.watch(currentCommunityProvider);
+    final communityId = ref.watch(currentCommunityIdProvider);
     final plan = ref.watch(subscriptionPlanProvider).value;
     final pendingAsync = ref.watch(pendingResidentsProvider);
     final pqrsAsync = ref.watch(allPqrsProvider);
+    final revenue = communityId != null
+        ? ref.watch(monthlyRevenueProvider(communityId)).value ?? 0
+        : 0;
 
     final communityName = communityAsync.value?.name ?? 'Mi comunidad';
     final memberCount = communityAsync.value?.memberCount ?? 0;
@@ -115,7 +119,7 @@ class _AdminHomePage extends ConsumerWidget {
               const SizedBox(width: 6),
               _StatCard(value: '$openPqrs', label: 'PQRS abiertos', color: AppColors.warning),
               const SizedBox(width: 6),
-              _StatCard(value: '\$4.2M', label: 'Recaudo mes', color: AppColors.success),
+              _StatCard(value: _formatCOP(revenue), label: 'Recaudo mes', color: AppColors.success),
             ],
           ),
           const SizedBox(height: AppSizes.lg),
@@ -278,4 +282,17 @@ class _MiniButton extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatCOP(int cop) {
+  if (cop == 0) return '\$0';
+  if (cop >= 1000000) {
+    final m = cop / 1000000;
+    return '\$${m.toStringAsFixed(m >= 10 ? 0 : 1)}M';
+  }
+  if (cop >= 1000) {
+    final k = cop / 1000;
+    return '\$${k.toStringAsFixed(k >= 10 ? 0 : 1)}K';
+  }
+  return '\$$cop';
 }

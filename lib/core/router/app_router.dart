@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/features/admin/screens/admin_panel_screen.dart';
+import 'package:vecindario_app/features/admin/screens/community_settings_screen.dart';
 import 'package:vecindario_app/features/admin/screens/pending_approvals_screen.dart';
 import 'package:vecindario_app/features/auth/screens/forgot_password_screen.dart';
 import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
@@ -33,6 +34,7 @@ import 'package:vecindario_app/features/premium/finances/screens/finances_screen
 import 'package:vecindario_app/features/premium/finances/screens/account_statement_screen.dart';
 import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/assemblies/screens/assemblies_screen.dart';
+import 'package:vecindario_app/features/premium/assemblies/screens/assembly_detail_screen.dart';
 import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dart';
 import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
 import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
@@ -45,6 +47,8 @@ import 'package:vecindario_app/features/profile/screens/terms_screen.dart';
 import 'package:vecindario_app/features/profile/screens/privacy_policy_screen.dart';
 import 'package:vecindario_app/features/stores/screens/store_panel_screen.dart';
 import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
+import 'package:vecindario_app/features/super_admin/screens/community_detail_admin_screen.dart';
+import 'package:vecindario_app/features/super_admin/screens/create_community_screen.dart';
 import 'package:vecindario_app/features/super_admin/screens/super_admin_panel_screen.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
@@ -77,6 +81,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn) {
         final user = currentUser.valueOrNull;
         final isLoading = currentUser.isLoading;
+
+        // Redirect forzado: super_admin siempre a /super-admin (excepto /profile)
+        if (user != null && user.role.toValue() == 'super_admin') {
+          final isSuperAdminArea =
+              state.matchedLocation.startsWith('/super-admin');
+          final isProfileArea = state.matchedLocation.startsWith('/profile');
+          if (!isSuperAdminArea && !isProfileArea) {
+            return '/super-admin';
+          }
+        }
 
         // Guard: /admin y /premium solo para admin o super_admin
         final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
@@ -273,6 +287,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'pending',
             builder: (_, __) => const PendingApprovalsScreen(),
           ),
+          GoRoute(
+            path: 'settings',
+            builder: (_, __) => const CommunitySettingsScreen(),
+          ),
         ],
       ),
 
@@ -336,12 +354,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const AssembliesScreen(),
       ),
       GoRoute(
+        path: '/premium/assemblies/:assemblyId',
+        builder: (_, state) => AssemblyDetailScreen(
+          assemblyId: state.pathParameters['assemblyId'] ?? '',
+        ),
+      ),
+      GoRoute(
         path: '/premium/plans',
         builder: (_, __) => const SubscriptionPlansScreen(),
       ),
       GoRoute(
         path: '/super-admin',
         builder: (_, __) => const SuperAdminPanelScreen(),
+        routes: [
+          GoRoute(
+            path: 'create-community',
+            builder: (_, __) => const CreateCommunityScreen(),
+          ),
+          GoRoute(
+            path: 'community/:communityId',
+            builder: (_, state) => CommunityDetailAdminScreen(
+              communityId: state.pathParameters['communityId'] ?? '',
+            ),
+          ),
+        ],
       ),
     ],
   );

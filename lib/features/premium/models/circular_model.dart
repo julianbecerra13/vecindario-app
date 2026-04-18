@@ -34,6 +34,19 @@ class ReadReceipt {
     );
   }
 
+  factory ReadReceipt.fromRaw(dynamic raw) {
+    if (raw is Map<String, dynamic>) {
+      return ReadReceipt.fromMap(raw);
+    }
+    if (raw is Map) {
+      return ReadReceipt.fromMap(Map<String, dynamic>.from(raw));
+    }
+    if (raw is String) {
+      return ReadReceipt(uid: raw, timestamp: DateTime.now());
+    }
+    return ReadReceipt(uid: '', timestamp: DateTime.now());
+  }
+
   Map<String, dynamic> toMap() => {
     'uid': uid,
     'timestamp': Timestamp.fromDate(timestamp),
@@ -77,12 +90,12 @@ class CircularModel {
       authorName: data['authorName'] ?? '',
       priority: CircularPriority.fromString(data['priority'] ?? 'general'),
       readBy: (data['readBy'] as List?)
-              ?.map((e) => ReadReceipt.fromMap(e as Map<String, dynamic>))
+              ?.map(ReadReceipt.fromRaw)
               .toList() ??
           [],
       requiresAck: data['requiresAck'] ?? false,
       ackBy: (data['ackBy'] as List?)
-              ?.map((e) => ReadReceipt.fromMap(e as Map<String, dynamic>))
+              ?.map(ReadReceipt.fromRaw)
               .toList() ??
           [],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),

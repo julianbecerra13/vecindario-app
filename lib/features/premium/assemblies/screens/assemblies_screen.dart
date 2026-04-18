@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -40,9 +41,8 @@ class AssembliesScreen extends ConsumerWidget {
                 margin: const EdgeInsets.only(bottom: AppSizes.md),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-                  onTap: () {
-                    // Navegar a detalle de asamblea
-                  },
+                  onTap: () =>
+                      context.push('/premium/assemblies/${assembly.id}'),
                   child: Padding(
                     padding: AppSizes.paddingCard,
                     child: Column(

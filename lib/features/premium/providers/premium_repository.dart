@@ -237,6 +237,24 @@ class PremiumRepository {
         .toList());
   }
 
+  Stream<int> watchMonthlyIncome(String communityId, DateTime startOfMonth) {
+    return _firestore
+        .collection(FirestorePaths.finances(communityId))
+        .where('type', isEqualTo: 'income')
+        .snapshots()
+        .map((snap) {
+      var total = 0;
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final ts = data['date'];
+        if (ts is Timestamp && !ts.toDate().isBefore(startOfMonth)) {
+          total += (data['amount'] ?? 0) as int;
+        }
+      }
+      return total;
+    });
+  }
+
   Stream<AccountStatementModel?> watchAccountStatement(
     String communityId,
     String uid,

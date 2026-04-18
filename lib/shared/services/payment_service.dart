@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 
 /// Tipos de pago soportados
@@ -69,6 +70,7 @@ class PaymentRecord {
 /// Servicio de pagos con Wompi
 class PaymentService {
   final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
 
   /// Llave pública de Wompi (sandbox para desarrollo)
   static const _wompiPublicKey = 'pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7';
@@ -76,7 +78,7 @@ class PaymentService {
   /// URL base de Wompi checkout
   static const _wompiCheckoutBase = 'https://checkout.wompi.co/p/';
 
-  PaymentService(this._firestore);
+  PaymentService(this._firestore, this._auth);
 
   /// Iniciar pago con Wompi (abre widget de checkout)
   Future<bool> startPayment({
@@ -86,8 +88,14 @@ class PaymentService {
     required PaymentType type,
     String currency = 'COP',
   }) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) {
+      throw StateError('No autenticado');
+    }
+
     // Guardar intención de pago en Firestore
     await _firestore.collection('payment_intents').add({
+      'uid': uid,
       'reference': reference,
       'amount': amountCOP,
       'amountInCents': amountCOP * 100,
@@ -137,7 +145,10 @@ class PaymentService {
 
 /// Provider del servicio de pagos
 final paymentServiceProvider = Provider<PaymentService>((ref) {
-  return PaymentService(ref.watch(firestoreProvider));
+  return PaymentService(
+    ref.watch(firestoreProvider),
+    ref.watch(firebaseAuthProvider),
+  );
 });
 
 /// Widget reutilizable de botón de pago

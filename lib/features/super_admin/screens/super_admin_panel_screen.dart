@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -96,7 +97,7 @@ class SuperAdminPanelScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add_business),
             tooltip: 'Crear comunidad',
-            onPressed: () => _showCreateCommunityDialog(context, ref),
+            onPressed: () => context.push('/super-admin/create-community'),
           ),
         ],
       ),
@@ -114,7 +115,7 @@ class SuperAdminPanelScreen extends ConsumerWidget {
                   const SizedBox(height: AppSizes.lg),
                   ElevatedButton.icon(
                     onPressed: () =>
-                        _showCreateCommunityDialog(context, ref),
+                        context.push('/super-admin/create-community'),
                     icon: const Icon(Icons.add),
                     label: const Text('Crear primera comunidad'),
                   ),
@@ -153,122 +154,6 @@ class SuperAdminPanelScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreateCommunityDialog(BuildContext context, WidgetRef ref) {
-    final nameController = TextEditingController();
-    final addressController = TextEditingController();
-    final cityController = TextEditingController();
-    int estrato = 3;
-    UnitType unitType = UnitType.apartment;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Crear Comunidad'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Nombre (ej: Pinares de Granada)',
-                  ),
-                ),
-                const SizedBox(height: AppSizes.sm),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(
-                    hintText: 'Dirección',
-                  ),
-                ),
-                const SizedBox(height: AppSizes.sm),
-                TextField(
-                  controller: cityController,
-                  decoration: const InputDecoration(
-                    hintText: 'Ciudad',
-                  ),
-                ),
-                const SizedBox(height: AppSizes.sm),
-                DropdownButtonFormField<int>(
-                  value: estrato,
-                  decoration: const InputDecoration(
-                    labelText: 'Estrato',
-                  ),
-                  items: List.generate(6, (i) {
-                    final e = i + 1;
-                    return DropdownMenuItem(
-                      value: e,
-                      child: Text('Estrato $e'),
-                    );
-                  }),
-                  onChanged: (v) =>
-                      setDialogState(() => estrato = v ?? 3),
-                ),
-                const SizedBox(height: AppSizes.sm),
-                DropdownButtonFormField<UnitType>(
-                  value: unitType,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo de unidad',
-                  ),
-                  items: UnitType.values.map((t) {
-                    return DropdownMenuItem(
-                      value: t,
-                      child: Text(t.label),
-                    );
-                  }).toList(),
-                  onChanged: (v) =>
-                      setDialogState(() => unitType = v ?? UnitType.apartment),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                if (nameController.text.trim().isEmpty) return;
-
-                // Generar código de invitación
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                final code = List.generate(
-                  6,
-                  (_) => chars[DateTime.now().microsecond % chars.length],
-                ).join();
-
-                final community = CommunityModel(
-                  id: '',
-                  name: nameController.text.trim(),
-                  address: addressController.text.trim(),
-                  city: cityController.text.trim(),
-                  estrato: estrato,
-                  adminUid: '', // Se asigna después
-                  inviteCode: code,
-                  unitType: unitType,
-                  createdAt: DateTime.now(),
-                );
-
-                await ref.read(firestoreProvider)
-                    .collection('communities')
-                    .add(community.toFirestore());
-
-                if (ctx.mounted) {
-                  Navigator.pop(ctx);
-                  context.showSuccessSnackBar(
-                    'Comunidad "${community.name}" creada. Código: $code',
-                  );
-                }
-              },
-              child: const Text('Crear'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // === WIDGETS ===
@@ -374,7 +259,11 @@ class _CommunityCard extends ConsumerWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppSizes.sm),
-      child: Padding(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+        onTap: () =>
+            context.push('/super-admin/community/${community.id}'),
+        child: Padding(
         padding: AppSizes.paddingCard,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -425,18 +314,18 @@ class _CommunityCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSizes.sm),
-            Row(
+            Wrap(
+              spacing: AppSizes.md,
+              runSpacing: AppSizes.xs,
               children: [
                 _InfoChip(
                   icon: Icons.people,
                   text: '${community.memberCount} residentes',
                 ),
-                const SizedBox(width: AppSizes.md),
                 _InfoChip(
                   icon: Icons.star,
                   text: community.estratoLabel,
                 ),
-                const SizedBox(width: AppSizes.md),
                 _InfoChip(
                   icon: Icons.home,
                   text: community.unitType.label,
@@ -475,18 +364,19 @@ class _CommunityCard extends ConsumerWidget {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => _showAssignAdminDialog(
-                      context, ref, community),
+                  onPressed: () =>
+                      _showAssignAdminDialog(context, ref, community),
                   child: const Text('Asignar Admin'),
                 ),
                 TextButton(
-                  onPressed: () => _showActivatePlanDialog(
-                      context, ref, community),
+                  onPressed: () =>
+                      _showActivatePlanDialog(context, ref, community),
                   child: const Text('Plan'),
                 ),
               ],
             ),
           ],
+        ),
         ),
       ),
     );
@@ -495,7 +385,6 @@ class _CommunityCard extends ConsumerWidget {
   void _showAssignAdminDialog(
       BuildContext context, WidgetRef ref, CommunityModel community) {
     final uidController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -526,20 +415,15 @@ class _CommunityCard extends ConsumerWidget {
             onPressed: () async {
               final uid = uidController.text.trim();
               if (uid.isEmpty) return;
-
               final fs = ref.read(firestoreProvider);
-
-              // Actualizar comunidad
               await fs.collection('communities').doc(community.id).update({
                 'adminUid': uid,
               });
-
-              // Cambiar rol del usuario a admin
               await fs.collection('users').doc(uid).update({
                 'role': 'admin',
+                'communityId': community.id,
                 'verified': true,
               });
-
               if (ctx.mounted) {
                 Navigator.pop(ctx);
                 context.showSuccessSnackBar('Admin asignado');
@@ -555,7 +439,6 @@ class _CommunityCard extends ConsumerWidget {
   void _showActivatePlanDialog(
       BuildContext context, WidgetRef ref, CommunityModel community) {
     String selectedPlan = 'starter';
-
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -589,26 +472,23 @@ class _CommunityCard extends ConsumerWidget {
               onPressed: () async {
                 final fs = ref.read(firestoreProvider);
                 final now = DateTime.now();
-
                 await fs
                     .collection('subscriptions')
                     .doc(community.id)
                     .set({
                   'plan': selectedPlan,
                   'status': 'trial',
+                  'trialStartedAt': Timestamp.fromDate(now),
                   'trialEndsAt': Timestamp.fromDate(
                     now.add(const Duration(days: 30)),
                   ),
-                  'startDate': Timestamp.fromDate(now),
-                  'nextBillingDate': Timestamp.fromDate(
-                    now.add(const Duration(days: 30)),
-                  ),
+                  'createdAt': Timestamp.fromDate(now),
+                  'createdBy': 'super_admin',
                 });
-
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   context.showSuccessSnackBar(
-                    'Plan $selectedPlan activado (trial 30 días)',
+                    'Plan $selectedPlan activado (trial 30 días gratis)',
                   );
                 }
               },
@@ -619,6 +499,7 @@ class _CommunityCard extends ConsumerWidget {
       ),
     );
   }
+
 }
 
 class _InfoChip extends StatelessWidget {

@@ -98,3 +98,28 @@ final assembliesProvider = StreamProvider<List<AssemblyModel>>((ref) {
   if (communityId == null) return Stream.value([]);
   return ref.watch(premiumRepositoryProvider).watchAssemblies(communityId);
 });
+
+final assemblyDetailProvider =
+    StreamProvider.family<AssemblyModel?, String>((ref, assemblyId) {
+  final communityId = ref.watch(currentCommunityIdProvider);
+  if (communityId == null) return Stream.value(null);
+  return ref
+      .watch(premiumRepositoryProvider)
+      .watchAssemblies(communityId)
+      .map((list) {
+    for (final a in list) {
+      if (a.id == assemblyId) return a;
+    }
+    return null;
+  });
+});
+
+// ==================== RECAUDO MENSUAL ====================
+final monthlyRevenueProvider =
+    StreamProvider.family<int, String>((ref, communityId) {
+  final now = DateTime.now();
+  final startOfMonth = DateTime(now.year, now.month, 1);
+  return ref
+      .watch(premiumRepositoryProvider)
+      .watchMonthlyIncome(communityId, startOfMonth);
+});
