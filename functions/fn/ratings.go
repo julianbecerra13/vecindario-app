@@ -11,12 +11,12 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("CalculateRatings", calculateRatings)
+	functions.CloudEvent("CalculateRatings", CalculateRatings)
 }
 
-// calculateRatings — Trigger cuando se crea/actualiza una reseña
+// CalculateRatings — Trigger cuando se crea/actualiza una reseña
 // Recalcula el promedio de rating del target (service, store, external_service)
-func calculateRatings(ctx context.Context, e cloudevents.Event) error {
+func CalculateRatings(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

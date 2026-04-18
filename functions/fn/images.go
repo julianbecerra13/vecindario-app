@@ -21,7 +21,7 @@ import (
 const maxImageWidth = 1200
 
 func init() {
-	functions.CloudEvent("ProcessImage", processImage)
+	functions.CloudEvent("ProcessImage", ProcessImage)
 }
 
 type storageEventData struct {
@@ -30,8 +30,8 @@ type storageEventData struct {
 	ContentType string `json:"contentType"`
 }
 
-// processImage resize imágenes a máx 1200px y elimina EXIF re-encodeando como JPEG.
-func processImage(ctx context.Context, e cloudevents.Event) error {
+// ProcessImage resize imágenes a máx 1200px y elimina EXIF re-encodeando como JPEG.
+func ProcessImage(ctx context.Context, e cloudevents.Event) error {
 	var data storageEventData
 	if err := e.DataAs(&data); err != nil {
 		return fmt.Errorf("parse event: %v", err)

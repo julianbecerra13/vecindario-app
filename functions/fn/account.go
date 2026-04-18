@@ -13,14 +13,14 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("ProcessAccountDeletion", processAccountDeletion)
-	functions.CloudEvent("ProcessDataExport", processDataExport)
+	functions.CloudEvent("ProcessAccountDeletion", ProcessAccountDeletion)
+	functions.CloudEvent("ProcessDataExport", ProcessDataExport)
 }
 
-// processAccountDeletion — Ejecutar diariamente (Cloud Scheduler)
+// ProcessAccountDeletion — Ejecutar diariamente (Cloud Scheduler)
 // Busca deletion_requests con status=pending y createdAt > 15 días
 // Anonimiza posts, reseñas, pedidos y elimina datos personales
-func processAccountDeletion(ctx context.Context, e cloudevents.Event) error {
+func ProcessAccountDeletion(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err
@@ -191,9 +191,9 @@ func deleteUserData(ctx context.Context, fs *firestore.Client, uid string) error
 	return err
 }
 
-// processDataExport — Genera un JSON con todos los datos del usuario
+// ProcessDataExport — Genera un JSON con todos los datos del usuario
 // Trigger: Firestore onCreate en data_export_requests
-func processDataExport(ctx context.Context, e cloudevents.Event) error {
+func ProcessDataExport(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

@@ -11,8 +11,8 @@ import (
 )
 
 func init() {
-	functions.HTTP("ProcessAdminFee", processAdminFee)
-	functions.HTTP("GenerateFinancialReport", generateFinancialReport)
+	functions.HTTP("ProcessAdminFee", ProcessAdminFee)
+	functions.HTTP("GenerateFinancialReport", GenerateFinancialReport)
 }
 
 type ProcessAdminFeeRequest struct {
@@ -21,8 +21,8 @@ type ProcessAdminFeeRequest struct {
 	Amount      int64  `json:"amount"`
 }
 
-// processAdminFee — Cobrar cuota de administración via Wompi, registrar en account_statements
-func processAdminFee(w http.ResponseWriter, r *http.Request) {
+// ProcessAdminFee — Cobrar cuota de administración via Wompi, registrar en account_statements
+func ProcessAdminFee(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -79,8 +79,8 @@ func processAdminFee(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// generateFinancialReport — Genera resumen financiero del mes
-func generateFinancialReport(w http.ResponseWriter, r *http.Request) {
+// GenerateFinancialReport — Genera resumen financiero del mes
+func GenerateFinancialReport(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

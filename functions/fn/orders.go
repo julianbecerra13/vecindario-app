@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	functions.HTTP("CreateOrder", createOrder)
+	functions.HTTP("CreateOrder", CreateOrder)
 }
 
 // Tarifas de comisión por estrato
@@ -38,8 +38,8 @@ type CreateOrderRequest struct {
 	Items   []OrderItem `json:"items"`
 }
 
-// createOrder — Valida stock, calcula comisión según estrato, crea orden
-func createOrder(w http.ResponseWriter, r *http.Request) {
+// CreateOrder — Valida stock, calcula comisión según estrato, crea orden
+func CreateOrder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

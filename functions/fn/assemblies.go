@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	functions.HTTP("CreateAssemblyVote", createAssemblyVote)
+	functions.HTTP("CreateAssemblyVote", CreateAssemblyVote)
 }
 
 type CreateAssemblyVoteRequest struct {
@@ -20,8 +20,8 @@ type CreateAssemblyVoteRequest struct {
 	VoteIndex   int    `json:"voteIndex"`
 }
 
-// createAssemblyVote — Abre votación en tiempo real
-func createAssemblyVote(w http.ResponseWriter, r *http.Request) {
+// CreateAssemblyVote — Abre votación en tiempo real
+func CreateAssemblyVote(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
