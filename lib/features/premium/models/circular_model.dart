@@ -89,15 +89,10 @@ class CircularModel {
       authorUid: data['authorUid'] ?? '',
       authorName: data['authorName'] ?? '',
       priority: CircularPriority.fromString(data['priority'] ?? 'general'),
-      readBy: (data['readBy'] as List?)
-              ?.map(ReadReceipt.fromRaw)
-              .toList() ??
-          [],
+      readBy:
+          (data['readBy'] as List?)?.map(ReadReceipt.fromRaw).toList() ?? [],
       requiresAck: data['requiresAck'] ?? false,
-      ackBy: (data['ackBy'] as List?)
-              ?.map(ReadReceipt.fromRaw)
-              .toList() ??
-          [],
+      ackBy: (data['ackBy'] as List?)?.map(ReadReceipt.fromRaw).toList() ?? [],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

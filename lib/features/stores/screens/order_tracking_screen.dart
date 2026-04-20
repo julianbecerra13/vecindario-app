@@ -30,20 +30,13 @@ class OrderTrackingScreen extends ConsumerWidget {
             child: Column(
               children: [
                 const SizedBox(height: AppSizes.md),
-                Icon(
-                  order.status.icon,
-                  size: 56,
-                  color: order.status.color,
-                ),
+                Icon(order.status.icon, size: 56, color: order.status.color),
                 const SizedBox(height: AppSizes.md),
                 Text(
                   'Pedido #${order.id.substring(0, 4).toUpperCase()}',
                   style: AppTextStyles.heading3,
                 ),
-                Text(
-                  order.storeName,
-                  style: AppTextStyles.bodySmall,
-                ),
+                Text(order.storeName, style: AppTextStyles.bodySmall),
                 if (order.status == OrderStatus.cancelled)
                   Container(
                     margin: const EdgeInsets.only(top: AppSizes.md),
@@ -80,24 +73,24 @@ class OrderTrackingScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSizes.sm),
-                      ...order.items.map((item) => Padding(
-                            padding:
-                                const EdgeInsets.only(bottom: AppSizes.xs),
-                            child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${item.name} x${item.quantity}',
-                                  style: AppTextStyles.bodySmall,
-                                ),
-                                Text(
-                                  formatCOP(item.total),
-                                  style: AppTextStyles.bodySmall,
-                                ),
-                              ],
-                            ),
-                          )),
+                      ...order.items.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(bottom: AppSizes.xs),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${item.name} x${item.quantity}',
+                                style: AppTextStyles.bodySmall,
+                              ),
+                              Text(
+                                formatCOP(item.total),
+                                style: AppTextStyles.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       const Divider(height: AppSizes.md),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,8 +140,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                     width: double.infinity,
                     height: AppSizes.buttonHeight,
                     child: ElevatedButton.icon(
-                      onPressed: () =>
-                          context.push('/stores/rate/${order.id}'),
+                      onPressed: () => context.push('/stores/rate/${order.id}'),
                       icon: const Icon(Icons.star, color: Colors.white),
                       label: const Text('Calificar pedido'),
                       style: ElevatedButton.styleFrom(

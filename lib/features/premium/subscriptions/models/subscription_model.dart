@@ -73,13 +73,13 @@ class SubscriptionModel {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'plan': plan.value,
-        'status': status.value,
-        'trialStartedAt': Timestamp.fromDate(trialStartedAt),
-        'trialEndsAt': Timestamp.fromDate(trialEndsAt),
-        'createdAt': Timestamp.fromDate(createdAt),
-        'createdBy': createdBy,
-      };
+    'plan': plan.value,
+    'status': status.value,
+    'trialStartedAt': Timestamp.fromDate(trialStartedAt),
+    'trialEndsAt': Timestamp.fromDate(trialEndsAt),
+    'createdAt': Timestamp.fromDate(createdAt),
+    'createdBy': createdBy,
+  };
 
   bool get isActive {
     if (status == SubscriptionStatus.active) return true;

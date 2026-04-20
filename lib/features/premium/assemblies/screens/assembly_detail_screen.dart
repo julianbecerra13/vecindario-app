@@ -48,24 +48,24 @@ class _AssemblyDetailScreenState extends ConsumerState<AssemblyDetailScreen> {
                   Text('Orden del día', style: AppTextStyles.heading3),
                   const SizedBox(height: AppSizes.sm),
                   ...assembly.agenda.asMap().entries.map(
-                        (e) => _AgendaItem(index: e.key + 1, text: e.value),
-                      ),
+                    (e) => _AgendaItem(index: e.key + 1, text: e.value),
+                  ),
                 ],
                 if (assembly.votes.isNotEmpty) ...[
                   const SizedBox(height: AppSizes.lg),
                   Text('Votaciones', style: AppTextStyles.heading3),
                   const SizedBox(height: AppSizes.sm),
                   ...assembly.votes.asMap().entries.map(
-                        (e) => _VoteCard(
-                          assemblyId: assembly.id,
-                          voteIndex: e.key,
-                          vote: e.value,
-                          canVote: assembly.isLive,
-                          disabled: _voting,
-                          onBeforeVote: () => setState(() => _voting = true),
-                          onAfterVote: () => setState(() => _voting = false),
-                        ),
-                      ),
+                    (e) => _VoteCard(
+                      assemblyId: assembly.id,
+                      voteIndex: e.key,
+                      vote: e.value,
+                      canVote: assembly.isLive,
+                      disabled: _voting,
+                      onBeforeVote: () => setState(() => _voting = true),
+                      onAfterVote: () => setState(() => _voting = false),
+                    ),
+                  ),
                 ],
                 if (assembly.actaPdfURL != null &&
                     assembly.actaPdfURL!.isNotEmpty) ...[
@@ -149,10 +149,7 @@ class _Header extends StatelessWidget {
           const SizedBox(height: AppSizes.sm),
           Text(assembly.title, style: AppTextStyles.heading2),
           const SizedBox(height: AppSizes.xs),
-          Text(
-            _statusLabel(assembly.status),
-            style: AppTextStyles.caption,
-          ),
+          Text(_statusLabel(assembly.status), style: AppTextStyles.caption),
         ],
       ),
     );
@@ -205,11 +202,7 @@ class _InfoRow extends StatelessWidget {
   final String text;
   final bool isLink;
 
-  const _InfoRow({
-    required this.icon,
-    required this.text,
-    this.isLink = false,
-  });
+  const _InfoRow({required this.icon, required this.text, this.isLink = false});
 
   @override
   Widget build(BuildContext context) {
@@ -225,8 +218,10 @@ class _InfoRow extends StatelessWidget {
                     onTap: () async {
                       final uri = Uri.parse(text);
                       if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri,
-                            mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
                       }
                     },
                     child: Text(
@@ -312,18 +307,17 @@ class _VoteCard extends ConsumerWidget {
         children: [
           Text(
             vote.topic,
-            style: AppTextStyles.bodyLarge
-                .copyWith(fontWeight: FontWeight.w600),
+            style: AppTextStyles.bodyLarge.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSizes.sm),
-          if (showResults) ..._buildResults()
+          if (showResults)
+            ..._buildResults()
           else
             ..._buildOptions(context, ref, user?.id),
           const SizedBox(height: AppSizes.xs),
-          Text(
-            '${vote.totalVotes()} votos',
-            style: AppTextStyles.caption,
-          ),
+          Text('${vote.totalVotes()} votos', style: AppTextStyles.caption),
         ],
       ),
     );
@@ -367,11 +361,7 @@ class _VoteCard extends ConsumerWidget {
     }).toList();
   }
 
-  List<Widget> _buildOptions(
-    BuildContext context,
-    WidgetRef ref,
-    String? uid,
-  ) {
+  List<Widget> _buildOptions(BuildContext context, WidgetRef ref, String? uid) {
     return vote.options.map((option) {
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSizes.xs),
@@ -399,13 +389,9 @@ class _VoteCard extends ConsumerWidget {
 
     onBeforeVote();
     try {
-      await ref.read(premiumRepositoryProvider).castVote(
-            communityId,
-            assemblyId,
-            voteIndex,
-            option,
-            uid,
-          );
+      await ref
+          .read(premiumRepositoryProvider)
+          .castVote(communityId, assemblyId, voteIndex, option, uid);
       if (context.mounted) context.showSuccessSnackBar('Voto registrado');
     } catch (e) {
       if (context.mounted) {

@@ -21,8 +21,9 @@ class PqrsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
-    final pqrsAsync =
-        isAdmin ? ref.watch(allPqrsProvider) : ref.watch(myPqrsProvider);
+    final pqrsAsync = isAdmin
+        ? ref.watch(allPqrsProvider)
+        : ref.watch(myPqrsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -60,10 +61,8 @@ class PqrsScreen extends ConsumerWidget {
                 return ListView.builder(
                   padding: const EdgeInsets.all(AppSizes.md),
                   itemCount: pqrs.length,
-                  itemBuilder: (_, i) => _PqrsCard(
-                    pqrs: pqrs[i],
-                    isAdmin: isAdmin,
-                  ),
+                  itemBuilder: (_, i) =>
+                      _PqrsCard(pqrs: pqrs[i], isAdmin: isAdmin),
                 );
               },
               loading: () => const LoadingIndicator(),
@@ -74,7 +73,6 @@ class PqrsScreen extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 class _AdminStats extends StatelessWidget {
@@ -85,22 +83,32 @@ class _AdminStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final open = pqrs.where((p) => p.status == PqrsStatus.received).length;
-    final inProgress =
-        pqrs.where((p) => p.status == PqrsStatus.inProgress).length;
-    final resolved =
-        pqrs.where((p) => p.status == PqrsStatus.resolved).length;
+    final inProgress = pqrs
+        .where((p) => p.status == PqrsStatus.inProgress)
+        .length;
+    final resolved = pqrs.where((p) => p.status == PqrsStatus.resolved).length;
 
     return Padding(
       padding: const EdgeInsets.all(AppSizes.md),
       child: Row(
         children: [
-          _StatBadge(label: 'Abiertos', value: '$open', color: AppColors.warning),
+          _StatBadge(
+            label: 'Abiertos',
+            value: '$open',
+            color: AppColors.warning,
+          ),
           const SizedBox(width: AppSizes.sm),
           _StatBadge(
-              label: 'En gestión', value: '$inProgress', color: AppColors.info),
+            label: 'En gestión',
+            value: '$inProgress',
+            color: AppColors.info,
+          ),
           const SizedBox(width: AppSizes.sm),
           _StatBadge(
-              label: 'Resueltos', value: '$resolved', color: AppColors.success),
+            label: 'Resueltos',
+            value: '$resolved',
+            color: AppColors.success,
+          ),
         ],
       ),
     );
@@ -137,10 +145,7 @@ class _StatBadge extends StatelessWidget {
                 color: color,
               ),
             ),
-            Text(
-              label,
-              style: TextStyle(fontSize: 10, color: color),
-            ),
+            Text(label, style: TextStyle(fontSize: 10, color: color)),
           ],
         ),
       ),
@@ -189,7 +194,11 @@ class _PqrsCard extends ConsumerWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(pqrs.category.icon, size: 12, color: AppColors.textHint),
+                    Icon(
+                      pqrs.category.icon,
+                      size: 12,
+                      color: AppColors.textHint,
+                    ),
                     const SizedBox(width: 4),
                     Text(pqrs.category.label, style: AppTextStyles.caption),
                   ],
@@ -315,7 +324,9 @@ class _PqrsCard extends ConsumerWidget {
               if (controller.text.trim().isEmpty) return;
               final communityId = ref.read(currentCommunityIdProvider);
               if (communityId != null) {
-                ref.read(premiumRepositoryProvider).updatePqrsStatus(
+                ref
+                    .read(premiumRepositoryProvider)
+                    .updatePqrsStatus(
                       communityId,
                       pqrs.id,
                       PqrsStatus.resolved,

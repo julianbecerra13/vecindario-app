@@ -17,15 +17,11 @@ class ServiceDetailScreen extends ConsumerWidget {
     final serviceAsync = ref.watch(serviceDetailProvider(serviceId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalle del Servicio'),
-      ),
+      appBar: AppBar(title: const Text('Detalle del Servicio')),
       body: serviceAsync.when(
         data: (service) {
           if (service == null) {
-            return const Center(
-              child: Text('Servicio no encontrado'),
-            );
+            return const Center(child: Text('Servicio no encontrado'));
           }
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSizes.md),
@@ -83,19 +79,13 @@ class ServiceDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppSizes.md),
 
                 // Título
-                Text(
-                  service.title,
-                  style: AppTextStyles.heading2,
-                ),
+                Text(service.title, style: AppTextStyles.heading2),
                 const SizedBox(height: AppSizes.sm),
 
                 // Rating y contador
                 Row(
                   children: [
-                    RatingStars(
-                      rating: service.rating,
-                      size: 16,
-                    ),
+                    RatingStars(rating: service.rating, size: 16),
                     const SizedBox(width: AppSizes.xs),
                     Text(
                       '${service.rating.toStringAsFixed(1)} (${service.ratingCount})',
@@ -146,10 +136,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSizes.sm),
-                Text(
-                  service.description,
-                  style: AppTextStyles.bodySmall,
-                ),
+                Text(service.description, style: AppTextStyles.bodySmall),
                 const SizedBox(height: AppSizes.lg),
 
                 // Información del prestador
@@ -163,8 +150,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                     children: [
                       if (service.ownerPhotoURL != null)
                         CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(service.ownerPhotoURL!),
+                          backgroundImage: NetworkImage(service.ownerPhotoURL!),
                           radius: 28,
                         )
                       else
@@ -200,9 +186,7 @@ class ServiceDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(
-          child: Text('Error: $e'),
-        ),
+        error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
   }

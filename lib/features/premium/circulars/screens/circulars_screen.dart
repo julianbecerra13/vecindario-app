@@ -47,10 +47,8 @@ class CircularsScreen extends ConsumerWidget {
           return ListView.builder(
             padding: const EdgeInsets.all(AppSizes.md),
             itemCount: circulars.length,
-            itemBuilder: (_, i) => _CircularCard(
-              circular: circulars[i],
-              isAdmin: isAdmin,
-            ),
+            itemBuilder: (_, i) =>
+                _CircularCard(circular: circulars[i], isAdmin: isAdmin),
           );
         },
         loading: () => const LoadingIndicator(),
@@ -89,11 +87,9 @@ class _CircularCard extends ConsumerWidget {
           if (currentUser != null && !isRead) {
             final communityId = ref.read(currentCommunityIdProvider);
             if (communityId != null) {
-              ref.read(premiumRepositoryProvider).markCircularAsRead(
-                    communityId,
-                    circular.id,
-                    currentUser.id,
-                  );
+              ref
+                  .read(premiumRepositoryProvider)
+                  .markCircularAsRead(communityId, circular.id, currentUser.id);
             }
           }
         },
@@ -166,44 +162,48 @@ class _CircularCard extends ConsumerWidget {
                     ),
                   const Spacer(),
                   if (isAdmin) ...[
-                    Builder(builder: (context) {
-                      final community = ref.watch(currentCommunityProvider).value;
-                      final total = community?.memberCount ?? 1;
-                      final readCount = circular.readBy.length;
-                      final pct = (readCount / total).clamp(0.0, 1.0);
-                      final pctInt = (pct * 100).round();
-                      final color = pctInt >= 80
-                          ? AppColors.success
-                          : pctInt >= 50
-                              ? AppColors.warning
-                              : AppColors.error;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '$pctInt% leído',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: color,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          SizedBox(
-                            width: 80,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(2),
-                              child: LinearProgressIndicator(
-                                value: pct,
-                                backgroundColor: AppColors.border,
+                    Builder(
+                      builder: (context) {
+                        final community = ref
+                            .watch(currentCommunityProvider)
+                            .value;
+                        final total = community?.memberCount ?? 1;
+                        final readCount = circular.readBy.length;
+                        final pct = (readCount / total).clamp(0.0, 1.0);
+                        final pctInt = (pct * 100).round();
+                        final color = pctInt >= 80
+                            ? AppColors.success
+                            : pctInt >= 50
+                            ? AppColors.warning
+                            : AppColors.error;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '$pctInt% leído',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
                                 color: color,
-                                minHeight: 4,
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    }),
+                            const SizedBox(height: 4),
+                            SizedBox(
+                              width: 80,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(2),
+                                child: LinearProgressIndicator(
+                                  value: pct,
+                                  backgroundColor: AppColors.border,
+                                  color: color,
+                                  minHeight: 4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ] else if (!isRead)
                     Container(
                       width: 8,
@@ -227,7 +227,9 @@ class _CircularCard extends ConsumerWidget {
                     onPressed: () {
                       final communityId = ref.read(currentCommunityIdProvider);
                       if (communityId != null) {
-                        ref.read(premiumRepositoryProvider).acknowledgeCircular(
+                        ref
+                            .read(premiumRepositoryProvider)
+                            .acknowledgeCircular(
                               communityId,
                               circular.id,
                               currentUser.id,

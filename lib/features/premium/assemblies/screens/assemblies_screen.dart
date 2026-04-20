@@ -58,14 +58,18 @@ class AssembliesScreen extends ConsumerWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.error,
-                                  borderRadius:
-                                      BorderRadius.circular(AppSizes.radiusFull),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSizes.radiusFull,
+                                  ),
                                 ),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.circle,
-                                        size: 8, color: Colors.white),
+                                    Icon(
+                                      Icons.circle,
+                                      size: 8,
+                                      color: Colors.white,
+                                    ),
                                     SizedBox(width: 4),
                                     Text(
                                       'EN VIVO',
@@ -93,8 +97,11 @@ class AssembliesScreen extends ConsumerWidget {
                         const SizedBox(height: AppSizes.sm),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_today,
-                                size: 14, color: AppColors.textHint),
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: AppColors.textHint,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               assembly.date.formatDateLong,
@@ -106,8 +113,11 @@ class AssembliesScreen extends ConsumerWidget {
                           const SizedBox(height: AppSizes.xs),
                           Row(
                             children: [
-                              const Icon(Icons.location_on,
-                                  size: 14, color: AppColors.textHint),
+                              const Icon(
+                                Icons.location_on,
+                                size: 14,
+                                color: AppColors.textHint,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 assembly.location!,
@@ -137,18 +147,20 @@ class AssembliesScreen extends ConsumerWidget {
                           const SizedBox(height: AppSizes.md),
                           ...assembly.votes.asMap().entries.map((entry) {
                             final vote = entry.value;
-                            final user =
-                                ref.read(currentUserProvider).value;
-                            final hasVoted = user != null && vote.hasVoted(user.id);
+                            final user = ref.read(currentUserProvider).value;
+                            final hasVoted =
+                                user != null && vote.hasVoted(user.id);
 
                             return Container(
-                              margin:
-                                  const EdgeInsets.only(bottom: AppSizes.sm),
+                              margin: const EdgeInsets.only(
+                                bottom: AppSizes.sm,
+                              ),
                               padding: const EdgeInsets.all(AppSizes.sm),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceVariant,
-                                borderRadius:
-                                    BorderRadius.circular(AppSizes.radiusMd),
+                                borderRadius: BorderRadius.circular(
+                                  AppSizes.radiusMd,
+                                ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +176,8 @@ class AssembliesScreen extends ConsumerWidget {
                                     final pct = vote.percentageFor(option);
                                     return Padding(
                                       padding: const EdgeInsets.only(
-                                          bottom: AppSizes.xs),
+                                        bottom: AppSizes.xs,
+                                      ),
                                       child: hasVoted
                                           ? Column(
                                               crossAxisAlignment:
@@ -175,9 +188,11 @@ class AssembliesScreen extends ConsumerWidget {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    Text(option,
-                                                        style: AppTextStyles
-                                                            .caption),
+                                                    Text(
+                                                      option,
+                                                      style:
+                                                          AppTextStyles.caption,
+                                                    ),
                                                     Text(
                                                       '${(pct * 100).round()}%',
                                                       style: const TextStyle(
@@ -194,12 +209,13 @@ class AssembliesScreen extends ConsumerWidget {
                                                       BorderRadius.circular(3),
                                                   child:
                                                       LinearProgressIndicator(
-                                                    value: pct,
-                                                    minHeight: 6,
-                                                    backgroundColor:
-                                                        AppColors.border,
-                                                    color: AppColors.success,
-                                                  ),
+                                                        value: pct,
+                                                        minHeight: 6,
+                                                        backgroundColor:
+                                                            AppColors.border,
+                                                        color:
+                                                            AppColors.success,
+                                                      ),
                                                 ),
                                               ],
                                             )
@@ -209,11 +225,14 @@ class AssembliesScreen extends ConsumerWidget {
                                                 onPressed: () {
                                                   if (user == null) return;
                                                   final communityId = ref.read(
-                                                      currentCommunityIdProvider);
-                                                  if (communityId == null) return;
+                                                    currentCommunityIdProvider,
+                                                  );
+                                                  if (communityId == null)
+                                                    return;
                                                   ref
                                                       .read(
-                                                          premiumRepositoryProvider)
+                                                        premiumRepositoryProvider,
+                                                      )
                                                       .castVote(
                                                         communityId,
                                                         assembly.id,
@@ -222,7 +241,8 @@ class AssembliesScreen extends ConsumerWidget {
                                                         user.id,
                                                       );
                                                   context.showSuccessSnackBar(
-                                                      'Voto registrado');
+                                                    'Voto registrado',
+                                                  );
                                                 },
                                                 child: Text(option),
                                               ),

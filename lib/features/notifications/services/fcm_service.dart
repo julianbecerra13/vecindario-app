@@ -12,7 +12,7 @@ class FCMService {
   final FlutterLocalNotificationsPlugin _localNotifications;
 
   FCMService(this._messaging, this._firestore)
-      : _localNotifications = FlutterLocalNotificationsPlugin();
+    : _localNotifications = FlutterLocalNotificationsPlugin();
 
   /// Canal de notificaciones Android
   static const _androidChannel = AndroidNotificationChannel(
@@ -40,7 +40,8 @@ class FCMService {
     // Configurar canal local (Android)
     await _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_androidChannel);
 
     // Inicializar local notifications
@@ -78,7 +79,9 @@ class FCMService {
       _handleMessageOpenedApp(initialMessage);
     }
 
-    debugPrint('FCM: Inicializado correctamente con token: ${token?.substring(0, 20)}...');
+    debugPrint(
+      'FCM: Inicializado correctamente con token: ${token?.substring(0, 20)}...',
+    );
   }
 
   /// Guardar token FCM en Firestore para envío desde Cloud Functions

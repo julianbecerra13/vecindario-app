@@ -76,13 +76,11 @@ class AuthRepository {
         nonce: nonce,
       );
 
-      final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
-        rawNonce: rawNonce,
-      );
+      final oauthCredential = OAuthProvider(
+        'apple.com',
+      ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
 
-      final userCredential =
-          await _auth.signInWithCredential(oauthCredential);
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
 
       // Apple solo envía el nombre la primera vez
       if (appleCredential.givenName != null) {
@@ -104,10 +102,9 @@ class AuthRepository {
 
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
-    required void Function(String verificationId, int? resendToken)
-        onCodeSent,
+    required void Function(String verificationId, int? resendToken) onCodeSent,
     required void Function(PhoneAuthCredential credential)
-        onVerificationCompleted,
+    onVerificationCompleted,
     required void Function(String message) onFailed,
   }) async {
     await _auth.verifyPhoneNumber(
@@ -123,7 +120,9 @@ class AuthRepository {
   }
 
   Future<void> linkPhoneCredential(
-      String verificationId, String smsCode) async {
+    String verificationId,
+    String smsCode,
+  ) async {
     try {
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
@@ -163,8 +162,10 @@ class AuthRepository {
     const charset =
         '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
     final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
+    return List.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
   }
 
   String _sha256ofString(String input) {

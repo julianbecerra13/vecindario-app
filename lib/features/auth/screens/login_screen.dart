@@ -31,26 +31,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    final success = await ref.read(authNotifierProvider.notifier).login(
-          _emailController.text.trim(),
-          _passwordController.text,
-        );
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .login(_emailController.text.trim(), _passwordController.text);
     if (success && mounted) {
       context.go('/feed');
     }
   }
 
   Future<void> _handleGoogleLogin() async {
-    final success =
-        await ref.read(authNotifierProvider.notifier).loginWithGoogle();
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .loginWithGoogle();
     if (success && mounted) {
       context.go('/feed');
     }
   }
 
   Future<void> _handleAppleLogin() async {
-    final success =
-        await ref.read(authNotifierProvider.notifier).loginWithApple();
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .loginWithApple();
     if (success && mounted) {
       context.go('/feed');
     }
@@ -118,8 +119,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
                         ),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
                       ),
                     ),
                   ),
@@ -149,8 +151,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       const Expanded(child: Divider()),
                       Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: AppSizes.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.md,
+                        ),
                         child: Text(
                           'o continúa con',
                           style: AppTextStyles.bodySmall,

@@ -75,7 +75,14 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
             child: FilledButton(
               onPressed: _isLoading ? null : _submit,
               child: _isLoading
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Enviar'),
             ),
           ),
@@ -86,80 +93,96 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // Tipo
-          Text('Tipo de solicitud', style: AppTextStyles.heading3),
-          const SizedBox(height: AppSizes.sm),
-          Wrap(
-            spacing: 8,
-            children: PqrsType.values.map((t) {
-              final selected = _type == t;
-              return ChoiceChip(
-                avatar: Icon(t.icon, size: 14, color: selected ? Colors.white : t.color),
-                label: Text(t.label),
-                selected: selected,
-                onSelected: (_) => setState(() => _type = t),
-                selectedColor: t.color,
-                labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontSize: 12),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppSizes.lg),
-
-          // Categoría
-          Text('Categoría', style: AppTextStyles.heading3),
-          const SizedBox(height: AppSizes.sm),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: PqrsCategory.values.map((c) {
-              final selected = _category == c;
-              return ChoiceChip(
-                avatar: Icon(c.icon, size: 14),
-                label: Text(c.label),
-                selected: selected,
-                onSelected: (_) => setState(() => _category = c),
-                selectedColor: AppColors.primary,
-                labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontSize: 12),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppSizes.lg),
-
-          // Descripción
-          TextField(
-            controller: _descriptionController,
-            maxLines: 6,
-            decoration: const InputDecoration(
-              labelText: 'Descripción',
-              hintText: 'Describe tu petición, queja, reclamo o sugerencia...',
-              alignLabelWithHint: true,
-            ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: AppSizes.md),
-
-          // Info
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.info_outline, color: AppColors.primary, size: 20),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tu solicitud será enviada al administrador del conjunto. Recibirás notificación cuando sea atendida.',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            // Tipo
+            Text('Tipo de solicitud', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSizes.sm),
+            Wrap(
+              spacing: 8,
+              children: PqrsType.values.map((t) {
+                final selected = _type == t;
+                return ChoiceChip(
+                  avatar: Icon(
+                    t.icon,
+                    size: 14,
+                    color: selected ? Colors.white : t.color,
                   ),
-                ),
-              ],
+                  label: Text(t.label),
+                  selected: selected,
+                  onSelected: (_) => setState(() => _type = t),
+                  selectedColor: t.color,
+                  labelStyle: TextStyle(
+                    color: selected ? Colors.white : AppColors.textPrimary,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList(),
             ),
-          ),
-        ],
+            const SizedBox(height: AppSizes.lg),
+
+            // Categoría
+            Text('Categoría', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSizes.sm),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: PqrsCategory.values.map((c) {
+                final selected = _category == c;
+                return ChoiceChip(
+                  avatar: Icon(c.icon, size: 14),
+                  label: Text(c.label),
+                  selected: selected,
+                  onSelected: (_) => setState(() => _category = c),
+                  selectedColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color: selected ? Colors.white : AppColors.textPrimary,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: AppSizes.lg),
+
+            // Descripción
+            TextField(
+              controller: _descriptionController,
+              maxLines: 6,
+              decoration: const InputDecoration(
+                labelText: 'Descripción',
+                hintText:
+                    'Describe tu petición, queja, reclamo o sugerencia...',
+                alignLabelWithHint: true,
+              ),
+              textCapitalization: TextCapitalization.sentences,
+            ),
+            const SizedBox(height: AppSizes.md),
+
+            // Info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                ),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.primary, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Tu solicitud será enviada al administrador del conjunto. Recibirás notificación cuando sea atendida.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

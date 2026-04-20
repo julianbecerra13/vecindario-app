@@ -122,15 +122,11 @@ class _SubscriptionPlansScreenState
 
     setState(() => _isLoading = true);
     try {
-      await ref.read(subscriptionRepositoryProvider).startTrial(
-            communityId: communityId,
-            plan: plan,
-            adminUid: user.id,
-          );
+      await ref
+          .read(subscriptionRepositoryProvider)
+          .startTrial(communityId: communityId, plan: plan, adminUid: user.id);
       if (!mounted) return;
-      context.showSuccessSnackBar(
-        'Trial de 30 días activado: ${plan.label}',
-      );
+      context.showSuccessSnackBar('Trial de 30 días activado: ${plan.label}');
       context.go('/premium/dashboard');
     } on StateError catch (e) {
       if (mounted) context.showErrorSnackBar(e.message);
@@ -235,37 +231,39 @@ class _PlanCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          ...features.map((f) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  children: [
-                    Icon(
-                      f.included ? Icons.check : Icons.close,
-                      size: 16,
-                      color:
-                          f.included ? AppColors.success : AppColors.textHint,
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Icon(
+                    f.included ? Icons.check : Icons.close,
+                    size: 16,
+                    color: f.included ? AppColors.success : AppColors.textHint,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    f.text,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: f.included
+                          ? AppColors.textPrimary
+                          : AppColors.textHint,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      f.text,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: f.included
-                            ? AppColors.textPrimary
-                            : AppColors.textHint,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: AppSizes.md),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: onSubscribe,
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isPopular ? AppColors.success : AppColors.primary,
+                backgroundColor: isPopular
+                    ? AppColors.success
+                    : AppColors.primary,
               ),
               child: const Text('Probar gratis 30 días'),
             ),

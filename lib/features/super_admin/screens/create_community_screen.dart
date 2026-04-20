@@ -191,10 +191,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                 border: OutlineInputBorder(),
               ),
               items: UnitType.values.map((t) {
-                return DropdownMenuItem(
-                  value: t,
-                  child: Text(t.label),
-                );
+                return DropdownMenuItem(value: t, child: Text(t.label));
               }).toList(),
               onChanged: (v) {
                 if (v != null) setState(() => _unitType = v);

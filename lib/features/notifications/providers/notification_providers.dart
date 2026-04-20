@@ -25,9 +25,11 @@ final notificationsProvider = StreamProvider<List<NotificationModel>>((ref) {
       .orderBy('createdAt', descending: true)
       .limit(50)
       .snapshots()
-      .map((snap) => snap.docs
-          .map((doc) => NotificationModel.fromFirestore(doc.data(), doc.id))
-          .toList());
+      .map(
+        (snap) => snap.docs
+            .map((doc) => NotificationModel.fromFirestore(doc.data(), doc.id))
+            .toList(),
+      );
 });
 
 /// Contador de no leídas

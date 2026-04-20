@@ -3,9 +3,6 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
-import 'package:vecindario_app/features/premium/models/fine_model.dart';
-import 'package:vecindario_app/features/premium/models/pqrs_model.dart';
-import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_repository.dart';
 
 void main() {

@@ -36,8 +36,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
   }
 
   Future<void> _initCart() async {
-    final store =
-        await ref.read(storesRepositoryProvider).getStore(widget.storeId);
+    final store = await ref
+        .read(storesRepositoryProvider)
+        .getStore(widget.storeId);
     if (store != null && mounted) {
       ref.read(cartProvider.notifier).initCart(store.id, store.name);
     }
@@ -48,7 +49,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     final user = ref.read(currentUserProvider).value;
     final community = ref.read(currentCommunityProvider).value;
 
-    if (cart == null || cart.isEmpty || user == null || community == null) return;
+    if (cart == null || cart.isEmpty || user == null || community == null)
+      return;
 
     final fee = OrderModel.calculateServiceFee(community.estrato);
     final subtotal = cart.subtotal;
@@ -64,27 +66,35 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
         buyerName: user.displayName,
         buyerApartment: user.unitInfo,
         items: cart.items
-            .map((item) => OrderItemModel(
-                  name: item.name,
-                  price: item.price,
-                  quantity: item.quantity,
-                ))
+            .map(
+              (item) => OrderItemModel(
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+              ),
+            )
             .toList(),
         subtotal: subtotal,
         serviceFee: fee,
         total: subtotal + fee,
-        paymentMethod: _paymentMethod == PaymentMethod.online ? 'online' : 'cash',
+        paymentMethod: _paymentMethod == PaymentMethod.online
+            ? 'online'
+            : 'cash',
         createdAt: DateTime.now(),
       );
 
-      final orderId =
-          await ref.read(storesRepositoryProvider).createOrder(order);
+      final orderId = await ref
+          .read(storesRepositoryProvider)
+          .createOrder(order);
 
       // Si eligió pago online, abrir Wompi
       if (_paymentMethod == PaymentMethod.online) {
         final paymentService = ref.read(paymentServiceProvider);
         await paymentService.startPayment(
-          reference: PaymentService.generateReference(PaymentType.order, orderId),
+          reference: PaymentService.generateReference(
+            PaymentType.order,
+            orderId,
+          ),
           amountCOP: subtotal + fee,
           customerEmail: user.email,
           type: PaymentType.order,
@@ -115,9 +125,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     final fee = OrderModel.calculateServiceFee(estrato);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(cart?.storeName ?? 'Tienda'),
-      ),
+      appBar: AppBar(title: Text(cart?.storeName ?? 'Tienda')),
       body: itemsAsync.when(
         data: (items) {
           if (items.isEmpty) {
@@ -136,7 +144,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                 return StoreItemTile(
                   item: item,
                   quantity: quantity,
-                  onAdd: () => ref.read(cartProvider.notifier).addItem(
+                  onAdd: () => ref
+                      .read(cartProvider.notifier)
+                      .addItem(
                         storeItemId: item.id,
                         name: item.name,
                         price: item.price,
@@ -165,9 +175,11 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                         icon: Icons.money,
                         title: 'Contra entrega',
                         subtitle: 'Paga al recibir tu pedido',
-                        selected: _paymentMethod == PaymentMethod.cashOnDelivery,
+                        selected:
+                            _paymentMethod == PaymentMethod.cashOnDelivery,
                         onTap: () => setState(
-                            () => _paymentMethod = PaymentMethod.cashOnDelivery),
+                          () => _paymentMethod = PaymentMethod.cashOnDelivery,
+                        ),
                       ),
                       const SizedBox(height: AppSizes.xs),
                       _PaymentMethodTile(
@@ -175,8 +187,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                         title: 'Pago en línea',
                         subtitle: 'PSE, tarjeta o Nequi via Wompi',
                         selected: _paymentMethod == PaymentMethod.online,
-                        onTap: () =>
-                            setState(() => _paymentMethod = PaymentMethod.online),
+                        onTap: () => setState(
+                          () => _paymentMethod = PaymentMethod.online,
+                        ),
                       ),
                     ],
                   ),
@@ -237,9 +250,11 @@ class _PaymentMethodTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon,
-                color: selected ? AppColors.primary : AppColors.textHint,
-                size: 22),
+            Icon(
+              icon,
+              color: selected ? AppColors.primary : AppColors.textHint,
+              size: 22,
+            ),
             const SizedBox(width: AppSizes.sm),
             Expanded(
               child: Column(
@@ -258,13 +273,19 @@ class _PaymentMethodTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                        fontSize: 11, color: AppColors.textHint),
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
                   ),
                 ],
               ),
             ),
             if (selected)
-              const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primary,
+                size: 20,
+              ),
           ],
         ),
       ),

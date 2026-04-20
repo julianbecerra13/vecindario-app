@@ -47,17 +47,22 @@ class StorePanelScreen extends ConsumerWidget {
             );
           }
 
-          final pending =
-              orders.where((o) => o.status == OrderStatus.pending).toList();
+          final pending = orders
+              .where((o) => o.status == OrderStatus.pending)
+              .toList();
           final active = orders
-              .where((o) =>
-                  o.status == OrderStatus.confirmed ||
-                  o.status == OrderStatus.inTransit)
+              .where(
+                (o) =>
+                    o.status == OrderStatus.confirmed ||
+                    o.status == OrderStatus.inTransit,
+              )
               .toList();
           final completed = orders
-              .where((o) =>
-                  o.status == OrderStatus.delivered ||
-                  o.status == OrderStatus.cancelled)
+              .where(
+                (o) =>
+                    o.status == OrderStatus.delivered ||
+                    o.status == OrderStatus.cancelled,
+              )
               .toList();
 
           return ListView(
@@ -81,9 +86,11 @@ class StorePanelScreen extends ConsumerWidget {
                   _StatChip(
                     label: 'Hoy',
                     count: orders
-                        .where((o) =>
-                            o.createdAt.day == DateTime.now().day &&
-                            o.createdAt.month == DateTime.now().month)
+                        .where(
+                          (o) =>
+                              o.createdAt.day == DateTime.now().day &&
+                              o.createdAt.month == DateTime.now().month,
+                        )
                         .length,
                     color: AppColors.success,
                   ),
@@ -140,11 +147,15 @@ class _StatChip extends StatelessWidget {
             Text(
               '$count',
               style: TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w700, color: color),
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
             ),
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 10, color: AppColors.textHint)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 10, color: AppColors.textHint),
+            ),
           ],
         ),
       ),
@@ -193,13 +204,16 @@ class _OrderManageCard extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     '#${order.id.substring(0, 4).toUpperCase()} — ${order.buyerName}',
-                    style: AppTextStyles.bodyMedium
-                        .copyWith(fontWeight: FontWeight.w600),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: order.status.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSizes.radiusFull),
@@ -215,7 +229,8 @@ class _OrderManageCard extends ConsumerWidget {
                 ),
               ],
             ),
-            if (order.buyerApartment != null && order.buyerApartment!.isNotEmpty)
+            if (order.buyerApartment != null &&
+                order.buyerApartment!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
@@ -252,8 +267,7 @@ class _OrderManageCard extends ConsumerWidget {
                     child: OutlinedButton(
                       onPressed: () => ref
                           .read(storesRepositoryProvider)
-                          .updateOrderStatus(
-                              order.id, OrderStatus.cancelled),
+                          .updateOrderStatus(order.id, OrderStatus.cancelled),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.error,
                         side: const BorderSide(color: AppColors.error),
@@ -266,8 +280,7 @@ class _OrderManageCard extends ConsumerWidget {
                     child: ElevatedButton(
                       onPressed: () => ref
                           .read(storesRepositoryProvider)
-                          .updateOrderStatus(
-                              order.id, OrderStatus.confirmed),
+                          .updateOrderStatus(order.id, OrderStatus.confirmed),
                       child: const Text('Confirmar'),
                     ),
                   ),

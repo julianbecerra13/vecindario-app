@@ -60,7 +60,7 @@ class _RecommendExternalServiceScreenState
         'email': _emailController.text.trim(),
         'website': _websiteController.text.trim(),
         'recommendedBy': user.id,
-        'recommendedByName': user.displayName ?? 'Usuario',
+        'recommendedByName': user.displayName,
         'communityId': community.id,
         'createdAt': DateTime.now(),
       });
@@ -81,9 +81,7 @@ class _RecommendExternalServiceScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recomendar Servicio'),
-      ),
+      appBar: AppBar(title: const Text('Recomendar Servicio')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSizes.md),
         child: Column(

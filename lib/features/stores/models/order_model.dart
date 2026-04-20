@@ -88,7 +88,8 @@ class OrderModel {
   });
 
   factory OrderModel.fromFirestore(Map<String, dynamic> data, String id) {
-    final items = (data['items'] as List?)
+    final items =
+        (data['items'] as List?)
             ?.map((e) => OrderItemModel.fromMap(e as Map<String, dynamic>))
             .toList() ??
         [];

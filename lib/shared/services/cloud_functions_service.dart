@@ -50,16 +50,14 @@ class CloudFunctionsService {
 
   // --- Funciones específicas ---
 
-  Future<Map<String, dynamic>> approveResident(
-      String uid, String communityId) {
+  Future<Map<String, dynamic>> approveResident(String uid, String communityId) {
     return callFunction('ApproveResident', {
       'uid': uid,
       'communityId': communityId,
     });
   }
 
-  Future<Map<String, dynamic>> rejectResident(
-      String uid, String communityId) {
+  Future<Map<String, dynamic>> rejectResident(String uid, String communityId) {
     return callFunction('RejectResident', {
       'uid': uid,
       'communityId': communityId,
@@ -67,17 +65,14 @@ class CloudFunctionsService {
   }
 
   Future<Map<String, dynamic>> rotateInviteCode(String communityId) {
-    return callFunction('RotateInviteCode', {
-      'communityId': communityId,
-    });
+    return callFunction('RotateInviteCode', {'communityId': communityId});
   }
 
   Future<Map<String, dynamic>> createOrder(
-      String storeId, List<Map<String, dynamic>> items) {
-    return callFunction('CreateOrder', {
-      'storeId': storeId,
-      'items': items,
-    });
+    String storeId,
+    List<Map<String, dynamic>> items,
+  ) {
+    return callFunction('CreateOrder', {'storeId': storeId, 'items': items});
   }
 }
 

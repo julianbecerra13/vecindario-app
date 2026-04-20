@@ -19,15 +19,19 @@ final feedPostsProvider = StreamProvider<List<PostModel>>((ref) {
   return ref.watch(feedRepositoryProvider).watchPosts(communityId).map((posts) {
     if (search.isEmpty) return posts;
     return posts
-        .where((p) =>
-            p.text.toLowerCase().contains(search) ||
-            p.authorName.toLowerCase().contains(search))
+        .where(
+          (p) =>
+              p.text.toLowerCase().contains(search) ||
+              p.authorName.toLowerCase().contains(search),
+        )
         .toList();
   });
 });
 
-final postDetailProvider =
-    FutureProvider.family<PostModel?, String>((ref, postId) async {
+final postDetailProvider = FutureProvider.family<PostModel?, String>((
+  ref,
+  postId,
+) async {
   final communityId = ref.watch(currentCommunityIdProvider);
   if (communityId == null) return null;
   return ref.read(feedRepositoryProvider).getPost(communityId, postId);

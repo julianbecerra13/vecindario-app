@@ -12,28 +12,29 @@ import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
-final _communityDetailProvider =
-    StreamProvider.family<CommunityModel?, String>((ref, communityId) {
-  return ref
-      .watch(firestoreProvider)
-      .collection('communities')
-      .doc(communityId)
-      .snapshots()
-      .map((doc) {
-    if (!doc.exists || doc.data() == null) return null;
-    return CommunityModel.fromFirestore(doc.data()!, doc.id);
-  });
-});
+final _communityDetailProvider = StreamProvider.family<CommunityModel?, String>(
+  (ref, communityId) {
+    return ref
+        .watch(firestoreProvider)
+        .collection('communities')
+        .doc(communityId)
+        .snapshots()
+        .map((doc) {
+          if (!doc.exists || doc.data() == null) return null;
+          return CommunityModel.fromFirestore(doc.data()!, doc.id);
+        });
+  },
+);
 
 final _communitySubscriptionProvider =
     StreamProvider.family<Map<String, dynamic>?, String>((ref, communityId) {
-  return ref
-      .watch(firestoreProvider)
-      .collection('subscriptions')
-      .doc(communityId)
-      .snapshots()
-      .map((doc) => doc.exists ? doc.data() : null);
-});
+      return ref
+          .watch(firestoreProvider)
+          .collection('subscriptions')
+          .doc(communityId)
+          .snapshots()
+          .map((doc) => doc.exists ? doc.data() : null);
+    });
 
 class CommunityDetailAdminScreen extends ConsumerWidget {
   final String communityId;
@@ -42,8 +43,9 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final communityAsync = ref.watch(_communityDetailProvider(communityId));
-    final subscriptionAsync =
-        ref.watch(_communitySubscriptionProvider(communityId));
+    final subscriptionAsync = ref.watch(
+      _communitySubscriptionProvider(communityId),
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Detalle de comunidad')),
@@ -66,24 +68,14 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
               _InfoRow(label: 'Ciudad', value: c.city),
               _InfoRow(label: 'Estrato', value: c.estratoLabel),
               _InfoRow(label: 'Tipo unidad', value: c.unitType.label),
-              _InfoRow(
-                label: 'Residentes',
-                value: '${c.memberCount}',
-              ),
+              _InfoRow(label: 'Residentes', value: '${c.memberCount}'),
               _InfoRow(
                 label: 'Admin UID',
                 value: c.adminUid.isEmpty ? 'Sin asignar' : c.adminUid,
                 mono: true,
               ),
-              _InfoRow(
-                label: 'ID comunidad',
-                value: c.id,
-                mono: true,
-              ),
-              _InfoRow(
-                label: 'Creada',
-                value: _formatDate(c.createdAt),
-              ),
+              _InfoRow(label: 'ID comunidad', value: c.id, mono: true),
+              _InfoRow(label: 'Creada', value: _formatDate(c.createdAt)),
               const SizedBox(height: AppSizes.lg),
               Text('Suscripción', style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.sm),
@@ -96,8 +88,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline,
-                          color: AppColors.textHint),
+                      const Icon(Icons.lock_outline, color: AppColors.textHint),
                       const SizedBox(width: AppSizes.sm),
                       Expanded(
                         child: Text(
@@ -111,8 +102,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
               else ...[
                 _InfoRow(
                   label: 'Plan',
-                  value:
-                      (subscription['plan'] as String? ?? '-').toUpperCase(),
+                  value: (subscription['plan'] as String? ?? '-').toUpperCase(),
                 ),
                 _InfoRow(
                   label: 'Estado',
@@ -132,8 +122,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
               _ActionTile(
                 icon: Icons.workspace_premium,
                 title: 'Activar plan',
-                subtitle:
-                    'Starter, Profesional o Enterprise (trial o activo)',
+                subtitle: 'Starter, Profesional o Enterprise (trial o activo)',
                 onTap: () => _showActivatePlanDialog(context, ref, c),
               ),
               _ActionTile(
@@ -166,13 +155,16 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
       'sep',
       'oct',
       'nov',
-      'dic'
+      'dic',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 
   void _showAssignAdminDialog(
-      BuildContext context, WidgetRef ref, CommunityModel c) {
+    BuildContext context,
+    WidgetRef ref,
+    CommunityModel c,
+  ) {
     final uidController = TextEditingController(text: c.adminUid);
     showDialog(
       context: context,
@@ -232,7 +224,10 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
   }
 
   void _showActivatePlanDialog(
-      BuildContext context, WidgetRef ref, CommunityModel c) {
+    BuildContext context,
+    WidgetRef ref,
+    CommunityModel c,
+  ) {
     String selectedPlan = 'starter';
     showDialog(
       context: context,
@@ -245,11 +240,13 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
               ...['starter', 'professional', 'enterprise'].map((plan) {
                 return RadioListTile<String>(
                   title: Text(plan[0].toUpperCase() + plan.substring(1)),
-                  subtitle: Text(plan == 'starter'
-                      ? '\$150.000/mes'
-                      : plan == 'professional'
-                          ? '\$350.000/mes'
-                          : '\$600.000/mes'),
+                  subtitle: Text(
+                    plan == 'starter'
+                        ? '\$150.000/mes'
+                        : plan == 'professional'
+                        ? '\$350.000/mes'
+                        : '\$600.000/mes',
+                  ),
                   value: plan,
                   groupValue: selectedPlan,
                   onChanged: (v) =>
@@ -299,7 +296,10 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(
-      BuildContext context, WidgetRef ref, CommunityModel c) async {
+    BuildContext context,
+    WidgetRef ref,
+    CommunityModel c,
+  ) async {
     final confirm = await showConfirmDialog(
       context,
       title: 'Eliminar comunidad',
@@ -349,19 +349,16 @@ class _Header extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  community.name,
-                  style: AppTextStyles.heading2,
-                ),
+                child: Text(community.name, style: AppTextStyles.heading2),
               ),
               if (plan != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? AppColors.success
-                        : AppColors.textHint,
+                    color: isActive ? AppColors.success : AppColors.textHint,
                     borderRadius: BorderRadius.circular(AppSizes.radiusFull),
                   ),
                   child: Text(
@@ -446,11 +443,7 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
   final bool mono;
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    this.mono = false,
-  });
+  const _InfoRow({required this.label, required this.value, this.mono = false});
 
   @override
   Widget build(BuildContext context) {
@@ -473,10 +466,7 @@ class _InfoRow extends StatelessWidget {
             child: Text(
               value,
               style: mono
-                  ? const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                    )
+                  ? const TextStyle(fontFamily: 'monospace', fontSize: 12)
                   : AppTextStyles.bodyMedium,
             ),
           ),
@@ -516,9 +506,10 @@ class _ActionTile extends StatelessWidget {
           ),
           child: Icon(icon, color: c),
         ),
-        title: Text(title,
-            style: AppTextStyles.bodyMedium
-                .copyWith(fontWeight: FontWeight.w600)),
+        title: Text(
+          title,
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

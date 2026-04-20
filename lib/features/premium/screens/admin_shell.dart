@@ -48,11 +48,31 @@ class _AdminShellState extends ConsumerState<AdminShell> {
         selectedFontSize: 10,
         unselectedFontSize: 10,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.campaign_outlined), activeIcon: Icon(Icons.campaign), label: 'Circulares'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_outlined), activeIcon: Icon(Icons.account_balance), label: 'Finanzas'),
-          BottomNavigationBarItem(icon: Icon(Icons.pool_outlined), activeIcon: Icon(Icons.pool), label: 'Zonas'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'PQRS'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.campaign_outlined),
+            activeIcon: Icon(Icons.campaign),
+            label: 'Circulares',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_outlined),
+            activeIcon: Icon(Icons.account_balance),
+            label: 'Finanzas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pool_outlined),
+            activeIcon: Icon(Icons.pool),
+            label: 'Zonas',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            activeIcon: Icon(Icons.assignment),
+            label: 'PQRS',
+          ),
         ],
       ),
     );
@@ -76,7 +96,13 @@ class _AdminHomePage extends ConsumerWidget {
 
     final communityName = communityAsync.value?.name ?? 'Mi comunidad';
     final memberCount = communityAsync.value?.memberCount ?? 0;
-    final openPqrs = pqrsAsync.value?.where((p) => p.status.name != 'resolved' && p.status.name != 'closed').length ?? 0;
+    final openPqrs =
+        pqrsAsync.value
+            ?.where(
+              (p) => p.status.name != 'resolved' && p.status.name != 'closed',
+            )
+            .length ??
+        0;
 
     return Scaffold(
       appBar: AppBar(
@@ -87,8 +113,19 @@ class _AdminHomePage extends ConsumerWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Vecindario Admin', style: TextStyle(fontSize: 10, color: AppColors.success, letterSpacing: 1, fontWeight: FontWeight.w600)),
-            Text(communityName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            const Text(
+              'Vecindario Admin',
+              style: TextStyle(
+                fontSize: 10,
+                color: AppColors.success,
+                letterSpacing: 1,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              communityName,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
           ],
         ),
         actions: [
@@ -103,7 +140,11 @@ class _AdminHomePage extends ConsumerWidget {
                 ),
                 child: Text(
                   plan.toUpperCase(),
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.success),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.success,
+                  ),
                 ),
               ),
             ),
@@ -115,11 +156,23 @@ class _AdminHomePage extends ConsumerWidget {
           // Stats
           Row(
             children: [
-              _StatCard(value: '$memberCount', label: 'Residentes', color: AppColors.primary),
+              _StatCard(
+                value: '$memberCount',
+                label: 'Residentes',
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 6),
-              _StatCard(value: '$openPqrs', label: 'PQRS abiertos', color: AppColors.warning),
+              _StatCard(
+                value: '$openPqrs',
+                label: 'PQRS abiertos',
+                color: AppColors.warning,
+              ),
               const SizedBox(width: 6),
-              _StatCard(value: _formatCOP(revenue), label: 'Recaudo mes', color: AppColors.success),
+              _StatCard(
+                value: _formatCOP(revenue),
+                label: 'Recaudo mes',
+                color: AppColors.success,
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.lg),
@@ -128,23 +181,31 @@ class _AdminHomePage extends ConsumerWidget {
           Text('ACCIONES RÁPIDAS', style: AppTextStyles.label),
           const SizedBox(height: AppSizes.sm),
           _QuickAction(
-            icon: Icons.campaign, color: AppColors.info,
-            title: 'Nueva Circular', subtitle: 'Enviar comunicado oficial',
+            icon: Icons.campaign,
+            color: AppColors.info,
+            title: 'Nueva Circular',
+            subtitle: 'Enviar comunicado oficial',
             onTap: () => context.push('/premium/circulars/create'),
           ),
           _QuickAction(
-            icon: Icons.warning_amber, color: AppColors.error,
-            title: 'Registrar Multa', subtitle: 'Crear sanción con evidencia',
+            icon: Icons.warning_amber,
+            color: AppColors.error,
+            title: 'Registrar Multa',
+            subtitle: 'Crear sanción con evidencia',
             onTap: () => context.push('/premium/fines/create'),
           ),
           _QuickAction(
-            icon: Icons.account_balance, color: AppColors.success,
-            title: 'Finanzas', subtitle: 'Presupuesto y ejecución',
+            icon: Icons.account_balance,
+            color: AppColors.success,
+            title: 'Finanzas',
+            subtitle: 'Presupuesto y ejecución',
             onTap: () => context.push('/premium/finances'),
           ),
           _QuickAction(
-            icon: Icons.how_to_vote, color: const Color(0xFF8B5CF6),
-            title: 'Convocar Asamblea', subtitle: 'Crear convocatoria con agenda',
+            icon: Icons.how_to_vote,
+            color: const Color(0xFF8B5CF6),
+            title: 'Convocar Asamblea',
+            subtitle: 'Crear convocatoria con agenda',
             onTap: () => context.push('/premium/assemblies'),
           ),
 
@@ -157,50 +218,85 @@ class _AdminHomePage extends ConsumerWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('SOLICITUDES PENDIENTES (${pending.length})', style: AppTextStyles.label),
+                  Text(
+                    'SOLICITUDES PENDIENTES (${pending.length})',
+                    style: AppTextStyles.label,
+                  ),
                   const SizedBox(height: AppSizes.sm),
-                  ...pending.take(5).map((user) => Card(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    child: ListTile(
-                      dense: true,
-                      leading: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        child: Text(
-                          user.displayName.isNotEmpty ? user.displayName[0] : '?',
-                          style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontSize: 12),
+                  ...pending
+                      .take(5)
+                      .map(
+                        (user) => Card(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          child: ListTile(
+                            dense: true,
+                            leading: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: AppColors.primary.withValues(
+                                alpha: 0.1,
+                              ),
+                              child: Text(
+                                user.displayName.isNotEmpty
+                                    ? user.displayName[0]
+                                    : '?',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              user.displayName,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'T${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}',
+                              style: AppTextStyles.caption,
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _MiniButton(
+                                  icon: Icons.check,
+                                  color: AppColors.success,
+                                  onTap: () async {
+                                    final communityId = ref.read(
+                                      currentCommunityIdProvider,
+                                    );
+                                    if (communityId != null) {
+                                      await ref
+                                          .read(cloudFunctionsProvider)
+                                          .approveResident(
+                                            user.id,
+                                            communityId,
+                                          );
+                                    }
+                                  },
+                                ),
+                                const SizedBox(width: 4),
+                                _MiniButton(
+                                  icon: Icons.close,
+                                  color: AppColors.textHint,
+                                  onTap: () async {
+                                    final communityId = ref.read(
+                                      currentCommunityIdProvider,
+                                    );
+                                    if (communityId != null) {
+                                      await ref
+                                          .read(cloudFunctionsProvider)
+                                          .rejectResident(user.id, communityId);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                      title: Text(user.displayName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                      subtitle: Text('T${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}', style: AppTextStyles.caption),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _MiniButton(
-                            icon: Icons.check,
-                            color: AppColors.success,
-                            onTap: () async {
-                              final communityId = ref.read(currentCommunityIdProvider);
-                              if (communityId != null) {
-                                await ref.read(cloudFunctionsProvider).approveResident(user.id, communityId);
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 4),
-                          _MiniButton(
-                            icon: Icons.close,
-                            color: AppColors.textHint,
-                            onTap: () async {
-                              final communityId = ref.read(currentCommunityIdProvider);
-                              if (communityId != null) {
-                                await ref.read(cloudFunctionsProvider).rejectResident(user.id, communityId);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
                 ],
               );
             },
@@ -216,7 +312,11 @@ class _AdminHomePage extends ConsumerWidget {
 class _StatCard extends StatelessWidget {
   final String value, label;
   final Color color;
-  const _StatCard({required this.value, required this.label, required this.color});
+  const _StatCard({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -226,9 +326,20 @@ class _StatCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
           child: Column(
             children: [
-              Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: color)),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(label, style: const TextStyle(fontSize: 9, color: AppColors.textHint), textAlign: TextAlign.center),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 9, color: AppColors.textHint),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
@@ -242,7 +353,13 @@ class _QuickAction extends StatelessWidget {
   final Color color;
   final String title, subtitle;
   final VoidCallback onTap;
-  const _QuickAction({required this.icon, required this.color, required this.title, required this.subtitle, required this.onTap});
+  const _QuickAction({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -251,13 +368,24 @@ class _QuickAction extends StatelessWidget {
       child: ListTile(
         dense: true,
         leading: Container(
-          width: 36, height: 36,
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.textHint, size: 18),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: AppColors.textHint,
+          size: 18,
+        ),
         onTap: onTap,
       ),
     );
@@ -268,7 +396,11 @@ class _MiniButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  const _MiniButton({required this.icon, required this.color, required this.onTap});
+  const _MiniButton({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -277,7 +409,10 @@ class _MiniButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
       child: Container(
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(4),
+        ),
         child: Icon(icon, size: 14, color: color),
       ),
     );

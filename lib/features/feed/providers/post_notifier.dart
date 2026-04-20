@@ -87,5 +87,5 @@ class PostNotifier extends StateNotifier<PostActionState> {
 
 final postNotifierProvider =
     StateNotifierProvider<PostNotifier, PostActionState>((ref) {
-  return PostNotifier(ref);
-});
+      return PostNotifier(ref);
+    });

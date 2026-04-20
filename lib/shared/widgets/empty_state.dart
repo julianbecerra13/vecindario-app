@@ -50,10 +50,7 @@ class EmptyState extends StatelessWidget {
             ],
             if (actionText != null && onAction != null) ...[
               const SizedBox(height: AppSizes.lg),
-              ElevatedButton(
-                onPressed: onAction,
-                child: Text(actionText!),
-              ),
+              ElevatedButton(onPressed: onAction, child: Text(actionText!)),
             ],
           ],
         ),

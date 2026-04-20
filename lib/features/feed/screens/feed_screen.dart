@@ -77,8 +77,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    loading: () => const Text('Cargando...', style: TextStyle(fontSize: 16)),
-                    error: (_, __) => const Text('Vecindario', style: TextStyle(fontSize: 16)),
+                    loading: () => const Text(
+                      'Cargando...',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    error: (_, __) => const Text(
+                      'Vecindario',
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),
@@ -103,39 +109,41 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 });
               },
             ),
-          Builder(builder: (context) {
-            final unread = ref.watch(unreadCountProvider);
-            return Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
-                  onPressed: () => context.push('/notifications'),
-                ),
-                if (unread > 0)
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: const BoxDecoration(
-                        color: AppColors.error,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        unread > 9 ? '9+' : '$unread',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
+          Builder(
+            builder: (context) {
+              final unread = ref.watch(unreadCountProvider);
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () => context.push('/notifications'),
+                  ),
+                  if (unread > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        decoration: const BoxDecoration(
+                          color: AppColors.error,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          unread > 9 ? '9+' : '$unread',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            );
-          }),
+                ],
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
             child: GestureDetector(
@@ -223,9 +231,7 @@ class _AdBanner extends StatelessWidget {
           ],
         ),
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [

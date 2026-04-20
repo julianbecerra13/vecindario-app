@@ -47,7 +47,10 @@ class NotificationModel {
     required this.createdAt,
   });
 
-  factory NotificationModel.fromFirestore(Map<String, dynamic> data, String id) {
+  factory NotificationModel.fromFirestore(
+    Map<String, dynamic> data,
+    String id,
+  ) {
     return NotificationModel(
       id: id,
       uid: data['uid'] ?? '',

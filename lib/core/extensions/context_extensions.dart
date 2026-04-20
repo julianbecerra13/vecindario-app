@@ -13,32 +13,26 @@ extension ContextExtensions on BuildContext {
 
   void showSnackBar(String message) {
     ScaffoldMessenger.of(this).hideCurrentSnackBar();
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void showErrorSnackBar(String message) {
     ScaffoldMessenger.of(this).hideCurrentSnackBar();
     ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
     );
   }
 
   void showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(this).hideCurrentSnackBar();
     ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.success,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppColors.success),
     );
   }
 
-  Future<T?> showBottomSheet<T>({required Widget Function(BuildContext) builder}) {
+  Future<T?> showBottomSheet<T>({
+    required Widget Function(BuildContext) builder,
+  }) {
     return showModalBottomSheet<T>(
       context: this,
       isScrollControlled: true,

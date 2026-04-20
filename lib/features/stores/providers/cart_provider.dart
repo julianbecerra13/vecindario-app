@@ -15,11 +15,9 @@ class CartNotifier extends StateNotifier<CartModel?> {
     required int price,
   }) {
     if (state == null) return;
-    state!.addItem(CartItem(
-      storeItemId: storeItemId,
-      name: name,
-      price: price,
-    ));
+    state!.addItem(
+      CartItem(storeItemId: storeItemId, name: name, price: price),
+    );
     state = CartModel(
       storeId: state!.storeId,
       storeName: state!.storeName,

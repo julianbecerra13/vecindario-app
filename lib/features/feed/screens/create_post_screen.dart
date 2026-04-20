@@ -67,7 +67,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       createdAt: DateTime.now(),
     );
 
-    final success = await ref.read(postNotifierProvider.notifier).createPost(post);
+    final success = await ref
+        .read(postNotifierProvider.notifier)
+        .createPost(post);
     if (success && mounted) {
       context.showSuccessSnackBar('Publicado');
       context.pop();
@@ -90,9 +92,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             padding: const EdgeInsets.only(right: AppSizes.sm),
             child: ElevatedButton(
               onPressed: actionState.isLoading ? null : _publish,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(80, 36),
-              ),
+              style: ElevatedButton.styleFrom(minimumSize: const Size(80, 36)),
               child: actionState.isLoading
                   ? const SizedBox(
                       height: 16,

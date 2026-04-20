@@ -31,8 +31,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return;
     try {
-      final consents =
-          await ref.read(userRepositoryProvider).getConsents(user.id);
+      final consents = await ref
+          .read(userRepositoryProvider)
+          .getConsents(user.id);
       if (mounted) {
         setState(() {
           _pushEnabled = consents['pushNotifications'] ?? true;
@@ -68,8 +69,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-              border:
-                  Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
             ),
             child: const Row(
               children: [
@@ -90,7 +92,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                       Text(
                         'Tienes derecho a conocer, actualizar, rectificar y suprimir tus datos personales.',
                         style: TextStyle(
-                            fontSize: 12, color: AppColors.textSecondary),
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -195,8 +199,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.warning_amber,
-                        color: AppColors.error, size: 20),
+                    Icon(Icons.warning_amber, color: AppColors.error, size: 20),
                     SizedBox(width: AppSizes.sm),
                     Text(
                       'Esta acción es irreversible',
@@ -212,39 +215,43 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 const Text(
                   'Después de 15 días no podrás recuperar tu cuenta.',
                   style: TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary),
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: AppSizes.md),
                 const Text(
                   'Se eliminará:',
-                  style:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
                 _DeleteItem(text: 'Tu perfil y foto', isDelete: true),
-                _DeleteItem(
-                    text: 'Documentos de verificación', isDelete: true),
+                _DeleteItem(text: 'Documentos de verificación', isDelete: true),
                 _DeleteItem(text: 'Tokens y sesiones', isDelete: true),
                 const SizedBox(height: AppSizes.sm),
                 const Text(
                   'Se anonimizará:',
-                  style:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 4),
                 _DeleteItem(
-                    text: 'Posts → "Usuario eliminado"', isDelete: false),
+                  text: 'Posts → "Usuario eliminado"',
+                  isDelete: false,
+                ),
                 _DeleteItem(
-                    text: 'Reseñas → "Usuario eliminado"', isDelete: false),
-                _DeleteItem(
-                    text: 'Pedidos → uid → null', isDelete: false),
+                  text: 'Reseñas → "Usuario eliminado"',
+                  isDelete: false,
+                ),
+                _DeleteItem(text: 'Pedidos → uid → null', isDelete: false),
                 const SizedBox(height: AppSizes.md),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () => _showDeleteAccountDialog(context),
-                    icon: const Icon(Icons.delete_forever,
-                        color: AppColors.error),
+                    icon: const Icon(
+                      Icons.delete_forever,
+                      color: AppColors.error,
+                    ),
                     label: const Text(
                       'Eliminar mi cuenta (15 días de gracia)',
                       style: TextStyle(color: AppColors.error),
@@ -275,15 +282,16 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           title: const Text(
             'Eliminar Cuenta',
             style: TextStyle(
-                color: AppColors.error, fontWeight: FontWeight.w700),
+              color: AppColors.error,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
                 '¿Estás seguro? Después de 15 días esta acción no se puede deshacer.',
-                style: TextStyle(
-                    fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               const SizedBox(height: AppSizes.md),
               TextField(
@@ -310,7 +318,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                       final password = passwordController.text;
                       if (password.isEmpty) {
                         setDialogState(
-                            () => errorText = 'Ingresa tu contraseña');
+                          () => errorText = 'Ingresa tu contraseña',
+                        );
                         return;
                       }
 
@@ -321,20 +330,19 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
 
                       try {
                         // Reautenticar con contraseña real
-                        final firebaseUser =
-                            FirebaseAuth.instance.currentUser!;
-                        final credential =
-                            EmailAuthProvider.credential(
+                        final firebaseUser = FirebaseAuth.instance.currentUser!;
+                        final credential = EmailAuthProvider.credential(
                           email: firebaseUser.email!,
                           password: password,
                         );
-                        await firebaseUser
-                            .reauthenticateWithCredential(credential);
+                        await firebaseUser.reauthenticateWithCredential(
+                          credential,
+                        );
 
                         // Contraseña correcta — proceder con eliminación
+                        if (!ctx.mounted) return;
                         Navigator.pop(ctx);
-                        final user =
-                            ref.read(currentUserProvider).value;
+                        final user = ref.read(currentUserProvider).value;
                         if (user != null) {
                           ref
                               .read(userRepositoryProvider)
@@ -359,14 +367,15 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                         });
                       }
                     },
-              style:
-                  FilledButton.styleFrom(backgroundColor: AppColors.error),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
               child: isLoading
                   ? const SizedBox(
                       height: 16,
                       width: 16,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Text('Eliminar mi cuenta'),
             ),
@@ -416,8 +425,7 @@ class _PrivacyAction extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(subtitle, style: AppTextStyles.caption),
-      trailing:
-          const Icon(Icons.chevron_right, color: AppColors.textHint),
+      trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
     );

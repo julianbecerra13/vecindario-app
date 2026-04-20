@@ -17,26 +17,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Registrar handler para notificaciones en background
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // Inicializar Remote Config
-  final remoteConfig = RemoteConfigService(
-    FirebaseRemoteConfig.instance,
-  );
+  final remoteConfig = RemoteConfigService(FirebaseRemoteConfig.instance);
   await remoteConfig.initialize();
 
   // Configurar timeago en español
   timeago.setLocaleMessages('es', timeago.EsMessages());
   timeago.setDefaultLocale('es');
 
-  runApp(
-    const ProviderScope(
-      child: VecindarioApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: VecindarioApp()));
 }

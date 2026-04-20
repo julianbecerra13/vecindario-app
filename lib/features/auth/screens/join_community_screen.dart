@@ -198,18 +198,14 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
               TextFormField(
                 controller: _towerController,
                 textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  hintText: _primaryLabel,
-                ),
+                decoration: InputDecoration(hintText: _primaryLabel),
               ),
               const SizedBox(height: AppSizes.md),
               TextFormField(
                 controller: _apartmentController,
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _handleJoin(),
-                decoration: InputDecoration(
-                  hintText: _secondaryLabel,
-                ),
+                decoration: InputDecoration(hintText: _secondaryLabel),
               ),
               const SizedBox(height: AppSizes.xl),
               ElevatedButton(

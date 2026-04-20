@@ -95,7 +95,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.mark_email_read_outlined, size: 80, color: Color(0xFF4CAF50)),
+        const Icon(
+          Icons.mark_email_read_outlined,
+          size: 80,
+          color: Color(0xFF4CAF50),
+        ),
         const SizedBox(height: AppSizes.lg),
         Text('¡Revisa tu correo!', style: AppTextStyles.heading2),
         const SizedBox(height: AppSizes.sm),

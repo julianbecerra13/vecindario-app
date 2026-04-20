@@ -7,10 +7,12 @@ class RemoteConfigService {
   RemoteConfigService(this._config);
 
   Future<void> initialize() async {
-    await _config.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: const Duration(hours: 1),
-    ));
+    await _config.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(hours: 1),
+      ),
+    );
 
     await _config.setDefaults({
       // Tarifas de servicio por estrato (COP)
@@ -22,8 +24,10 @@ class RemoteConfigService {
       'fee_estrato_6': 500,
       // Features premium por plan
       'starter_features': 'circulars,pqrs,manual,fines',
-      'professional_features': 'circulars,pqrs,manual,fines,amenities,finances,payments',
-      'enterprise_features': 'circulars,pqrs,manual,fines,amenities,finances,payments,assemblies,reports,api',
+      'professional_features':
+          'circulars,pqrs,manual,fines,amenities,finances,payments',
+      'enterprise_features':
+          'circulars,pqrs,manual,fines,amenities,finances,payments,assemblies,reports,api',
     });
 
     try {

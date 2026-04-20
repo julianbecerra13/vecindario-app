@@ -15,9 +15,11 @@ class FeedRepository {
         .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => PostModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => PostModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<PostModel?> getPost(String communityId, String postId) async {
@@ -95,9 +97,7 @@ class FeedRepository {
         voterUids: [...options[optionIndex].voterUids, uid],
       );
 
-      tx.update(ref, {
-        'pollOptions': options.map((e) => e.toMap()).toList(),
-      });
+      tx.update(ref, {'pollOptions': options.map((e) => e.toMap()).toList()});
     });
   }
 
@@ -113,24 +113,23 @@ class FeedRepository {
         .doc(postId)
         .collection('reports')
         .add({
-      'reporterUid': reporterUid,
-      'reason': reason,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+          'reporterUid': reporterUid,
+          'reason': reason,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
   }
 
   // Comentarios
-  Stream<List<CommentModel>> watchComments(
-    String communityId,
-    String postId,
-  ) {
+  Stream<List<CommentModel>> watchComments(String communityId, String postId) {
     return _firestore
         .collection(FirestorePaths.comments(communityId, postId))
         .orderBy('createdAt', descending: false)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => CommentModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => CommentModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> addComment(
@@ -141,9 +140,7 @@ class FeedRepository {
     final batch = _firestore.batch();
 
     batch.set(
-      _firestore
-          .collection(FirestorePaths.comments(communityId, postId))
-          .doc(),
+      _firestore.collection(FirestorePaths.comments(communityId, postId)).doc(),
       comment.toFirestore(),
     );
 

@@ -120,7 +120,10 @@ class AppTheme {
         unselectedItemColor: AppColors.textHint,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
-        selectedLabelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        selectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
         unselectedLabelStyle: TextStyle(fontSize: 12),
       ),
       chipTheme: ChipThemeData(
@@ -176,9 +179,7 @@ class AppTheme {
         textColor: AppColors.textPrimary,
         iconColor: AppColors.textSecondary,
       ),
-      popupMenuTheme: const PopupMenuThemeData(
-        color: AppColors.surfaceVariant,
-      ),
+      popupMenuTheme: const PopupMenuThemeData(color: AppColors.surfaceVariant),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
       ),

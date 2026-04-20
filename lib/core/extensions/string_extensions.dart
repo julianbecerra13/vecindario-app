@@ -38,7 +38,8 @@ extension StringExtensions on String {
 
   bool get isValidPhone {
     final digits = replaceAll(RegExp(r'[^\d]'), '');
-    return digits.length == 10 || (digits.length == 12 && digits.startsWith('57'));
+    return digits.length == 10 ||
+        (digits.length == 12 && digits.startsWith('57'));
   }
 
   bool get isValidInviteCode {

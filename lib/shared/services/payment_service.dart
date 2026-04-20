@@ -52,7 +52,9 @@ class PaymentRecord {
     return PaymentRecord(
       id: id,
       reference: data['reference'] ?? '',
-      amount: data['amountInCents'] != null ? (data['amountInCents'] as int) ~/ 100 : data['amount'] ?? 0,
+      amount: data['amountInCents'] != null
+          ? (data['amountInCents'] as int) ~/ 100
+          : data['amount'] ?? 0,
       type: PaymentType.values.firstWhere(
         (e) => e.value == (data['type'] ?? ''),
         orElse: () => PaymentType.cuota,
@@ -62,7 +64,8 @@ class PaymentRecord {
         orElse: () => PaymentStatus.pending,
       ),
       transactionId: data['transactionId'],
-      createdAt: (data['processedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt:
+          (data['processedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 }
@@ -73,7 +76,8 @@ class PaymentService {
   final FirebaseAuth _auth;
 
   /// Llave pública de Wompi (sandbox para desarrollo)
-  static const _wompiPublicKey = 'pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7';
+  static const _wompiPublicKey =
+      'pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7';
 
   /// URL base de Wompi checkout
   static const _wompiCheckoutBase = 'https://checkout.wompi.co/p/';
@@ -107,13 +111,15 @@ class PaymentService {
     });
 
     // Construir URL de checkout de Wompi
-    final uri = Uri.parse(_wompiCheckoutBase).replace(queryParameters: {
-      'public-key': _wompiPublicKey,
-      'currency': currency,
-      'amount-in-cents': '${amountCOP * 100}',
-      'reference': reference,
-      'customer-data:email': customerEmail,
-    });
+    final uri = Uri.parse(_wompiCheckoutBase).replace(
+      queryParameters: {
+        'public-key': _wompiPublicKey,
+        'currency': currency,
+        'amount-in-cents': '${amountCOP * 100}',
+        'reference': reference,
+        'customer-data:email': customerEmail,
+      },
+    );
 
     // Abrir en navegador
     if (await canLaunchUrl(uri)) {
@@ -131,9 +137,12 @@ class PaymentService {
         .limit(1)
         .snapshots()
         .map((snap) {
-      if (snap.docs.isEmpty) return null;
-      return PaymentRecord.fromFirestore(snap.docs.first.data(), snap.docs.first.id);
-    });
+          if (snap.docs.isEmpty) return null;
+          return PaymentRecord.fromFirestore(
+            snap.docs.first.data(),
+            snap.docs.first.id,
+          );
+        });
   }
 
   /// Generar referencia única para un pago
@@ -186,7 +195,9 @@ class PaymentButton extends ConsumerWidget {
           );
           if (!launched && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('No se pudo abrir el sistema de pago')),
+              const SnackBar(
+                content: Text('No se pudo abrir el sistema de pago'),
+              ),
             );
           }
         },

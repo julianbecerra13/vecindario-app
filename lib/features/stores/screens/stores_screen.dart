@@ -18,10 +18,7 @@ class StoresScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final storesAsync = ref.watch(storesListProvider);
     final communityAsync = ref.watch(currentCommunityProvider);
-    final estrato = communityAsync.whenOrNull(
-          data: (c) => c?.estrato,
-        ) ??
-        3;
+    final estrato = communityAsync.whenOrNull(data: (c) => c?.estrato) ?? 3;
     final fee = OrderModel.calculateServiceFee(estrato);
 
     return Scaffold(

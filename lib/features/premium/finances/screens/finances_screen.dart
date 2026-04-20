@@ -63,12 +63,13 @@ class _AdminFinancesView extends ConsumerWidget {
           }
           // Presupuesto estimado (1.3x del gasto real como placeholder)
           for (final cat in expenseByCategory.keys) {
-            budgetByCategory[cat] =
-                (expenseByCategory[cat]! * 1.3).round();
+            budgetByCategory[cat] = (expenseByCategory[cat]! * 1.3).round();
           }
 
           // Tasa de recaudo (ingresos / (ingresos + cartera))
-          final recaudoRate = incomes > 0 ? (incomes / (incomes + expenses * 0.1)) : 0.0;
+          final recaudoRate = incomes > 0
+              ? (incomes / (incomes + expenses * 0.1))
+              : 0.0;
 
           return ListView(
             padding: const EdgeInsets.all(AppSizes.md),
@@ -124,8 +125,10 @@ class _AdminFinancesView extends ConsumerWidget {
               // Gráfico Presupuesto vs Ejecución
               if (expenseByCategory.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.lg),
-                Text('Presupuesto vs. Ejecución',
-                    style: AppTextStyles.heading3),
+                Text(
+                  'Presupuesto vs. Ejecución',
+                  style: AppTextStyles.heading3,
+                ),
                 const SizedBox(height: AppSizes.sm),
                 Container(
                   height: 200,
@@ -145,7 +148,10 @@ class _AdminFinancesView extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _ChartLegend(color: AppColors.primary, label: 'Presupuesto'),
+                    _ChartLegend(
+                      color: AppColors.primary,
+                      label: 'Presupuesto',
+                    ),
                     const SizedBox(width: AppSizes.md),
                     _ChartLegend(color: AppColors.success, label: 'Ejecutado'),
                   ],
@@ -171,10 +177,13 @@ class _AdminFinancesView extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Tasa de recaudo',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary)),
+                            const Text(
+                              'Tasa de recaudo',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                             Text(
                               '${(recaudoRate * 100).toStringAsFixed(0)}%',
                               style: TextStyle(
@@ -188,10 +197,13 @@ class _AdminFinancesView extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text('Cartera morosa',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary)),
+                            const Text(
+                              'Cartera morosa',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
                             Text(
                               formatCOP((expenses * 0.1).round()),
                               style: TextStyle(
@@ -246,9 +258,10 @@ class _BudgetVsExecutionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxValue = [...budget.values, ...executed.values]
-        .fold(0, (a, b) => a > b ? a : b)
-        .toDouble();
+    final maxValue = [
+      ...budget.values,
+      ...executed.values,
+    ].fold(0, (a, b) => a > b ? a : b).toDouble();
 
     return BarChart(
       BarChartData(
@@ -269,7 +282,9 @@ class _BudgetVsExecutionChart extends StatelessWidget {
                     child: Text(
                       label.length > 6 ? '${label.substring(0, 6)}.' : label,
                       style: const TextStyle(
-                          fontSize: 9, color: AppColors.textHint),
+                        fontSize: 9,
+                        color: AppColors.textHint,
+                      ),
                     ),
                   );
                 }
@@ -279,11 +294,14 @@ class _BudgetVsExecutionChart extends StatelessWidget {
             ),
           ),
           leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false)),
+            sideTitles: SideTitles(showTitles: false),
+          ),
           topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false)),
+            sideTitles: SideTitles(showTitles: false),
+          ),
           rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false)),
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         borderData: FlBorderData(show: false),
         gridData: const FlGridData(show: false),
@@ -296,15 +314,17 @@ class _BudgetVsExecutionChart extends StatelessWidget {
                 toY: (budget[cat] ?? 0).toDouble(),
                 color: AppColors.primary,
                 width: 10,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(4)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
               ),
               BarChartRodData(
                 toY: (executed[cat] ?? 0).toDouble(),
                 color: AppColors.success,
                 width: 10,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(4)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(4),
+                ),
               ),
             ],
           );
@@ -333,8 +353,10 @@ class _ChartLegend extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(label,
-            style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+        ),
       ],
     );
   }
@@ -360,11 +382,16 @@ class _ResidentFinancesView extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.account_balance_wallet,
-                        size: 64, color: AppColors.textHint),
+                    Icon(
+                      Icons.account_balance_wallet,
+                      size: 64,
+                      color: AppColors.textHint,
+                    ),
                     SizedBox(height: AppSizes.md),
-                    Text('Estado de cuenta no disponible',
-                        style: TextStyle(color: AppColors.textSecondary)),
+                    Text(
+                      'Estado de cuenta no disponible',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
                   ],
                 ),
               ),
@@ -404,8 +431,11 @@ class _ResidentFinancesView extends ConsumerWidget {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check_circle,
-                              color: AppColors.success, size: 16),
+                          Icon(
+                            Icons.check_circle,
+                            color: AppColors.success,
+                            size: 16,
+                          ),
                           SizedBox(width: 4),
                           Text(
                             'Estás al día',
@@ -432,9 +462,7 @@ class _ResidentFinancesView extends ConsumerWidget {
               const SizedBox(height: AppSizes.lg),
               Text('Historial', style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.md),
-              ...statement.items.map(
-                (item) => _StatementItemTile(item: item),
-              ),
+              ...statement.items.map((item) => _StatementItemTile(item: item)),
             ],
           );
         },
@@ -521,8 +549,9 @@ class _FinanceEntryTile extends StatelessWidget {
               children: [
                 Text(
                   entry.description,
-                  style: AppTextStyles.bodySmall
-                      .copyWith(fontWeight: FontWeight.w600),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
                   '${entry.category} \u00b7 ${entry.date.formatDateShort}',
@@ -558,8 +587,7 @@ class _StatementItemTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSizes.sm),
       child: ListTile(
         title: Text(item.concept, style: AppTextStyles.bodySmall),
-        subtitle:
-            Text(item.date.formatDateShort, style: AppTextStyles.caption),
+        subtitle: Text(item.date.formatDateShort, style: AppTextStyles.caption),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -572,8 +600,7 @@ class _StatementItemTile extends StatelessWidget {
               ),
             ),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
                 color: isPaid
                     ? AppColors.success.withValues(alpha: 0.1)

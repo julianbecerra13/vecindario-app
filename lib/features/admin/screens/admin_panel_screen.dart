@@ -36,7 +36,12 @@ class AdminPanelScreen extends ConsumerWidget {
           children: [
             const Text(
               'PANEL ADMIN',
-              style: TextStyle(fontSize: 10, color: AppColors.primary, letterSpacing: 1, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 10,
+                color: AppColors.primary,
+                letterSpacing: 1,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
               communityAsync.value?.name ?? 'Mi comunidad',
@@ -62,7 +67,11 @@ class AdminPanelScreen extends ConsumerWidget {
                             ),
                             child: Text(
                               '${list.length}',
-                              style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.w700),
+                              style: const TextStyle(
+                                fontSize: 9,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         )
@@ -96,7 +105,12 @@ class AdminPanelScreen extends ConsumerWidget {
                     children: [
                       const Text(
                         'CÓDIGO DE INVITACIÓN',
-                        style: TextStyle(fontSize: 9, color: Color(0xFF60A5FA), letterSpacing: 1, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Color(0xFF60A5FA),
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -129,10 +143,14 @@ class AdminPanelScreen extends ConsumerWidget {
                       icon: Icons.refresh,
                       label: 'Rotar',
                       onTap: () async {
-                        final communityId = ref.read(currentCommunityIdProvider);
+                        final communityId = ref.read(
+                          currentCommunityIdProvider,
+                        );
                         if (communityId == null) return;
                         final newCode = _generateCode();
-                        await ref.read(communityRepositoryProvider).regenerateInviteCode(communityId, newCode);
+                        await ref
+                            .read(communityRepositoryProvider)
+                            .regenerateInviteCode(communityId, newCode);
                         if (context.mounted) {
                           context.showSuccessSnackBar('Nuevo código: $newCode');
                         }
@@ -161,47 +179,71 @@ class AdminPanelScreen extends ConsumerWidget {
                     style: AppTextStyles.heading3,
                   ),
                   const SizedBox(height: AppSizes.sm),
-                  ...pending.take(3).map((user) => Card(
-                        margin: const EdgeInsets.only(bottom: AppSizes.sm),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 18,
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                                child: Text(
-                                  user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : '?',
-                                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(user.displayName, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                                    Text(
-                                      'Torre ${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}',
-                                      style: AppTextStyles.caption,
+                  ...pending
+                      .take(3)
+                      .map(
+                        (user) => Card(
+                          margin: const EdgeInsets.only(bottom: AppSizes.sm),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  child: Text(
+                                    user.displayName.isNotEmpty
+                                        ? user.displayName[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primary,
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                              FilledButton.tonal(
-                                onPressed: () => context.push('/admin/pending'),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.success,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  minimumSize: const Size(0, 32),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user.displayName,
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                      Text(
+                                        'Torre ${user.tower ?? '-'} · Apto ${user.apartment ?? '-'}',
+                                        style: AppTextStyles.caption,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                child: const Text('Revisar', style: TextStyle(fontSize: 12)),
-                              ),
-                            ],
+                                FilledButton.tonal(
+                                  onPressed: () =>
+                                      context.push('/admin/pending'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    minimumSize: const Size(0, 32),
+                                  ),
+                                  child: const Text(
+                                    'Revisar',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                   if (pending.length > 3)
                     TextButton(
                       onPressed: () => context.push('/admin/pending'),
@@ -313,8 +355,11 @@ class _VecindarioAdminBanner extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.dashboard_customize,
-                      color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.dashboard_customize,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: AppSizes.md),
                 Expanded(
@@ -335,7 +380,9 @@ class _VecindarioAdminBanner extends StatelessWidget {
                             const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 1),
+                                horizontal: 6,
+                                vertical: 1,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(4),
@@ -360,8 +407,11 @@ class _VecindarioAdminBanner extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    color: Colors.white, size: 14),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 14,
+                ),
               ],
             ),
           ),
@@ -390,8 +440,11 @@ class _VecindarioAdminBanner extends StatelessWidget {
                   color: AppColors.success.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.rocket_launch,
-                    color: AppColors.success, size: 22),
+                child: const Icon(
+                  Icons.rocket_launch,
+                  color: AppColors.success,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: AppSizes.md),
               Expanded(
@@ -414,8 +467,11 @@ class _VecindarioAdminBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios,
-                  color: AppColors.success, size: 14),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppColors.success,
+                size: 14,
+              ),
             ],
           ),
         ),
@@ -429,7 +485,11 @@ class _SmallButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _SmallButton({required this.icon, required this.label, required this.onTap});
+  const _SmallButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -447,7 +507,14 @@ class _SmallButton extends StatelessWidget {
           children: [
             Icon(icon, size: 12, color: const Color(0xFF60A5FA)),
             const SizedBox(width: 4),
-            Text(label, style: const TextStyle(fontSize: 9, color: Color(0xFF60A5FA), fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 9,
+                color: Color(0xFF60A5FA),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
@@ -477,7 +544,11 @@ class _StatCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: color),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
             ),
             const SizedBox(height: 2),
             Text(label, style: AppTextStyles.caption),
@@ -517,7 +588,10 @@ class _ActionTile extends StatelessWidget {
           ),
           child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        title: Text(
+          title,
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
         trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
         onTap: onTap,

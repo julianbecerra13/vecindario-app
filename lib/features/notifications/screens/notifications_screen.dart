@@ -66,10 +66,7 @@ class _NotificationTile extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
 
-  const _NotificationTile({
-    required this.notification,
-    required this.onTap,
-  });
+  const _NotificationTile({required this.notification, required this.onTap});
 
   IconData get _icon {
     switch (notification.type) {
@@ -128,8 +125,12 @@ class _NotificationTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: notification.read ? null : AppColors.primary.withValues(alpha: 0.04),
-          border: const Border(bottom: BorderSide(color: AppColors.border, width: 0.5)),
+          color: notification.read
+              ? null
+              : AppColors.primary.withValues(alpha: 0.04),
+          border: const Border(
+            bottom: BorderSide(color: AppColors.border, width: 0.5),
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +155,9 @@ class _NotificationTile extends StatelessWidget {
                         child: Text(
                           notification.title,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            fontWeight: notification.read ? FontWeight.w400 : FontWeight.w700,
+                            fontWeight: notification.read
+                                ? FontWeight.w400
+                                : FontWeight.w700,
                           ),
                         ),
                       ),
@@ -175,7 +178,10 @@ class _NotificationTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: _iconColor.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(4),

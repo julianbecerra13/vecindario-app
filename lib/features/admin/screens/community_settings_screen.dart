@@ -113,10 +113,12 @@ class _CommunitySettingsScreenState
                           border: OutlineInputBorder(),
                         ),
                         items: List.generate(6, (i) => i + 1)
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text('Estrato $e'),
-                                ))
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text('Estrato $e'),
+                              ),
+                            )
                             .toList(),
                         onChanged: (v) {
                           if (v != null) setState(() => _estrato = v);
@@ -134,7 +136,8 @@ class _CommunitySettingsScreenState
                                   height: 20,
                                   width: 20,
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2),
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Text('Guardar cambios'),
                         ),
@@ -197,15 +200,12 @@ class _CommunitySettingsScreenState
 
     setState(() => _saving = true);
     try {
-      await ref.read(communityRepositoryProvider).updateCommunity(
-        original.id,
-        {
-          'name': _nameController.text.trim(),
-          'address': _addressController.text.trim(),
-          'city': _cityController.text.trim(),
-          'estrato': _estrato,
-        },
-      );
+      await ref.read(communityRepositoryProvider).updateCommunity(original.id, {
+        'name': _nameController.text.trim(),
+        'address': _addressController.text.trim(),
+        'city': _cityController.text.trim(),
+        'estrato': _estrato,
+      });
       if (mounted) context.showSuccessSnackBar('Cambios guardados');
     } catch (e) {
       if (mounted) {
@@ -267,8 +267,10 @@ class _InviteCodeCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onCopy,
                   icon: const Icon(Icons.copy, color: Colors.white),
-                  label: const Text('Copiar',
-                      style: TextStyle(color: Colors.white)),
+                  label: const Text(
+                    'Copiar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.white70),
                   ),
@@ -288,8 +290,10 @@ class _InviteCodeCard extends StatelessWidget {
                           ),
                         )
                       : const Icon(Icons.refresh, color: Colors.white),
-                  label: const Text('Rotar',
-                      style: TextStyle(color: Colors.white)),
+                  label: const Text(
+                    'Rotar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.white70),
                   ),
@@ -317,20 +321,11 @@ class _StatsRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _StatItem(
-            label: 'Residentes',
-            value: '${community.memberCount}',
-          ),
+          _StatItem(label: 'Residentes', value: '${community.memberCount}'),
           const SizedBox(width: AppSizes.lg),
-          _StatItem(
-            label: 'Servicio',
-            value: '\$${community.serviceFee}',
-          ),
+          _StatItem(label: 'Servicio', value: '\$${community.serviceFee}'),
           const SizedBox(width: AppSizes.lg),
-          _StatItem(
-            label: 'Unidades',
-            value: community.unitType.label,
-          ),
+          _StatItem(label: 'Unidades', value: community.unitType.label),
         ],
       ),
     );
@@ -351,9 +346,7 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );

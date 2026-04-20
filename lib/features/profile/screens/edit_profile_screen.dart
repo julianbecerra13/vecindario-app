@@ -76,15 +76,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     } on FirebaseException catch (e) {
       if (mounted) {
         final msg = switch (e.code) {
-          'storage/unauthorized' =>
-            'No tienes permisos para subir fotos',
-          'storage/quota-exceeded' =>
-            'La foto es demasiado grande (máx 5 MB)',
-          'storage/retry-limit-exceeded' =>
-            'Red inestable, intenta de nuevo',
+          'storage/unauthorized' => 'No tienes permisos para subir fotos',
+          'storage/quota-exceeded' => 'La foto es demasiado grande (máx 5 MB)',
+          'storage/retry-limit-exceeded' => 'Red inestable, intenta de nuevo',
           'storage/canceled' => 'Subida cancelada',
-          'permission-denied' =>
-            'No tienes permisos. ¿Sesión expirada?',
+          'permission-denied' => 'No tienes permisos. ¿Sesión expirada?',
           'unavailable' =>
             'Sin conexión. Verifica tu internet e intenta de nuevo',
           _ => 'Error al guardar: ${e.message ?? e.code}',

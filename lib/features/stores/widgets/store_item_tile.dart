@@ -34,10 +34,7 @@ class StoreItemTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.name,
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text(item.name, style: AppTextStyles.bodyMedium),
                 Text(
                   item.formattedPrice,
                   style: AppTextStyles.bodySmall.copyWith(
@@ -49,11 +46,7 @@ class StoreItemTile extends StatelessWidget {
             ),
           ),
           if (quantity == 0)
-            _RoundButton(
-              icon: Icons.add,
-              filled: true,
-              onTap: onAdd,
-            )
+            _RoundButton(icon: Icons.add, filled: true, onTap: onAdd)
           else
             Row(
               children: [
@@ -72,11 +65,7 @@ class StoreItemTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                _RoundButton(
-                  icon: Icons.add,
-                  filled: true,
-                  onTap: onAdd,
-                ),
+                _RoundButton(icon: Icons.add, filled: true, onTap: onAdd),
               ],
             ),
         ],

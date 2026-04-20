@@ -15,8 +15,7 @@ class FirestorePaths {
   static const auditLogs = 'audit_logs';
 
   // Sub-colecciones de communities
-  static String posts(String communityId) =>
-      '$communities/$communityId/posts';
+  static String posts(String communityId) => '$communities/$communityId/posts';
 
   static String comments(String communityId, String postId) =>
       '$communities/$communityId/posts/$postId/comments';
@@ -25,8 +24,7 @@ class FirestorePaths {
   static String circulars(String communityId) =>
       '$communities/$communityId/circulars';
 
-  static String fines(String communityId) =>
-      '$communities/$communityId/fines';
+  static String fines(String communityId) => '$communities/$communityId/fines';
 
   static String amenities(String communityId) =>
       '$communities/$communityId/amenities';
@@ -49,8 +47,7 @@ class FirestorePaths {
   static String assemblies(String communityId) =>
       '$communities/$communityId/assemblies';
 
-  static String pqrs(String communityId) =>
-      '$communities/$communityId/pqrs';
+  static String pqrs(String communityId) => '$communities/$communityId/pqrs';
 
   // Documentos específicos
   static String user(String uid) => '$users/$uid';

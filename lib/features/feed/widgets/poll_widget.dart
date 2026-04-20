@@ -17,8 +17,7 @@ class PollWidget extends ConsumerWidget {
     required this.currentUid,
   });
 
-  bool get _hasVoted =>
-      options.any((o) => o.voterUids.contains(currentUid));
+  bool get _hasVoted => options.any((o) => o.voterUids.contains(currentUid));
 
   int get _totalVotes => options.fold(0, (sum, o) => sum + o.votes);
 
@@ -31,8 +30,7 @@ class PollWidget extends ConsumerWidget {
           final index = entry.key;
           final option = entry.value;
           final voted = option.voterUids.contains(currentUid);
-          final percentage =
-              _totalVotes > 0 ? option.votes / _totalVotes : 0.0;
+          final percentage = _totalVotes > 0 ? option.votes / _totalVotes : 0.0;
 
           if (_hasVoted) {
             return Padding(
@@ -46,8 +44,9 @@ class PollWidget extends ConsumerWidget {
                         child: Text(
                           option.text,
                           style: TextStyle(
-                            fontWeight:
-                                voted ? FontWeight.w700 : FontWeight.w400,
+                            fontWeight: voted
+                                ? FontWeight.w700
+                                : FontWeight.w400,
                           ),
                         ),
                       ),
@@ -92,10 +91,7 @@ class PollWidget extends ConsumerWidget {
         }),
         Text(
           '$_totalVotes voto${_totalVotes == 1 ? '' : 's'}',
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textHint,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
         ),
       ],
     );

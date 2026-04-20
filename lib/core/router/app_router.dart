@@ -60,7 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/feed',
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
-      final isAuthRoute = state.matchedLocation == '/login' ||
+      final isAuthRoute =
+          state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/forgot-password' ||
           state.matchedLocation == '/onboarding' ||
@@ -84,8 +85,9 @@ final routerProvider = Provider<GoRouter>((ref) {
 
         // Redirect forzado: super_admin siempre a /super-admin (excepto /profile)
         if (user != null && user.role.toValue() == 'super_admin') {
-          final isSuperAdminArea =
-              state.matchedLocation.startsWith('/super-admin');
+          final isSuperAdminArea = state.matchedLocation.startsWith(
+            '/super-admin',
+          );
           final isProfileArea = state.matchedLocation.startsWith('/profile');
           if (!isSuperAdminArea && !isProfileArea) {
             return '/super-admin';
@@ -93,24 +95,34 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
 
         // Guard: /admin y /premium solo para admin o super_admin
-        final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
+        final isAdminRoute =
+            state.matchedLocation.startsWith('/admin') ||
             state.matchedLocation.startsWith('/premium');
         if (isAdminRoute && isLoading) return null;
-        if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
+        if (isAdminRoute &&
+            user != null &&
+            user.role.toValue() != 'admin' &&
+            user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: /super-admin exclusivo para super_admin de plataforma
-        final isSuperAdminRoute = state.matchedLocation.startsWith('/super-admin');
+        final isSuperAdminRoute = state.matchedLocation.startsWith(
+          '/super-admin',
+        );
         if (isSuperAdminRoute && isLoading) return '/feed';
-        if (isSuperAdminRoute && user != null && user.role.toValue() != 'super_admin') {
+        if (isSuperAdminRoute &&
+            user != null &&
+            user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: store-panel solo para storeOwner
         final isStorePanel = state.matchedLocation.startsWith('/store-panel');
         if (isStorePanel && isLoading) return '/feed';
-        if (isStorePanel && user != null && user.role.toValue() != 'store_owner') {
+        if (isStorePanel &&
+            user != null &&
+            user.role.toValue() != 'store_owner') {
           return '/feed';
         }
       }
@@ -123,14 +135,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/onboarding',
         builder: (_, __) => const OnboardingScreen(),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (_, __) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (_, __) => const RegisterScreen(),
-      ),
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
       GoRoute(
         path: '/forgot-password',
         builder: (_, __) => const ForgotPasswordScreen(),
@@ -253,18 +259,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
         routes: [
-          GoRoute(
-            path: 'edit',
-            builder: (_, __) => const EditProfileScreen(),
-          ),
-          GoRoute(
-            path: 'privacy',
-            builder: (_, __) => const PrivacyScreen(),
-          ),
-          GoRoute(
-            path: 'terms',
-            builder: (_, __) => const TermsScreen(),
-          ),
+          GoRoute(path: 'edit', builder: (_, __) => const EditProfileScreen()),
+          GoRoute(path: 'privacy', builder: (_, __) => const PrivacyScreen()),
+          GoRoute(path: 'terms', builder: (_, __) => const TermsScreen()),
           GoRoute(
             path: 'privacy-policy',
             builder: (_, __) => const PrivacyPolicyScreen(),
@@ -295,10 +292,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // Rutas Premium (Vecindario Admin)
-      GoRoute(
-        path: '/premium',
-        builder: (_, __) => const AdminShell(),
-      ),
+      GoRoute(path: '/premium', builder: (_, __) => const AdminShell()),
       GoRoute(
         path: '/premium/dashboard',
         builder: (_, __) => const PremiumDashboardScreen(),
@@ -311,24 +305,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/premium/circulars/create',
         builder: (_, __) => const CreateCircularScreen(),
       ),
-      GoRoute(
-        path: '/premium/fines',
-        builder: (_, __) => const FinesScreen(),
-      ),
+      GoRoute(path: '/premium/fines', builder: (_, __) => const FinesScreen()),
       GoRoute(
         path: '/premium/fines/create',
         builder: (_, __) => const CreateFineScreen(),
       ),
       GoRoute(
         path: '/premium/fines/:fineId',
-        builder: (_, state) => FineDetailScreen(
-          fineId: state.pathParameters['fineId'] ?? '',
-        ),
+        builder: (_, state) =>
+            FineDetailScreen(fineId: state.pathParameters['fineId'] ?? ''),
       ),
-      GoRoute(
-        path: '/premium/pqrs',
-        builder: (_, __) => const PqrsScreen(),
-      ),
+      GoRoute(path: '/premium/pqrs', builder: (_, __) => const PqrsScreen()),
       GoRoute(
         path: '/premium/pqrs/create',
         builder: (_, __) => const CreatePqrsScreen(),

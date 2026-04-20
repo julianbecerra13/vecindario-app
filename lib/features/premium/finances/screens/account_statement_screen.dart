@@ -48,10 +48,7 @@ class AccountStatementScreen extends ConsumerWidget {
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        'Saldo actual',
-                        style: AppTextStyles.caption,
-                      ),
+                      Text('Saldo actual', style: AppTextStyles.caption),
                       const SizedBox(height: AppSizes.xs),
                       Text(
                         '\$${_formatNumber(statement.balance.abs())}',
@@ -107,7 +104,9 @@ class AccountStatementScreen extends ConsumerWidget {
                     style: TextStyle(color: AppColors.textHint),
                   )
                 else
-                  ...statement.items.map((item) => _StatementItemTile(item: item)),
+                  ...statement.items.map(
+                    (item) => _StatementItemTile(item: item),
+                  ),
 
                 const SizedBox(height: AppSizes.xl),
               ],
@@ -181,10 +180,7 @@ class _StatementItemTile extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: isPaid
                       ? AppColors.success.withValues(alpha: 0.1)

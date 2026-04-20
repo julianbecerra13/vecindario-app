@@ -24,9 +24,9 @@ class SubscriptionRepository {
         .doc(communityId)
         .snapshots()
         .map((doc) {
-      if (!doc.exists) return null;
-      return SubscriptionModel.fromFirestore(doc.data()!, doc.id);
-    });
+          if (!doc.exists) return null;
+          return SubscriptionModel.fromFirestore(doc.data()!, doc.id);
+        });
   }
 
   Future<void> startTrial({
@@ -61,8 +61,10 @@ final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
   return SubscriptionRepository(ref.watch(firestoreProvider));
 });
 
-final subscriptionProvider =
-    StreamProvider.family<SubscriptionModel?, String>((ref, communityId) {
+final subscriptionProvider = StreamProvider.family<SubscriptionModel?, String>((
+  ref,
+  communityId,
+) {
   return ref
       .watch(subscriptionRepositoryProvider)
       .watchSubscription(communityId);

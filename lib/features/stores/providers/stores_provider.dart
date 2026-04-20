@@ -15,7 +15,9 @@ final storesListProvider = StreamProvider<List<StoreModel>>((ref) {
   return ref.watch(storesRepositoryProvider).watchStores(communityId);
 });
 
-final storeItemsProvider =
-    StreamProvider.family<List<StoreItemModel>, String>((ref, storeId) {
+final storeItemsProvider = StreamProvider.family<List<StoreItemModel>, String>((
+  ref,
+  storeId,
+) {
   return ref.watch(storesRepositoryProvider).watchStoreItems(storeId);
 });

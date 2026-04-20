@@ -70,7 +70,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                 child: Row(
                   children: [
                     if (currentSort == ServiceSortBy.recent)
-                      const Icon(Icons.check, size: 18, color: AppColors.primary),
+                      const Icon(
+                        Icons.check,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                     if (currentSort == ServiceSortBy.recent)
                       const SizedBox(width: 8),
                     const Text('Más recientes'),
@@ -82,7 +86,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                 child: Row(
                   children: [
                     if (currentSort == ServiceSortBy.rating)
-                      const Icon(Icons.check, size: 18, color: AppColors.primary),
+                      const Icon(
+                        Icons.check,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                     if (currentSort == ServiceSortBy.rating)
                       const SizedBox(width: 8),
                     const Text('Mejor calificación'),
@@ -94,7 +102,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                 child: Row(
                   children: [
                     if (currentSort == ServiceSortBy.popular)
-                      const Icon(Icons.check, size: 18, color: AppColors.primary),
+                      const Icon(
+                        Icons.check,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                     if (currentSort == ServiceSortBy.popular)
                       const SizedBox(width: 8),
                     const Text('Más populares'),
@@ -121,8 +133,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh: () async =>
-                      ref.invalidate(servicesListProvider),
+                  onRefresh: () async => ref.invalidate(servicesListProvider),
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSizes.md,
@@ -131,8 +142,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                     itemCount: services.length,
                     itemBuilder: (_, i) => ServiceCard(
                       service: services[i],
-                      onTap: () =>
-                          context.push('/services/${services[i].id}'),
+                      onTap: () => context.push('/services/${services[i].id}'),
                     ),
                   ),
                 );

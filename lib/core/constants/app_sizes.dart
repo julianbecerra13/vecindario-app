@@ -51,7 +51,9 @@ class AppSizes {
 
   // Padding helpers
   static const EdgeInsets paddingAll = EdgeInsets.all(md);
-  static const EdgeInsets paddingHorizontal = EdgeInsets.symmetric(horizontal: md);
+  static const EdgeInsets paddingHorizontal = EdgeInsets.symmetric(
+    horizontal: md,
+  );
   static const EdgeInsets paddingVertical = EdgeInsets.symmetric(vertical: md);
   static const EdgeInsets paddingCard = EdgeInsets.all(md);
 }

@@ -40,8 +40,11 @@ class CategoryChips extends ConsumerWidget {
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(cat.icon, size: 14,
-                      color: isSelected ? Colors.white : cat.color),
+                    Icon(
+                      cat.icon,
+                      size: 14,
+                      color: isSelected ? Colors.white : cat.color,
+                    ),
                     const SizedBox(width: 4),
                     Text(cat.label),
                   ],

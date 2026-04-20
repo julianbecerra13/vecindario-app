@@ -29,33 +29,37 @@ final servicesListProvider = StreamProvider<List<ServiceModel>>((ref) {
       .watch(servicesRepositoryProvider)
       .watchServices(communityId, category: category)
       .map((services) {
-    var filtered = services;
+        var filtered = services;
 
-    // Filtrar por búsqueda
-    if (search.isNotEmpty) {
-      filtered = filtered
-          .where((s) =>
-              s.title.toLowerCase().contains(search) ||
-              s.description.toLowerCase().contains(search) ||
-              s.ownerName.toLowerCase().contains(search))
-          .toList();
-    }
+        // Filtrar por búsqueda
+        if (search.isNotEmpty) {
+          filtered = filtered
+              .where(
+                (s) =>
+                    s.title.toLowerCase().contains(search) ||
+                    s.description.toLowerCase().contains(search) ||
+                    s.ownerName.toLowerCase().contains(search),
+              )
+              .toList();
+        }
 
-    // Ordenar
-    switch (sort) {
-      case ServiceSortBy.rating:
-        filtered.sort((a, b) => b.rating.compareTo(a.rating));
-      case ServiceSortBy.popular:
-        filtered.sort((a, b) => b.orderCount.compareTo(a.orderCount));
-      case ServiceSortBy.recent:
-        break; // Ya viene ordenado por fecha desde Firestore
-    }
+        // Ordenar
+        switch (sort) {
+          case ServiceSortBy.rating:
+            filtered.sort((a, b) => b.rating.compareTo(a.rating));
+          case ServiceSortBy.popular:
+            filtered.sort((a, b) => b.orderCount.compareTo(a.orderCount));
+          case ServiceSortBy.recent:
+            break; // Ya viene ordenado por fecha desde Firestore
+        }
 
-    return filtered;
-  });
+        return filtered;
+      });
 });
 
-final serviceDetailProvider =
-    FutureProvider.family<ServiceModel?, String>((ref, serviceId) async {
+final serviceDetailProvider = FutureProvider.family<ServiceModel?, String>((
+  ref,
+  serviceId,
+) async {
   return ref.read(servicesRepositoryProvider).getService(serviceId);
 });

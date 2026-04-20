@@ -104,12 +104,18 @@ class PostCard extends ConsumerWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AppSizes.radiusFull),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radiusFull,
+                            ),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.push_pin, size: 12, color: AppColors.primary),
+                              Icon(
+                                Icons.push_pin,
+                                size: 12,
+                                color: AppColors.primary,
+                              ),
                               SizedBox(width: 2),
                               Text(
                                 'Fijado',
@@ -133,7 +139,12 @@ class PostCard extends ConsumerWidget {
                                 .read(postNotifierProvider.notifier)
                                 .pinPost(post.id, !post.pinned);
                           } else if (value == 'report') {
-                            _showReportDialog(context, ref, post, currentUser?.id ?? '');
+                            _showReportDialog(
+                              context,
+                              ref,
+                              post,
+                              currentUser?.id ?? '',
+                            );
                           }
                         },
                         itemBuilder: (_) => [
@@ -170,7 +181,8 @@ class PostCard extends ConsumerWidget {
                     ImageCarousel(imageUrls: post.imageURLs),
                   ],
                   // Encuesta
-                  if (post.type == PostType.poll && post.pollOptions != null) ...[
+                  if (post.type == PostType.poll &&
+                      post.pollOptions != null) ...[
                     const SizedBox(height: AppSizes.sm),
                     PollWidget(
                       options: post.pollOptions!,
@@ -185,18 +197,14 @@ class PostCard extends ConsumerWidget {
                   Row(
                     children: [
                       _ActionButton(
-                        icon: isLiked
-                            ? Icons.favorite
-                            : Icons.favorite_border,
+                        icon: isLiked ? Icons.favorite : Icons.favorite_border,
                         label: '${post.likes}',
                         color: isLiked ? AppColors.error : null,
                         onTap: () {
                           if (currentUser == null) return;
-                          ref.read(postNotifierProvider.notifier).toggleLike(
-                                post.id,
-                                currentUser.id,
-                                isLiked,
-                              );
+                          ref
+                              .read(postNotifierProvider.notifier)
+                              .toggleLike(post.id, currentUser.id, isLiked);
                         },
                       ),
                       const SizedBox(width: AppSizes.md),
@@ -226,7 +234,11 @@ class PostCard extends ConsumerWidget {
 }
 
 void _showReportDialog(
-    BuildContext context, WidgetRef ref, PostModel post, String uid) {
+  BuildContext context,
+  WidgetRef ref,
+  PostModel post,
+  String uid,
+) {
   final reasons = [
     'Contenido inapropiado',
     'Spam o publicidad',
@@ -242,8 +254,7 @@ void _showReportDialog(
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('Reportar publicación',
-                style: AppTextStyles.heading3),
+            child: Text('Reportar publicación', style: AppTextStyles.heading3),
           ),
           ...reasons.map(
             (reason) => ListTile(

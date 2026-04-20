@@ -56,10 +56,9 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
         createdAt: DateTime.now(),
       );
 
-      await ref.read(storesRepositoryProvider).submitOrderReview(
-            orderId: widget.orderId,
-            review: review,
-          );
+      await ref
+          .read(storesRepositoryProvider)
+          .submitOrderReview(orderId: widget.orderId, review: review);
 
       if (mounted) {
         context.showSuccessSnackBar('Calificación enviada');
@@ -90,8 +89,11 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
             child: Column(
               children: [
                 const SizedBox(height: AppSizes.xl),
-                const Icon(Icons.star_outline,
-                    size: 64, color: AppColors.warning),
+                const Icon(
+                  Icons.star_outline,
+                  size: 64,
+                  color: AppColors.warning,
+                ),
                 const SizedBox(height: AppSizes.md),
                 Text(
                   '¿Cómo fue tu pedido en ${order.storeName}?',
@@ -110,9 +112,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 6),
                         child: Icon(
-                          starIndex <= _rating
-                              ? Icons.star
-                              : Icons.star_border,
+                          starIndex <= _rating ? Icons.star : Icons.star_border,
                           size: 44,
                           color: starIndex <= _rating
                               ? AppColors.warning
