@@ -39,10 +39,9 @@ class PendingApprovalsScreen extends ConsumerWidget {
               onApprove: () async {
                 if (communityId == null) return;
                 try {
-                  await ref.read(cloudFunctionsProvider).approveResident(
-                        residents[i].id,
-                        communityId,
-                      );
+                  await ref
+                      .read(cloudFunctionsProvider)
+                      .approveResident(residents[i].id, communityId);
                   if (context.mounted) {
                     context.showSuccessSnackBar(
                       '${residents[i].displayName} aprobado',
@@ -57,10 +56,9 @@ class PendingApprovalsScreen extends ConsumerWidget {
               onReject: () async {
                 if (communityId == null) return;
                 try {
-                  await ref.read(cloudFunctionsProvider).rejectResident(
-                        residents[i].id,
-                        communityId,
-                      );
+                  await ref
+                      .read(cloudFunctionsProvider)
+                      .rejectResident(residents[i].id, communityId);
                   if (context.mounted) {
                     context.showSnackBar('Solicitud rechazada');
                   }

@@ -60,8 +60,7 @@ class FineModel {
       evidenceURLs: List<String>.from(data['evidenceURLs'] ?? []),
       status: FineStatus.fromString(data['status'] ?? 'notified'),
       defenseText: data['defenseText'],
-      defenseDeadline:
-          (data['defenseDeadline'] as Timestamp?)?.toDate(),
+      defenseDeadline: (data['defenseDeadline'] as Timestamp?)?.toDate(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }

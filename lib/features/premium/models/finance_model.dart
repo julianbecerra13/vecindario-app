@@ -93,7 +93,8 @@ class AccountStatementModel {
       id: id,
       unitNumber: data['unitNumber'] ?? '',
       residentUid: data['residentUid'] ?? '',
-      items: (data['items'] as List?)
+      items:
+          (data['items'] as List?)
               ?.map((e) => StatementItem.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -163,7 +164,8 @@ class AssemblyModel {
       location: data['location'],
       virtualLink: data['virtualLink'],
       attendees: List<String>.from(data['attendees'] ?? []),
-      votes: (data['votes'] as List?)
+      votes:
+          (data['votes'] as List?)
               ?.map((e) => VoteItem.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -227,6 +229,5 @@ class VoteItem {
     return (results[option]?.length ?? 0) / total;
   }
 
-  bool hasVoted(String uid) =>
-      results.values.any((list) => list.contains(uid));
+  bool hasVoted(String uid) => results.values.any((list) => list.contains(uid));
 }

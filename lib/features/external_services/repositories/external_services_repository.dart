@@ -23,10 +23,16 @@ class ExternalServicesRepository {
         .orderBy('sponsored', descending: true)
         .orderBy('rating', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => ExternalServiceModel.fromFirestore(
-                doc.data() as Map<String, dynamic>, doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map(
+                (doc) => ExternalServiceModel.fromFirestore(
+                  doc.data() as Map<String, dynamic>,
+                  doc.id,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<void> recommendService(ExternalServiceModel service) async {
@@ -42,9 +48,11 @@ class ExternalServicesRepository {
         .where('targetType', isEqualTo: 'external')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => ReviewModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => ReviewModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> addReview(ReviewModel review) async {

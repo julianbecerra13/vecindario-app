@@ -14,8 +14,8 @@ import (
 )
 
 func init() {
-	functions.HTTP("BookAmenity", bookAmenity)
-	functions.HTTP("RefundDeposit", refundDeposit)
+	functions.HTTP("BookAmenity", BookAmenity)
+	functions.HTTP("RefundDeposit", RefundDeposit)
 }
 
 type BookAmenityRequest struct {
@@ -26,8 +26,8 @@ type BookAmenityRequest struct {
 	EndTime     string `json:"endTime"`
 }
 
-// bookAmenity — Valida disponibilidad, crea reserva
-func bookAmenity(w http.ResponseWriter, r *http.Request) {
+// BookAmenity — Valida disponibilidad, crea reserva
+func BookAmenity(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -151,8 +151,8 @@ type RefundDepositRequest struct {
 	BookingID   string `json:"bookingId"`
 }
 
-// refundDeposit — Admin aprueba devolución de depósito post-uso
-func refundDeposit(w http.ResponseWriter, r *http.Request) {
+// RefundDeposit — Admin aprueba devolución de depósito post-uso
+func RefundDeposit(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

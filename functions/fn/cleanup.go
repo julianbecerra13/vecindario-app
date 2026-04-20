@@ -12,12 +12,12 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("CleanupVerificationDocs", cleanupVerificationDocs)
+	functions.CloudEvent("CleanupVerificationDocs", CleanupVerificationDocs)
 }
 
-// cleanupVerificationDocs — Scheduled diario (Cloud Scheduler)
+// CleanupVerificationDocs — Scheduled diario (Cloud Scheduler)
 // Elimina documentos de verificación de Storage con más de 30 días tras aprobación
-func cleanupVerificationDocs(ctx context.Context, e cloudevents.Event) error {
+func CleanupVerificationDocs(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

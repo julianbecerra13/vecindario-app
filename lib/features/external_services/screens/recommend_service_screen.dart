@@ -94,16 +94,18 @@ class _RecommendServiceScreenState
                 prefixIcon: Icon(Icons.category),
               ),
               items: ExternalCategory.values
-                  .map((cat) => DropdownMenuItem(
-                        value: cat,
-                        child: Row(
-                          children: [
-                            Icon(cat.icon, size: 18),
-                            const SizedBox(width: 8),
-                            Text(cat.label),
-                          ],
-                        ),
-                      ))
+                  .map(
+                    (cat) => DropdownMenuItem(
+                      value: cat,
+                      child: Row(
+                        children: [
+                          Icon(cat.icon, size: 18),
+                          const SizedBox(width: 8),
+                          Text(cat.label),
+                        ],
+                      ),
+                    ),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _category = v!),
             ),

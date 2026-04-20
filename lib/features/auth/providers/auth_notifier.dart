@@ -41,7 +41,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final UserRepository _userRepository;
 
   AuthNotifier(this._authRepository, this._userRepository)
-      : super(const AuthState());
+    : super(const AuthState());
 
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -184,10 +184,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _authRepository.linkPhoneCredential(
-        state.verificationId!,
-        smsCode,
-      );
+      await _authRepository.linkPhoneCredential(state.verificationId!, smsCode);
       state = state.copyWith(isLoading: false, phoneVerified: true);
       return true;
     } on AuthFailure catch (e) {
@@ -215,8 +212,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 }
 
-final authNotifierProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
+  ref,
+) {
   return AuthNotifier(
     ref.watch(authRepositoryProvider),
     ref.watch(userRepositoryProvider),

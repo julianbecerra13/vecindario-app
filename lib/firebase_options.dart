@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '606807280271',
     projectId: 'vecindario-app-a746b',
     storageBucket: 'vecindario-app-a746b.firebasestorage.app',
-    iosClientId: '606807280271-0dp7grhhsqshms6klu3a9l74h1kbptuh.apps.googleusercontent.com',
+    iosClientId:
+        '606807280271-0dp7grhhsqshms6klu3a9l74h1kbptuh.apps.googleusercontent.com',
     iosBundleId: 'com.vecindario.vecindarioApp',
   );
 }

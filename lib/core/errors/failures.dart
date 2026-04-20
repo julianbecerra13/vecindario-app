@@ -24,15 +24,21 @@ class AuthFailure extends Failure {
       case 'email-already-in-use':
         return const AuthFailure('Ya existe una cuenta con este correo.');
       case 'weak-password':
-        return const AuthFailure('La contraseña es muy débil. Usa mínimo 8 caracteres.');
+        return const AuthFailure(
+          'La contraseña es muy débil. Usa mínimo 8 caracteres.',
+        );
       case 'invalid-email':
         return const AuthFailure('El correo electrónico no es válido.');
       case 'user-disabled':
         return const AuthFailure('Esta cuenta ha sido deshabilitada.');
       case 'too-many-requests':
-        return const AuthFailure('Demasiados intentos. Intenta de nuevo más tarde.');
+        return const AuthFailure(
+          'Demasiados intentos. Intenta de nuevo más tarde.',
+        );
       case 'invalid-credential':
-        return const AuthFailure('Credenciales inválidas. Verifica tu correo y contraseña.');
+        return const AuthFailure(
+          'Credenciales inválidas. Verifica tu correo y contraseña.',
+        );
       default:
         return AuthFailure('Error de autenticación: $code');
     }
@@ -44,7 +50,9 @@ class CacheFailure extends Failure {
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([super.message = 'Sin conexión a internet. Verifica tu red.']);
+  const NetworkFailure([
+    super.message = 'Sin conexión a internet. Verifica tu red.',
+  ]);
 }
 
 class ValidationFailure extends Failure {

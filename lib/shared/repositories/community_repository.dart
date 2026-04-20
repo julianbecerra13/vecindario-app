@@ -8,8 +8,10 @@ class CommunityRepository {
   CommunityRepository(this._firestore);
 
   Future<CommunityModel?> getCommunity(String id) async {
-    final doc =
-        await _firestore.collection(FirestorePaths.communities).doc(id).get();
+    final doc = await _firestore
+        .collection(FirestorePaths.communities)
+        .doc(id)
+        .get();
     if (!doc.exists || doc.data() == null) return null;
     return CommunityModel.fromFirestore(doc.data()!, doc.id);
   }
@@ -20,9 +22,9 @@ class CommunityRepository {
         .doc(id)
         .snapshots()
         .map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      return CommunityModel.fromFirestore(doc.data()!, doc.id);
-    });
+          if (!doc.exists || doc.data() == null) return null;
+          return CommunityModel.fromFirestore(doc.data()!, doc.id);
+        });
   }
 
   Future<CommunityModel?> getCommunityByInviteCode(String code) async {
@@ -50,10 +52,7 @@ class CommunityRepository {
     });
   }
 
-  Future<void> updateCommunity(
-    String id,
-    Map<String, dynamic> data,
-  ) async {
+  Future<void> updateCommunity(String id, Map<String, dynamic> data) async {
     await _firestore
         .collection(FirestorePaths.communities)
         .doc(id)

@@ -29,8 +29,11 @@ class PremiumDashboardScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock_outline,
-                    size: 64, color: AppColors.textHint),
+                const Icon(
+                  Icons.lock_outline,
+                  size: 64,
+                  color: AppColors.textHint,
+                ),
                 const SizedBox(height: AppSizes.md),
                 Text('Vecindario Admin', style: AppTextStyles.heading3),
                 const SizedBox(height: AppSizes.sm),
@@ -59,8 +62,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
             const Text('Vecindario Admin'),
             if (plan != null)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppSizes.radiusFull),
@@ -85,13 +87,15 @@ class PremiumDashboardScreen extends ConsumerWidget {
             _AdminStats(),
             const SizedBox(height: AppSizes.lg),
             // Acciones rápidas (cards full-width como en diseño .pen)
-            const Text('ACCIONES RÁPIDAS',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textHint,
-                  letterSpacing: 1.2,
-                )),
+            const Text(
+              'ACCIONES RÁPIDAS',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textHint,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSizes.sm),
             _QuickActionCard(
               icon: Icons.campaign,
@@ -125,13 +129,15 @@ class PremiumDashboardScreen extends ConsumerWidget {
           ],
 
           // === MÓDULOS ===
-          const Text('MÓDULOS',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textHint,
-                letterSpacing: 1.2,
-              )),
+          const Text(
+            'MÓDULOS',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textHint,
+              letterSpacing: 1.2,
+            ),
+          ),
           const SizedBox(height: AppSizes.sm),
           if (isFeatureAvailable(plan, 'circulars'))
             _ModuleTile(
@@ -216,13 +222,18 @@ class _AdminStats extends ConsumerWidget {
 
     final memberCount = community?.memberCount ?? 0;
 
-    final openPqrs = pqrsAsync.whenOrNull(
-          data: (list) =>
-              list.where((p) => p.status.name != 'resolved' && p.status.name != 'closed').length,
+    final openPqrs =
+        pqrsAsync.whenOrNull(
+          data: (list) => list
+              .where(
+                (p) => p.status.name != 'resolved' && p.status.name != 'closed',
+              )
+              .length,
         ) ??
         0;
 
-    final monthIncome = financesAsync.whenOrNull(
+    final monthIncome =
+        financesAsync.whenOrNull(
           data: (list) => list
               .where((e) => e.type == FinanceType.income)
               .fold(0, (sum, e) => sum + e.amount),
@@ -336,10 +347,7 @@ class _QuickActionCard extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(
-            fontSize: 11,
-            color: AppColors.textHint,
-          ),
+          style: const TextStyle(fontSize: 11, color: AppColors.textHint),
         ),
         trailing: const Icon(
           Icons.chevron_right,
@@ -387,12 +395,10 @@ class _ModuleTile extends StatelessWidget {
         ),
         title: Text(
           title,
-          style:
-              AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+          style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
-        trailing:
-            const Icon(Icons.chevron_right, color: AppColors.textHint),
+        trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
       ),
     );
   }

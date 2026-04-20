@@ -14,10 +14,10 @@ final isPremiumProvider = StreamProvider<bool>((ref) {
       .doc(communityId)
       .snapshots()
       .map((doc) {
-    if (!doc.exists) return false;
-    final status = doc.data()?['status'] ?? '';
-    return status == 'active' || status == 'trial';
-  });
+        if (!doc.exists) return false;
+        final status = doc.data()?['status'] ?? '';
+        return status == 'active' || status == 'trial';
+      });
 });
 
 /// Plan actual de la suscripción
@@ -31,33 +31,18 @@ final subscriptionPlanProvider = StreamProvider<String?>((ref) {
       .doc(communityId)
       .snapshots()
       .map((doc) {
-    if (!doc.exists) return null;
-    return doc.data()?['plan'] as String?;
-  });
+        if (!doc.exists) return null;
+        return doc.data()?['plan'] as String?;
+      });
 });
 
 /// Verifica si una feature específica está disponible según el plan
 bool isFeatureAvailable(String? plan, String feature) {
   if (plan == null) return false;
 
-  const starterFeatures = [
-    'circulars',
-    'pqrs',
-    'manual',
-    'fines',
-  ];
-  const proFeatures = [
-    ...starterFeatures,
-    'amenities',
-    'finances',
-    'payments',
-  ];
-  const enterpriseFeatures = [
-    ...proFeatures,
-    'assemblies',
-    'reports',
-    'api',
-  ];
+  const starterFeatures = ['circulars', 'pqrs', 'manual', 'fines'];
+  const proFeatures = [...starterFeatures, 'amenities', 'finances', 'payments'];
+  const enterpriseFeatures = [...proFeatures, 'assemblies', 'reports', 'api'];
 
   switch (plan) {
     case 'starter':

@@ -148,7 +148,11 @@ class _OnboardingPage extends StatelessWidget {
             child: Icon(icon, size: 60, color: AppColors.primary),
           ),
           const SizedBox(height: AppSizes.xl),
-          Text(title, textAlign: TextAlign.center, style: AppTextStyles.heading2),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.heading2,
+          ),
           const SizedBox(height: AppSizes.md),
           Text(
             description,

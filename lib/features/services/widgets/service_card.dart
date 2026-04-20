@@ -33,9 +33,8 @@ class ServiceCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: service.imageURLs.first,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(
-                          color: AppColors.surfaceVariant,
-                        ),
+                        placeholder: (_, __) =>
+                            Container(color: AppColors.surfaceVariant),
                         errorWidget: (_, __, ___) => _placeholder(),
                       )
                     : _placeholder(),
@@ -100,7 +99,11 @@ class ServiceCard extends StatelessWidget {
     return Container(
       color: service.category.color.withValues(alpha: 0.1),
       child: Center(
-        child: Icon(service.category.icon, size: 40, color: service.category.color),
+        child: Icon(
+          service.category.icon,
+          size: 40,
+          color: service.category.color,
+        ),
       ),
     );
   }

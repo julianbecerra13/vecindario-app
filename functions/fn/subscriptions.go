@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("BillSubscription", billSubscription)
+	functions.CloudEvent("BillSubscription", BillSubscription)
 }
 
 // Precios por plan en COP
@@ -23,9 +23,9 @@ var planPrices = map[string]int64{
 	"enterprise":   600000,
 }
 
-// billSubscription — Scheduled mensual (Cloud Scheduler)
+// BillSubscription — Scheduled mensual (Cloud Scheduler)
 // Cobra suscripción B2B a cada comunidad con plan activo
-func billSubscription(ctx context.Context, e cloudevents.Event) error {
+func BillSubscription(ctx context.Context, e cloudevents.Event) error {
 	fs, _, err := initFirebase(ctx)
 	if err != nil {
 		return err

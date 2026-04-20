@@ -71,14 +71,18 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: fine.status.color.withValues(alpha: 0.15),
-                              borderRadius:
-                                  BorderRadius.circular(AppSizes.radiusFull),
+                              borderRadius: BorderRadius.circular(
+                                AppSizes.radiusFull,
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(fine.status.icon,
-                                    size: 14, color: fine.status.color),
+                                Icon(
+                                  fine.status.icon,
+                                  size: 14,
+                                  color: fine.status.color,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   fine.status.label,
@@ -107,10 +111,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        fine.unitNumber,
-                        style: AppTextStyles.caption,
-                      ),
+                      Text(fine.unitNumber, style: AppTextStyles.caption),
                     ],
                   ),
                 ),
@@ -120,10 +121,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 // Motivo
                 Text('Motivo', style: AppTextStyles.heading3),
                 const SizedBox(height: AppSizes.sm),
-                Text(
-                  fine.reason,
-                  style: AppTextStyles.bodyLarge,
-                ),
+                Text(fine.reason, style: AppTextStyles.bodyLarge),
 
                 // Artículo del manual
                 if (fine.manualArticle != null &&
@@ -167,13 +165,15 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                         height: 80,
                         margin: const EdgeInsets.only(right: AppSizes.sm),
                         decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppSizes.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusMd,
+                          ),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(AppSizes.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusMd,
+                          ),
                           child: CachedNetworkImage(
                             imageUrl: fine.evidenceURLs[i],
                             fit: BoxFit.cover,
@@ -201,8 +201,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                             color: fine.daysLeftForDefense! <= 1
                                 ? AppColors.error.withValues(alpha: 0.1)
                                 : AppColors.warning.withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppSizes.radiusFull),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radiusFull,
+                            ),
                           ),
                           child: Text(
                             '${fine.daysLeftForDefense} días restantes',
@@ -292,8 +293,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                   PaymentButton(
                     label: 'Pagar multa',
                     amountCOP: fine.amount,
-                    reference:
-                        PaymentService.generateReference(PaymentType.fine, fine.id),
+                    reference: PaymentService.generateReference(
+                      PaymentType.fine,
+                      fine.id,
+                    ),
                     type: PaymentType.fine,
                     customerEmail: currentUser?.email ?? '',
                   ),
@@ -316,10 +319,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
       context.showErrorSnackBar('Escribe tu descargo');
       return;
     }
-    await ref.read(premiumRepositoryProvider).updateFine(
-      fine.id,
-      {'defenseText': text, 'status': 'defense'},
-    );
+    await ref.read(premiumRepositoryProvider).updateFine(fine.id, {
+      'defenseText': text,
+      'status': 'defense',
+    });
     if (mounted) {
       context.showSuccessSnackBar('Descargo enviado');
     }
@@ -334,10 +337,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
       isDestructive: true,
     );
     if (confirm) {
-      await ref.read(premiumRepositoryProvider).updateFine(
-        fine.id,
-        {'status': 'confirmed'},
-      );
+      await ref.read(premiumRepositoryProvider).updateFine(fine.id, {
+        'status': 'confirmed',
+      });
     }
   }
 
@@ -349,10 +351,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
       confirmText: 'Anular',
     );
     if (confirm) {
-      await ref.read(premiumRepositoryProvider).updateFine(
-        fine.id,
-        {'status': 'voided'},
-      );
+      await ref.read(premiumRepositoryProvider).updateFine(fine.id, {
+        'status': 'voided',
+      });
     }
   }
 }

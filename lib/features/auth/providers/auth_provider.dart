@@ -11,9 +11,4 @@ final authStateChangesProvider = StreamProvider<User?>((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges;
 });
 
-enum AuthStatus {
-  unauthenticated,
-  authenticated,
-  noCommunity,
-  pendingApproval,
-}
+enum AuthStatus { unauthenticated, authenticated, noCommunity, pendingApproval }

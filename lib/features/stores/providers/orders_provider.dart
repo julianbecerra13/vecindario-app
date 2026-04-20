@@ -9,7 +9,9 @@ final myOrdersProvider = StreamProvider<List<OrderModel>>((ref) {
   return ref.watch(storesRepositoryProvider).watchMyOrders(user.id);
 });
 
-final orderDetailProvider =
-    StreamProvider.family<OrderModel?, String>((ref, orderId) {
+final orderDetailProvider = StreamProvider.family<OrderModel?, String>((
+  ref,
+  orderId,
+) {
   return ref.watch(storesRepositoryProvider).watchOrder(orderId);
 });

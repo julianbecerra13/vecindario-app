@@ -16,14 +16,18 @@ class StoresRepository {
         .where('communityId', isEqualTo: communityId)
         .where('active', isEqualTo: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<StoreModel?> getStore(String storeId) async {
-    final doc =
-        await _firestore.collection(FirestorePaths.stores).doc(storeId).get();
+    final doc = await _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .get();
     if (!doc.exists) return null;
     return StoreModel.fromFirestore(doc.data()!, doc.id);
   }
@@ -36,9 +40,11 @@ class StoresRepository {
         .where('available', isEqualTo: true)
         .orderBy('sortOrder')
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => StoreItemModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => StoreItemModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<String> createOrder(OrderModel order) async {
@@ -54,9 +60,9 @@ class StoresRepository {
         .doc(orderId)
         .snapshots()
         .map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      return OrderModel.fromFirestore(doc.data()!, doc.id);
-    });
+          if (!doc.exists || doc.data() == null) return null;
+          return OrderModel.fromFirestore(doc.data()!, doc.id);
+        });
   }
 
   Stream<List<OrderModel>> watchMyOrders(String buyerUid) {
@@ -66,9 +72,11 @@ class StoresRepository {
         .orderBy('createdAt', descending: true)
         .limit(20)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => OrderModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => OrderModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Stream<List<OrderModel>> watchStoreOrders(String storeId) {
@@ -78,9 +86,11 @@ class StoresRepository {
         .orderBy('createdAt', descending: true)
         .limit(50)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => OrderModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => OrderModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
@@ -90,7 +100,10 @@ class StoresRepository {
     } else if (status == OrderStatus.delivered) {
       data['deliveredAt'] = FieldValue.serverTimestamp();
     }
-    await _firestore.collection(FirestorePaths.orders).doc(orderId).update(data);
+    await _firestore
+        .collection(FirestorePaths.orders)
+        .doc(orderId)
+        .update(data);
   }
 
   Future<void> submitOrderReview({
@@ -106,10 +119,9 @@ class StoresRepository {
     );
 
     // Marcar pedido como calificado
-    batch.update(
-      _firestore.collection(FirestorePaths.orders).doc(orderId),
-      {'rated': true},
-    );
+    batch.update(_firestore.collection(FirestorePaths.orders).doc(orderId), {
+      'rated': true,
+    });
 
     await batch.commit();
   }
@@ -119,8 +131,10 @@ class StoresRepository {
         .collection(FirestorePaths.stores)
         .where('ownerUid', isEqualTo: ownerUid)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 }

@@ -21,13 +21,12 @@ class FinesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAdmin = ref.watch(isAdminProvider);
-    final finesAsync =
-        isAdmin ? ref.watch(allFinesProvider) : ref.watch(myFinesProvider);
+    final finesAsync = isAdmin
+        ? ref.watch(allFinesProvider)
+        : ref.watch(myFinesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isAdmin ? 'Gestión de Multas' : 'Mis Multas'),
-      ),
+      appBar: AppBar(title: Text(isAdmin ? 'Gestión de Multas' : 'Mis Multas')),
       body: finesAsync.when(
         data: (fines) {
           if (fines.isEmpty) {
@@ -42,10 +41,7 @@ class FinesScreen extends ConsumerWidget {
           return ListView.builder(
             padding: const EdgeInsets.all(AppSizes.md),
             itemCount: fines.length,
-            itemBuilder: (_, i) => _FineCard(
-              fine: fines[i],
-              isAdmin: isAdmin,
-            ),
+            itemBuilder: (_, i) => _FineCard(fine: fines[i], isAdmin: isAdmin),
           );
         },
         loading: () => const LoadingIndicator(),
@@ -67,9 +63,7 @@ class _FineCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSizes.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        side: BorderSide(
-          color: fine.status.color.withValues(alpha: 0.3),
-        ),
+        side: BorderSide(color: fine.status.color.withValues(alpha: 0.3)),
       ),
       child: Padding(
         padding: AppSizes.paddingCard,
@@ -110,10 +104,7 @@ class _FineCard extends ConsumerWidget {
             ),
             const SizedBox(height: AppSizes.sm),
             // Apto
-            Text(
-              'Apto ${fine.unitNumber}',
-              style: AppTextStyles.caption,
-            ),
+            Text('Apto ${fine.unitNumber}', style: AppTextStyles.caption),
             const SizedBox(height: AppSizes.xs),
             // Motivo
             Text(
@@ -132,7 +123,11 @@ class _FineCard extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.menu_book, size: 14, color: Color(0xFF8B5CF6)),
+                    const Icon(
+                      Icons.menu_book,
+                      size: 14,
+                      color: Color(0xFF8B5CF6),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       fine.manualArticle!,
@@ -170,21 +165,17 @@ class _FineCard extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      fine.defenseText!,
-                      style: AppTextStyles.bodySmall,
-                    ),
+                    Text(fine.defenseText!, style: AppTextStyles.bodySmall),
                   ],
                 ),
               ),
             ],
             const SizedBox(height: AppSizes.sm),
-            Text(
-              fine.createdAt.smartDate,
-              style: AppTextStyles.caption,
-            ),
+            Text(fine.createdAt.smartDate, style: AppTextStyles.caption),
             // Acciones
-            if (fine.daysLeftForDefense != null && fine.canDefend && !isAdmin) ...[
+            if (fine.daysLeftForDefense != null &&
+                fine.canDefend &&
+                !isAdmin) ...[
               const SizedBox(height: AppSizes.sm),
               Text(
                 '⏱ ${fine.daysLeftForDefense} días para presentar descargo',
@@ -211,7 +202,9 @@ class _FineCard extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        final communityId = ref.read(currentCommunityIdProvider);
+                        final communityId = ref.read(
+                          currentCommunityIdProvider,
+                        );
                         if (communityId != null) {
                           ref
                               .read(premiumRepositoryProvider)
@@ -232,7 +225,9 @@ class _FineCard extends ConsumerWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        final communityId = ref.read(currentCommunityIdProvider);
+                        final communityId = ref.read(
+                          currentCommunityIdProvider,
+                        );
                         if (communityId != null) {
                           ref
                               .read(premiumRepositoryProvider)
@@ -277,7 +272,9 @@ class _FineCard extends ConsumerWidget {
               if (controller.text.trim().isEmpty) return;
               final communityId = ref.read(currentCommunityIdProvider);
               if (communityId != null) {
-                ref.read(premiumRepositoryProvider).submitDefense(
+                ref
+                    .read(premiumRepositoryProvider)
+                    .submitDefense(
                       communityId,
                       fine.id,
                       controller.text.trim(),

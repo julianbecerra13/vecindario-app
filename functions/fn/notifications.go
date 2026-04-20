@@ -16,11 +16,11 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("SendNotification", sendNotification)
-	functions.CloudEvent("OnNewCircular", onNewCircular)
-	functions.CloudEvent("OnNewPost", onNewPost)
-	functions.CloudEvent("OnOrderStatusChange", onOrderStatusChange)
-	functions.CloudEvent("OnNewPQRS", onNewPQRS)
+	functions.CloudEvent("SendNotification", SendNotification)
+	functions.CloudEvent("OnNewCircular", OnNewCircular)
+	functions.CloudEvent("OnNewPost", OnNewPost)
+	functions.CloudEvent("OnOrderStatusChange", OnOrderStatusChange)
+	functions.CloudEvent("OnNewPQRS", OnNewPQRS)
 }
 
 // Estructura para notificaciones Firestore
@@ -151,14 +151,14 @@ func sendPushToCommunity(ctx context.Context, fs *firestore.Client, msg *messagi
 	return nil
 }
 
-// sendNotification — Trigger genérico cuando se crea un doc en users/{uid}/notifications
-func sendNotification(ctx context.Context, e cloudevents.Event) error {
+// SendNotification — Trigger genérico cuando se crea un doc en users/{uid}/notifications
+func SendNotification(ctx context.Context, e cloudevents.Event) error {
 	log.Println("SendNotification triggered")
 	return nil
 }
 
-// onNewCircular — Trigger cuando se crea una circular nueva
-func onNewCircular(ctx context.Context, e cloudevents.Event) error {
+// OnNewCircular — Trigger cuando se crea una circular nueva
+func OnNewCircular(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return fmt.Errorf("initFirebase: %v", err)
@@ -171,8 +171,9 @@ func onNewCircular(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("DataAs: %v", err)
 	}
 
-	documentID := e.Subject[strings.LastIndex(e.Subject, "/")+1:]
-	pathParts := strings.Split(e.Subject, "/")
+	subject := e.Subject()
+	documentID := subject[strings.LastIndex(subject, "/")+1:]
+	pathParts := strings.Split(subject, "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -207,15 +208,15 @@ func onNewCircular(ctx context.Context, e cloudevents.Event) error {
 	return nil
 }
 
-// onNewPost — Trigger cuando se crea un post fijado
-func onNewPost(ctx context.Context, e cloudevents.Event) error {
+// OnNewPost — Trigger cuando se crea un post fijado
+func OnNewPost(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return fmt.Errorf("initFirebase: %v", err)
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -264,15 +265,15 @@ func onNewPost(ctx context.Context, e cloudevents.Event) error {
 	return nil
 }
 
-// onOrderStatusChange — Trigger cuando cambia el estado de un pedido
-func onOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
+// OnOrderStatusChange — Trigger cuando cambia el estado de un pedido
+func OnOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return fmt.Errorf("initFirebase: %v", err)
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 2 {
 		return fmt.Errorf("invalid path")
 	}
@@ -311,15 +312,15 @@ func onOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 	return sendPushToUser(ctx, fs, msg, buyerUID, title, body, "/stores/orders")
 }
 
-// onNewPQRS — Trigger cuando se crea un PQRS (notificar admin)
-func onNewPQRS(ctx context.Context, e cloudevents.Event) error {
+// OnNewPQRS — Trigger cuando se crea un PQRS (notificar admin)
+func OnNewPQRS(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return fmt.Errorf("initFirebase: %v", err)
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject, "/")
+	pathParts := strings.Split(e.Subject(), "/")
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}

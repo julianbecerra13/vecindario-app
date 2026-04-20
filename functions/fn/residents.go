@@ -17,9 +17,9 @@ import (
 )
 
 func init() {
-	functions.HTTP("ApproveResident", approveResident)
-	functions.HTTP("RejectResident", rejectResident)
-	functions.HTTP("RotateInviteCode", rotateInviteCode)
+	functions.HTTP("ApproveResident", ApproveResident)
+	functions.HTTP("RejectResident", RejectResident)
+	functions.HTTP("RotateInviteCode", RotateInviteCode)
 }
 
 // ApproveResidentRequest — Payload para aprobar un residente
@@ -28,8 +28,8 @@ type ApproveResidentRequest struct {
 	CommunityID string `json:"communityId"`
 }
 
-// approveResident — Cambia verified=true server-side, valida que quien llama sea admin
-func approveResident(w http.ResponseWriter, r *http.Request) {
+// ApproveResident — Cambia verified=true server-side, valida que quien llama sea admin
+func ApproveResident(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -112,8 +112,8 @@ func approveResident(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "approved"})
 }
 
-// rejectResident — Rechaza un residente pendiente
-func rejectResident(w http.ResponseWriter, r *http.Request) {
+// RejectResident — Rechaza un residente pendiente
+func RejectResident(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -176,8 +176,8 @@ type RotateInviteCodeRequest struct {
 	CommunityID string `json:"communityId"`
 }
 
-// rotateInviteCode — Genera un nuevo código de invitación de 6 caracteres
-func rotateInviteCode(w http.ResponseWriter, r *http.Request) {
+// RotateInviteCode — Genera un nuevo código de invitación de 6 caracteres
+func RotateInviteCode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

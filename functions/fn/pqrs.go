@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	functions.CloudEvent("AssignPQRS", assignPQRS)
+	functions.CloudEvent("AssignPQRS", AssignPQRS)
 }
 
 // SLA por tipo de PQRS (en horas)
@@ -23,8 +23,8 @@ var slaByCategoryHours = map[string]int{
 	"administracion": 48,
 }
 
-// assignPQRS — Auto-asigna al área responsable según categoría y calcula deadline SLA
-func assignPQRS(ctx context.Context, e cloudevents.Event) error {
+// AssignPQRS — Auto-asigna al área responsable según categoría y calcula deadline SLA
+func AssignPQRS(ctx context.Context, e cloudevents.Event) error {
 	fs, msg, err := initFirebase(ctx)
 	if err != nil {
 		return err

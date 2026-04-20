@@ -30,10 +30,7 @@ class RatingStars extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '($showCount)',
-            style: TextStyle(
-              fontSize: size * 0.75,
-              color: AppColors.textHint,
-            ),
+            style: TextStyle(fontSize: size * 0.75, color: AppColors.textHint),
           ),
         ],
       ],

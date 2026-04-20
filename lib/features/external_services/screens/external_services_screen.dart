@@ -36,9 +36,9 @@ class ExternalServicesScreen extends ConsumerWidget {
                   child: ChoiceChip(
                     label: const Text('Todos'),
                     selected: selectedCategory == null,
-                    onSelected: (_) => ref
-                        .read(externalCategoryProvider.notifier)
-                        .state = null,
+                    onSelected: (_) =>
+                        ref.read(externalCategoryProvider.notifier).state =
+                            null,
                     selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
                       color: selectedCategory == null
@@ -61,9 +61,9 @@ class ExternalServicesScreen extends ConsumerWidget {
                         ],
                       ),
                       selected: isSelected,
-                      onSelected: (_) => ref
-                          .read(externalCategoryProvider.notifier)
-                          .state = isSelected ? null : cat,
+                      onSelected: (_) =>
+                          ref.read(externalCategoryProvider.notifier).state =
+                              isSelected ? null : cat,
                       selectedColor: AppColors.primary,
                       labelStyle: TextStyle(
                         color: isSelected
@@ -89,8 +89,11 @@ class ExternalServicesScreen extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline,
-                    size: 16, color: AppColors.textHint),
+                const Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.textHint,
+                ),
                 const SizedBox(width: AppSizes.sm),
                 Expanded(
                   child: Text(
@@ -125,8 +128,7 @@ class ExternalServicesScreen extends ConsumerWidget {
               loading: () => const LoadingIndicator(),
               error: (e, _) => ErrorDisplay(
                 message: 'Error al cargar servicios',
-                onRetry: () =>
-                    ref.invalidate(externalServicesListProvider),
+                onRetry: () => ref.invalidate(externalServicesListProvider),
               ),
             ),
           ),
@@ -154,9 +156,7 @@ class _ExternalServiceCard extends StatelessWidget {
       shape: service.sponsored
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-              side: BorderSide(
-                color: AppColors.warning.withValues(alpha: 0.3),
-              ),
+              side: BorderSide(color: AppColors.warning.withValues(alpha: 0.3)),
             )
           : null,
       child: Padding(
@@ -173,8 +173,7 @@ class _ExternalServiceCard extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   ),
-                  child:
-                      Icon(service.category.icon, color: AppColors.primary),
+                  child: Icon(service.category.icon, color: AppColors.primary),
                 ),
                 const SizedBox(width: AppSizes.md),
                 Expanded(
@@ -198,16 +197,19 @@ class _ExternalServiceCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    Colors.amber.withValues(alpha: 0.2),
+                                color: Colors.amber.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(
-                                    AppSizes.radiusFull),
+                                  AppSizes.radiusFull,
+                                ),
                               ),
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.star,
-                                      size: 10, color: Colors.amber),
+                                  Icon(
+                                    Icons.star,
+                                    size: 10,
+                                    color: Colors.amber,
+                                  ),
                                   SizedBox(width: 2),
                                   Text(
                                     'SPONSOR',
@@ -235,10 +237,7 @@ class _ExternalServiceCard extends StatelessWidget {
               const SizedBox(height: AppSizes.xs),
               Text(
                 service.description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -280,8 +279,7 @@ class _ExternalServiceCard extends StatelessWidget {
                     side: BorderSide(
                       color: AppColors.warning.withValues(alpha: 0.3),
                     ),
-                    backgroundColor:
-                        AppColors.warning.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.warning.withValues(alpha: 0.1),
                   ),
                 ),
               ),

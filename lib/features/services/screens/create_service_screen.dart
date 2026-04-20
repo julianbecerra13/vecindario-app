@@ -32,8 +32,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
   }
 
   Future<void> _submit() async {
-    if (_titleController.text.isEmpty ||
-        _descriptionController.text.isEmpty) {
+    if (_titleController.text.isEmpty || _descriptionController.text.isEmpty) {
       context.showErrorSnackBar('Completa todos los campos');
       return;
     }
@@ -49,8 +48,9 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final price =
-          _priceController.text.isEmpty ? null : double.parse(_priceController.text);
+      final price = _priceController.text.isEmpty
+          ? null
+          : double.parse(_priceController.text);
 
       final service = ServiceModel(
         id: '',
@@ -60,7 +60,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
         description: _descriptionController.text.trim(),
         category: _selectedCategory,
         price: price,
-        ownerName: user.displayName ?? 'Usuario',
+        ownerName: user.displayName,
         ownerPhotoURL: user.photoURL,
         createdAt: DateTime.now(),
       );
@@ -83,9 +83,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ofrecer Servicio'),
-      ),
+      appBar: AppBar(title: const Text('Ofrecer Servicio')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSizes.md),
         child: Column(

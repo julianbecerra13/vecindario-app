@@ -62,26 +62,18 @@ class StoreCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.textHint,
-                  ),
+                  const Icon(Icons.chevron_right, color: AppColors.textHint),
                 ],
               ),
               const SizedBox(height: AppSizes.sm),
               Container(
                 padding: const EdgeInsets.only(top: AppSizes.sm),
                 decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: AppColors.border),
-                  ),
+                  border: Border(top: BorderSide(color: AppColors.border)),
                 ),
                 child: Row(
                   children: [
-                    _MetaItem(
-                      icon: Icons.schedule,
-                      text: store.deliveryTime,
-                    ),
+                    _MetaItem(icon: Icons.schedule, text: store.deliveryTime),
                     const SizedBox(width: AppSizes.md),
                     _MetaItem(
                       icon: Icons.inventory_2_outlined,

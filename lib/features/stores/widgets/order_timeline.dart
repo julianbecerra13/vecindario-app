@@ -39,9 +39,7 @@ class OrderTimeline extends StatelessWidget {
       ),
     ];
 
-    return Column(
-      children: steps.map((step) => _buildStep(step)).toList(),
-    );
+    return Column(children: steps.map((step) => _buildStep(step)).toList());
   }
 
   Widget _buildStep(_TimelineStep step) {
@@ -104,8 +102,8 @@ class OrderTimeline extends StatelessWidget {
                     color: step.isCompleted
                         ? AppColors.success
                         : step.isCurrent
-                            ? AppColors.primary
-                            : AppColors.textHint,
+                        ? AppColors.primary
+                        : AppColors.textHint,
                   ),
                 ),
                 if (step.subtitle != null)

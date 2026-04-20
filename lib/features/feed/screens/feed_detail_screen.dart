@@ -19,15 +19,11 @@ class FeedDetailScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Post'),
-      ),
+      appBar: AppBar(title: const Text('Post')),
       body: postAsync.when(
         data: (post) {
           if (post == null) {
-            return const Center(
-              child: Text('Post no encontrado'),
-            );
+            return const Center(child: Text('Post no encontrado'));
           }
           final isLiked = post.likedBy.contains(currentUser?.id);
           return SingleChildScrollView(
@@ -44,10 +40,7 @@ class FeedDetailScreen extends ConsumerWidget {
                         radius: 28,
                       )
                     else
-                      const CircleAvatar(
-                        child: Icon(Icons.person),
-                        radius: 28,
-                      ),
+                      const CircleAvatar(child: Icon(Icons.person), radius: 28),
                     const SizedBox(width: AppSizes.md),
                     Expanded(
                       child: Column(
@@ -74,12 +67,18 @@ class FeedDetailScreen extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.warning.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppSizes.radiusFull),
+                          borderRadius: BorderRadius.circular(
+                            AppSizes.radiusFull,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.push_pin, size: 12, color: AppColors.warning),
+                            const Icon(
+                              Icons.push_pin,
+                              size: 12,
+                              color: AppColors.warning,
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               'Fijado',
@@ -119,10 +118,7 @@ class FeedDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppSizes.md),
 
                 // Contenido de texto
-                Text(
-                  post.text,
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text(post.text, style: AppTextStyles.bodyMedium),
                 const SizedBox(height: AppSizes.lg),
 
                 // Imágenes
@@ -130,11 +126,12 @@ class FeedDetailScreen extends ConsumerWidget {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: AppSizes.xs,
-                      crossAxisSpacing: AppSizes.xs,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: AppSizes.xs,
+                          crossAxisSpacing: AppSizes.xs,
+                        ),
                     itemCount: post.imageURLs.length,
                     itemBuilder: (_, i) => ClipRRect(
                       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
@@ -148,7 +145,8 @@ class FeedDetailScreen extends ConsumerWidget {
                 ],
 
                 // Encuesta si aplica
-                if (post.pollOptions != null && post.pollOptions!.isNotEmpty) ...[
+                if (post.pollOptions != null &&
+                    post.pollOptions!.isNotEmpty) ...[
                   Text(
                     'Encuesta',
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -162,8 +160,9 @@ class FeedDetailScreen extends ConsumerWidget {
                       0,
                       (sum, opt) => sum + opt.votes,
                     );
-                    final percentage =
-                        totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+                    final percentage = totalVotes > 0
+                        ? (option.votes / totalVotes) * 100
+                        : 0;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSizes.sm),
                       child: Column(
@@ -237,7 +236,12 @@ class FeedDetailScreen extends ConsumerWidget {
                             : () {
                                 ref
                                     .read(feedRepositoryProvider)
-                                    .toggleLike('', postId, currentUser.id, isLiked);
+                                    .toggleLike(
+                                      '',
+                                      postId,
+                                      currentUser.id,
+                                      isLiked,
+                                    );
                               },
                         icon: Icon(
                           isLiked ? Icons.favorite : Icons.favorite_outline,
@@ -246,7 +250,9 @@ class FeedDetailScreen extends ConsumerWidget {
                         label: Text(
                           'Me gusta',
                           style: TextStyle(
-                            color: isLiked ? AppColors.error : AppColors.textPrimary,
+                            color: isLiked
+                                ? AppColors.error
+                                : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -265,9 +271,7 @@ class FeedDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(
-          child: Text('Error: $e'),
-        ),
+        error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
   }

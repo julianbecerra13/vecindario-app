@@ -17,8 +17,8 @@ import (
 )
 
 func init() {
-	functions.HTTP("WompiWebhook", wompiWebhook)
-	functions.HTTP("CreateWompiTransaction", createWompiTransaction)
+	functions.HTTP("WompiWebhook", WompiWebhook)
+	functions.HTTP("CreateWompiTransaction", CreateWompiTransaction)
 }
 
 // ==================== WOMPI PAYMENT GATEWAY ====================
@@ -48,8 +48,8 @@ type WompiTransaction struct {
 	FinalizedAt     string `json:"finalized_at"`
 }
 
-// wompiWebhook — Recibe webhooks de Wompi cuando una transacción cambia de estado
-func wompiWebhook(w http.ResponseWriter, r *http.Request) {
+// WompiWebhook — Recibe webhooks de Wompi cuando una transacción cambia de estado
+func WompiWebhook(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -233,8 +233,8 @@ type CreatePaymentRequest struct {
 	CustomerEmail string `json:"customer_email"`
 }
 
-// createWompiTransaction — Endpoint HTTP para crear una transacción de Wompi
-func createWompiTransaction(w http.ResponseWriter, r *http.Request) {
+// CreateWompiTransaction — Endpoint HTTP para crear una transacción de Wompi
+func CreateWompiTransaction(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

@@ -75,7 +75,10 @@ class PendingApprovalScreen extends ConsumerWidget {
                 ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.error),
-                  minimumSize: const Size(double.infinity, AppSizes.buttonHeight),
+                  minimumSize: const Size(
+                    double.infinity,
+                    AppSizes.buttonHeight,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSizes.md),

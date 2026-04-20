@@ -11,20 +11,21 @@ class UserRepository {
   UserRepository(this._firestore, this._storage);
 
   Future<UserModel?> getUser(String uid) async {
-    final doc = await _firestore.collection(FirestorePaths.users).doc(uid).get();
+    final doc = await _firestore
+        .collection(FirestorePaths.users)
+        .doc(uid)
+        .get();
     if (!doc.exists || doc.data() == null) return null;
     return UserModel.fromFirestore(doc.data()!, doc.id);
   }
 
   Stream<UserModel?> watchUser(String uid) {
-    return _firestore
-        .collection(FirestorePaths.users)
-        .doc(uid)
-        .snapshots()
-        .map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      return UserModel.fromFirestore(doc.data()!, doc.id);
-    });
+    return _firestore.collection(FirestorePaths.users).doc(uid).snapshots().map(
+      (doc) {
+        if (!doc.exists || doc.data() == null) return null;
+        return UserModel.fromFirestore(doc.data()!, doc.id);
+      },
+    );
   }
 
   Future<void> createUser(UserModel user) async {
@@ -91,9 +92,9 @@ class UserRepository {
         .collection('consents')
         .doc('preferences')
         .set({
-      ...consents,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+          ...consents,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
   }
 
   Stream<List<UserModel>> watchPendingResidents(String communityId) {
@@ -102,8 +103,10 @@ class UserRepository {
         .where('communityId', isEqualTo: communityId)
         .where('verified', isEqualTo: false)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => UserModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => UserModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 }

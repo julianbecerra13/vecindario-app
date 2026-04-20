@@ -10,9 +10,12 @@ enum PostType {
 
   static PostType fromString(String value) {
     switch (value) {
-      case 'alert': return PostType.alert;
-      case 'poll': return PostType.poll;
-      default: return PostType.news;
+      case 'alert':
+        return PostType.alert;
+      case 'poll':
+        return PostType.poll;
+      default:
+        return PostType.news;
     }
   }
 }
@@ -89,8 +92,8 @@ class PostModel {
       commentCount: data['commentCount'] ?? 0,
       pollOptions: data['pollOptions'] != null
           ? (data['pollOptions'] as List)
-              .map((e) => PollOption.fromMap(e as Map<String, dynamic>))
-              .toList()
+                .map((e) => PollOption.fromMap(e as Map<String, dynamic>))
+                .toList()
           : null,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );

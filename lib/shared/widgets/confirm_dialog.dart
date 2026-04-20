@@ -22,8 +22,9 @@ Future<bool> showConfirmDialog(
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                isDestructive ? AppColors.error : AppColors.primary,
+            backgroundColor: isDestructive
+                ? AppColors.error
+                : AppColors.primary,
             foregroundColor: Colors.white,
           ),
           child: Text(confirmText),

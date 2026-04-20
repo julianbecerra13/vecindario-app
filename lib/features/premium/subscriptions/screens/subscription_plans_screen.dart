@@ -1,108 +1,147 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/premium/subscriptions/models/subscription_model.dart';
+import 'package:vecindario_app/features/premium/subscriptions/repositories/subscription_repository.dart';
+import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
-class SubscriptionPlansScreen extends ConsumerWidget {
+class SubscriptionPlansScreen extends ConsumerStatefulWidget {
   const SubscriptionPlansScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SubscriptionPlansScreen> createState() =>
+      _SubscriptionPlansScreenState();
+}
+
+class _SubscriptionPlansScreenState
+    extends ConsumerState<SubscriptionPlansScreen> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Planes Vecindario Admin')),
-      body: SingleChildScrollView(
-        padding: AppSizes.paddingAll,
-        child: Column(
-          children: [
-            Text(
-              'Digitaliza la gestión de tu conjunto',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            Text(
-              'Primer mes gratis',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppSizes.lg),
-
-            // Plan Starter
-            _PlanCard(
-              name: 'Starter',
-              units: '1 - 50 unidades',
-              price: 150000,
-              features: const [
-                _Feature('Circulares con tracking', true),
-                _Feature('PQRS con SLA', true),
-                _Feature('Manual de convivencia', true),
-                _Feature('Gestión de multas', true),
-                _Feature('Zonas sociales', false),
-                _Feature('Finanzas', false),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: AppSizes.paddingAll,
+            child: Column(
+              children: [
+                Text(
+                  'Digitaliza la gestión de tu conjunto',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.sm),
+                Text(
+                  'Primer mes gratis',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.lg),
+                _PlanCard(
+                  plan: SubscriptionPlan.starter,
+                  units: '1 - 50 unidades',
+                  features: const [
+                    _Feature('Circulares con tracking', true),
+                    _Feature('PQRS con SLA', true),
+                    _Feature('Manual de convivencia', true),
+                    _Feature('Gestión de multas', true),
+                    _Feature('Zonas sociales', false),
+                    _Feature('Finanzas', false),
+                  ],
+                  onSubscribe: () => _startTrial(SubscriptionPlan.starter),
+                ),
+                const SizedBox(height: AppSizes.md),
+                _PlanCard(
+                  plan: SubscriptionPlan.professional,
+                  units: '51 - 150 unidades',
+                  isPopular: true,
+                  features: const [
+                    _Feature('Todo de Starter', true),
+                    _Feature('Reserva zonas sociales', true),
+                    _Feature('Pagos en línea', true),
+                    _Feature('Dashboard financiero', true),
+                    _Feature('Estado de cuenta individual', true),
+                    _Feature('Asambleas/votaciones', false),
+                  ],
+                  onSubscribe: () => _startTrial(SubscriptionPlan.professional),
+                ),
+                const SizedBox(height: AppSizes.md),
+                _PlanCard(
+                  plan: SubscriptionPlan.enterprise,
+                  units: '151+ unidades',
+                  features: const [
+                    _Feature('Todo de Profesional', true),
+                    _Feature('Asambleas + votaciones', true),
+                    _Feature('Reportes PDF automáticos', true),
+                    _Feature('API contable (Siigo)', true),
+                    _Feature('Soporte prioritario', true),
+                  ],
+                  onSubscribe: () => _startTrial(SubscriptionPlan.enterprise),
+                ),
+                const SizedBox(height: AppSizes.lg),
+                Text(
+                  '20% descuento pago anual (2 meses gratis)',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.caption,
+                ),
+                const SizedBox(height: AppSizes.xl),
               ],
-              onSubscribe: () => _startTrial(context, 'starter'),
             ),
-
-            const SizedBox(height: AppSizes.md),
-
-            // Plan Profesional
-            _PlanCard(
-              name: 'Profesional',
-              units: '51 - 150 unidades',
-              price: 350000,
-              isPopular: true,
-              features: const [
-                _Feature('Todo de Starter', true),
-                _Feature('Reserva zonas sociales', true),
-                _Feature('Pagos en línea', true),
-                _Feature('Dashboard financiero', true),
-                _Feature('Estado de cuenta individual', true),
-                _Feature('Asambleas/votaciones', false),
-              ],
-              onSubscribe: () => _startTrial(context, 'professional'),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.3),
+              child: const Center(child: CircularProgressIndicator()),
             ),
-
-            const SizedBox(height: AppSizes.md),
-
-            // Plan Enterprise
-            _PlanCard(
-              name: 'Enterprise',
-              units: '151+ unidades',
-              price: 600000,
-              features: const [
-                _Feature('Todo de Profesional', true),
-                _Feature('Asambleas + votaciones', true),
-                _Feature('Reportes PDF automáticos', true),
-                _Feature('API contable (Siigo)', true),
-                _Feature('Soporte prioritario', true),
-              ],
-              onSubscribe: () => _startTrial(context, 'enterprise'),
-            ),
-
-            const SizedBox(height: AppSizes.lg),
-            Text(
-              '20% descuento pago anual (2 meses gratis)',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.caption,
-            ),
-            const SizedBox(height: AppSizes.xl),
-          ],
-        ),
+        ],
       ),
     );
   }
 
-  void _startTrial(BuildContext context, String plan) {
-    context.showSuccessSnackBar(
-      'Trial de 30 días activado para el plan ${plan.toUpperCase()}',
-    );
+  Future<void> _startTrial(SubscriptionPlan plan) async {
+    if (_isLoading) return;
+
+    final user = ref.read(currentUserProvider).value;
+    final communityId = ref.read(currentCommunityIdProvider);
+    if (user == null || communityId == null) {
+      context.showErrorSnackBar('Usuario o comunidad no disponibles');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await ref
+          .read(subscriptionRepositoryProvider)
+          .startTrial(communityId: communityId, plan: plan, adminUid: user.id);
+      if (!mounted) return;
+      context.showSuccessSnackBar('Trial de 30 días activado: ${plan.label}');
+      context.go('/premium/dashboard');
+    } on StateError catch (e) {
+      if (mounted) context.showErrorSnackBar(e.message);
+    } on FirebaseException catch (e) {
+      if (mounted) {
+        final msg = e.code == 'permission-denied'
+            ? 'Solo administradores pueden activar el trial'
+            : 'Error al activar trial: ${e.message}';
+        context.showErrorSnackBar(msg);
+      }
+    } catch (e) {
+      if (mounted) context.showErrorSnackBar('Error inesperado: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }
 
@@ -113,17 +152,15 @@ class _Feature {
 }
 
 class _PlanCard extends StatelessWidget {
-  final String name;
+  final SubscriptionPlan plan;
   final String units;
-  final int price;
   final bool isPopular;
   final List<_Feature> features;
   final VoidCallback onSubscribe;
 
   const _PlanCard({
-    required this.name,
+    required this.plan,
     required this.units,
-    required this.price,
     this.isPopular = false,
     required this.features,
     required this.onSubscribe,
@@ -149,7 +186,7 @@ class _PlanCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(name, style: AppTextStyles.heading3),
+              Text(plan.label, style: AppTextStyles.heading3),
               if (isPopular) ...[
                 const SizedBox(width: AppSizes.sm),
                 Container(
@@ -179,8 +216,8 @@ class _PlanCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${_formatPrice(price)}',
-                style: TextStyle(
+                '\$${_formatPrice(plan.priceCOP)}',
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
                   color: AppColors.success,
@@ -189,51 +226,48 @@ class _PlanCard extends StatelessWidget {
               const SizedBox(width: 4),
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  '/mes',
-                  style: AppTextStyles.caption,
-                ),
+                child: Text('/mes', style: AppTextStyles.caption),
               ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
-          ...features.map((f) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  children: [
-                    Icon(
-                      f.included ? Icons.check : Icons.close,
-                      size: 16,
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Icon(
+                    f.included ? Icons.check : Icons.close,
+                    size: 16,
+                    color: f.included ? AppColors.success : AppColors.textHint,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    f.text,
+                    style: TextStyle(
+                      fontSize: 13,
                       color: f.included
-                          ? AppColors.success
+                          ? AppColors.textPrimary
                           : AppColors.textHint,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      f.text,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: f.included
-                            ? AppColors.textPrimary
-                            : AppColors.textHint,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          if (isPopular) ...[
-            const SizedBox(height: AppSizes.sm),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onSubscribe,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.success,
-                ),
-                child: const Text('Probar gratis 30 días'),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
+          const SizedBox(height: AppSizes.md),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onSubscribe,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isPopular
+                    ? AppColors.success
+                    : AppColors.primary,
+              ),
+              child: const Text('Probar gratis 30 días'),
+            ),
+          ),
         ],
       ),
     );

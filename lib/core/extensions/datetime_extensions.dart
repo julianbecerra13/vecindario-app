@@ -10,7 +10,8 @@ extension DateTimeExtensions on DateTime {
 
   String get formatTime => DateFormat('HH:mm').format(this);
 
-  String get formatDateLong => DateFormat("d 'de' MMMM, yyyy", 'es').format(this);
+  String get formatDateLong =>
+      DateFormat("d 'de' MMMM, yyyy", 'es').format(this);
 
   String get formatDateShort => DateFormat('d MMM', 'es').format(this);
 

@@ -32,7 +32,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await ref.read(authNotifierProvider.notifier).register(
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .register(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           name: _nameController.text.trim(),
@@ -45,16 +47,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _handleGoogleRegister() async {
-    final success =
-        await ref.read(authNotifierProvider.notifier).loginWithGoogle();
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .loginWithGoogle();
     if (success && mounted) {
       context.go('/join-community');
     }
   }
 
   Future<void> _handleAppleRegister() async {
-    final success =
-        await ref.read(authNotifierProvider.notifier).loginWithApple();
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .loginWithApple();
     if (success && mounted) {
       context.go('/join-community');
     }
@@ -96,9 +100,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: Validators.validateEmail,
-                  decoration: const InputDecoration(
-                    hintText: 'Email',
-                  ),
+                  decoration: const InputDecoration(hintText: 'Email'),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
@@ -139,8 +141,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     const Expanded(child: Divider()),
                     Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: AppSizes.md),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.md,
+                      ),
                       child: Text(
                         'o continuar con',
                         style: TextStyle(
@@ -157,8 +160,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed:
-                            authState.isLoading ? null : _handleGoogleRegister,
+                        onPressed: authState.isLoading
+                            ? null
+                            : _handleGoogleRegister,
                         icon: const Icon(Icons.g_mobiledata, size: 24),
                         label: const Text('Google'),
                       ),
@@ -166,8 +170,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(width: AppSizes.sm),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed:
-                            authState.isLoading ? null : _handleAppleRegister,
+                        onPressed: authState.isLoading
+                            ? null
+                            : _handleAppleRegister,
                         icon: const Icon(Icons.apple, size: 24),
                         label: const Text('Apple'),
                       ),

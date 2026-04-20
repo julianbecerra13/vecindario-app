@@ -13,7 +13,8 @@ class CreateCircularScreen extends ConsumerStatefulWidget {
   const CreateCircularScreen({super.key});
 
   @override
-  ConsumerState<CreateCircularScreen> createState() => _CreateCircularScreenState();
+  ConsumerState<CreateCircularScreen> createState() =>
+      _CreateCircularScreenState();
 }
 
 class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
@@ -57,7 +58,9 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
     );
 
     try {
-      await ref.read(premiumRepositoryProvider).createCircular(communityId, circular);
+      await ref
+          .read(premiumRepositoryProvider)
+          .createCircular(communityId, circular);
       if (mounted) {
         context.showSuccessSnackBar('Circular publicada');
         context.pop();
@@ -81,7 +84,14 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
             child: FilledButton(
               onPressed: _isLoading ? null : _publish,
               child: _isLoading
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Publicar'),
             ),
           ),
@@ -92,59 +102,72 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // Prioridad
-          Text('Prioridad', style: AppTextStyles.heading3),
-          const SizedBox(height: AppSizes.sm),
-          Wrap(
-            spacing: 8,
-            children: CircularPriority.values.map((p) {
-              final selected = _priority == p;
-              return ChoiceChip(
-                avatar: Icon(p.icon, size: 14, color: selected ? Colors.white : p.color),
-                label: Text(p.label),
-                selected: selected,
-                onSelected: (_) => setState(() => _priority = p),
-                selectedColor: p.color,
-                labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontSize: 12),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppSizes.lg),
-
-          // Título
-          TextField(
-            controller: _titleController,
-            decoration: const InputDecoration(
-              labelText: 'Título de la circular',
-              hintText: 'Ej: Corte de agua programado',
+            // Prioridad
+            Text('Prioridad', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSizes.sm),
+            Wrap(
+              spacing: 8,
+              children: CircularPriority.values.map((p) {
+                final selected = _priority == p;
+                return ChoiceChip(
+                  avatar: Icon(
+                    p.icon,
+                    size: 14,
+                    color: selected ? Colors.white : p.color,
+                  ),
+                  label: Text(p.label),
+                  selected: selected,
+                  onSelected: (_) => setState(() => _priority = p),
+                  selectedColor: p.color,
+                  labelStyle: TextStyle(
+                    color: selected ? Colors.white : AppColors.textPrimary,
+                    fontSize: 12,
+                  ),
+                );
+              }).toList(),
             ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.lg),
 
-          // Cuerpo
-          TextField(
-            controller: _bodyController,
-            maxLines: 8,
-            decoration: const InputDecoration(
-              labelText: 'Contenido',
-              hintText: 'Escribe el comunicado completo...',
-              alignLabelWithHint: true,
+            // Título
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Título de la circular',
+                hintText: 'Ej: Corte de agua programado',
+              ),
+              textCapitalization: TextCapitalization.sentences,
             ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.md),
 
-          // Opciones
-          SwitchListTile(
-            title: const Text('Requiere firma de acuse', style: TextStyle(fontSize: 14)),
-            subtitle: const Text('Los residentes deberán firmar que lo leyeron', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            value: _requiresSignature,
-            onChanged: (v) => setState(() => _requiresSignature = v),
-            activeColor: const Color(0xFF8B5CF6),
-            contentPadding: EdgeInsets.zero,
-          ),
-        ],
+            // Cuerpo
+            TextField(
+              controller: _bodyController,
+              maxLines: 8,
+              decoration: const InputDecoration(
+                labelText: 'Contenido',
+                hintText: 'Escribe el comunicado completo...',
+                alignLabelWithHint: true,
+              ),
+              textCapitalization: TextCapitalization.sentences,
+            ),
+            const SizedBox(height: AppSizes.md),
+
+            // Opciones
+            SwitchListTile(
+              title: const Text(
+                'Requiere firma de acuse',
+                style: TextStyle(fontSize: 14),
+              ),
+              subtitle: const Text(
+                'Los residentes deberán firmar que lo leyeron',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              value: _requiresSignature,
+              onChanged: (v) => setState(() => _requiresSignature = v),
+              activeColor: const Color(0xFF8B5CF6),
+              contentPadding: EdgeInsets.zero,
+            ),
+          ],
         ),
       ),
     );

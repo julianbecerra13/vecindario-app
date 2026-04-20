@@ -7,11 +7,7 @@ class ImageCarousel extends StatefulWidget {
   final List<String> imageUrls;
   final double height;
 
-  const ImageCarousel({
-    super.key,
-    required this.imageUrls,
-    this.height = 200,
-  });
+  const ImageCarousel({super.key, required this.imageUrls, this.height = 200});
 
   @override
   State<ImageCarousel> createState() => _ImageCarouselState();
@@ -60,8 +56,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 height: 6,
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
-                  color:
-                      _current == i ? AppColors.primary : AppColors.border,
+                  color: _current == i ? AppColors.primary : AppColors.border,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),

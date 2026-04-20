@@ -41,9 +41,7 @@ class _PhoneVerificationScreenState
   }
 
   void _sendCode() {
-    ref
-        .read(authNotifierProvider.notifier)
-        .sendPhoneOTP(widget.phoneNumber);
+    ref.read(authNotifierProvider.notifier).sendPhoneOTP(widget.phoneNumber);
     setState(() => _codeSent = true);
   }
 
@@ -54,8 +52,9 @@ class _PhoneVerificationScreenState
       return;
     }
 
-    final success =
-        await ref.read(authNotifierProvider.notifier).verifyOTP(code);
+    final success = await ref
+        .read(authNotifierProvider.notifier)
+        .verifyOTP(code);
     if (success && mounted) {
       context.go('/join-community');
     }
@@ -107,10 +106,7 @@ class _PhoneVerificationScreenState
                 ),
               ),
               const SizedBox(height: AppSizes.lg),
-              Text(
-                'Código de verificación',
-                style: AppTextStyles.heading3,
-              ),
+              Text('Código de verificación', style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.sm),
               Text(
                 'Enviamos un código SMS al\n+57 ${widget.phoneNumber}',

@@ -80,7 +80,10 @@ void main() {
         unitNumber: 'T1-101',
         amount: 100000,
         reason: 'Test',
-        defenseDeadline: DateTime.now().add(const Duration(days: 3)),
+        // 3 días + 1 minuto para evitar truncamiento por microsegundos
+        defenseDeadline: DateTime.now().add(
+          const Duration(days: 3, minutes: 1),
+        ),
         createdAt: DateTime.now(),
       );
 

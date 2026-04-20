@@ -6,7 +6,10 @@ class ImageUtils {
 
   static final _picker = ImagePicker();
 
-  static Future<File?> pickFromCamera({int maxWidth = 1200, int quality = 85}) async {
+  static Future<File?> pickFromCamera({
+    int maxWidth = 1200,
+    int quality = 85,
+  }) async {
     final picked = await _picker.pickImage(
       source: ImageSource.camera,
       maxWidth: maxWidth.toDouble(),
@@ -16,7 +19,10 @@ class ImageUtils {
     return File(picked.path);
   }
 
-  static Future<File?> pickFromGallery({int maxWidth = 1200, int quality = 85}) async {
+  static Future<File?> pickFromGallery({
+    int maxWidth = 1200,
+    int quality = 85,
+  }) async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
       maxWidth: maxWidth.toDouble(),
@@ -35,7 +41,10 @@ class ImageUtils {
       maxWidth: maxWidth.toDouble(),
       imageQuality: quality,
     );
-    final files = picked.take(maxImages).map((xFile) => File(xFile.path)).toList();
+    final files = picked
+        .take(maxImages)
+        .map((xFile) => File(xFile.path))
+        .toList();
     return files;
   }
 }

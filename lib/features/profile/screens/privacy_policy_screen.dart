@@ -14,8 +14,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Política de Privacidad y Tratamiento de Datos Personales',
-                style: AppTextStyles.heading2),
+            Text(
+              'Política de Privacidad y Tratamiento de Datos Personales',
+              style: AppTextStyles.heading2,
+            ),
             const SizedBox(height: AppSizes.sm),
             const Text(
               'En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013',
@@ -98,12 +100,14 @@ class _Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: AppTextStyles.bodyMedium
-                  .copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            title,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: AppSizes.xs),
-          Text(body,
-              style: const TextStyle(fontSize: 14, height: 1.6)),
+          Text(body, style: const TextStyle(fontSize: 14, height: 1.6)),
         ],
       ),
     );

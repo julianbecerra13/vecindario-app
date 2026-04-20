@@ -17,12 +17,17 @@ class PremiumRepository {
         .collection(FirestorePaths.circulars(communityId))
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => CircularModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => CircularModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Future<void> createCircular(String communityId, CircularModel circular) async {
+  Future<void> createCircular(
+    String communityId,
+    CircularModel circular,
+  ) async {
     await _firestore
         .collection(FirestorePaths.circulars(communityId))
         .add(circular.toFirestore());
@@ -37,10 +42,10 @@ class PremiumRepository {
         .collection(FirestorePaths.circulars(communityId))
         .doc(circularId)
         .update({
-      'readBy': FieldValue.arrayUnion([
-        {'uid': uid, 'timestamp': Timestamp.now()}
-      ]),
-    });
+          'readBy': FieldValue.arrayUnion([
+            {'uid': uid, 'timestamp': Timestamp.now()},
+          ]),
+        });
   }
 
   Future<void> acknowledgeCircular(
@@ -52,10 +57,10 @@ class PremiumRepository {
         .collection(FirestorePaths.circulars(communityId))
         .doc(circularId)
         .update({
-      'ackBy': FieldValue.arrayUnion([
-        {'uid': uid, 'timestamp': Timestamp.now()}
-      ]),
-    });
+          'ackBy': FieldValue.arrayUnion([
+            {'uid': uid, 'timestamp': Timestamp.now()},
+          ]),
+        });
   }
 
   // ==================== MULTAS ====================
@@ -64,9 +69,11 @@ class PremiumRepository {
         .collection(FirestorePaths.fines(communityId))
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => FineModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => FineModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Stream<List<FineModel>> watchMyFines(String communityId, String uid) {
@@ -75,9 +82,11 @@ class PremiumRepository {
         .where('residentUid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => FineModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => FineModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> createFine(String communityId, FineModel fine) async {
@@ -95,9 +104,9 @@ class PremiumRepository {
         .collection(FirestorePaths.fines(communityId))
         .doc(fineId)
         .update({
-      'defenseText': defenseText,
-      'status': FineStatus.defense.name,
-    });
+          'defenseText': defenseText,
+          'status': FineStatus.defense.name,
+        });
   }
 
   Stream<FineModel?> watchFine(String communityId, String fineId) {
@@ -106,15 +115,16 @@ class PremiumRepository {
         .doc(fineId)
         .snapshots()
         .map((doc) {
-      if (!doc.exists || doc.data() == null) return null;
-      return FineModel.fromFirestore(doc.data()!, doc.id);
-    });
+          if (!doc.exists || doc.data() == null) return null;
+          return FineModel.fromFirestore(doc.data()!, doc.id);
+        });
   }
 
   Future<void> updateFine(String fineId, Map<String, dynamic> data) async {
     // Buscar la multa en cualquier comunidad (usar collectionGroup si es necesario)
     // Por simplicidad, usamos el communityId del usuario actual
-    final query = await _firestore.collectionGroup('fines')
+    final query = await _firestore
+        .collectionGroup('fines')
         .where(FieldPath.documentId, isEqualTo: fineId)
         .limit(1)
         .get();
@@ -139,9 +149,11 @@ class PremiumRepository {
     return _firestore
         .collection(FirestorePaths.amenities(communityId))
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => AmenityModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => AmenityModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Stream<List<BookingModel>> watchBookings(
@@ -152,23 +164,24 @@ class PremiumRepository {
         .collection(FirestorePaths.bookings(communityId))
         .where('amenityId', isEqualTo: amenityId)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => BookingModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => BookingModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
-  Stream<List<BookingModel>> watchMyBookings(
-    String communityId,
-    String uid,
-  ) {
+  Stream<List<BookingModel>> watchMyBookings(String communityId, String uid) {
     return _firestore
         .collection(FirestorePaths.bookings(communityId))
         .where('residentUid', isEqualTo: uid)
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => BookingModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => BookingModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> createBooking(String communityId, BookingModel booking) async {
@@ -183,9 +196,11 @@ class PremiumRepository {
         .collection(FirestorePaths.pqrs(communityId))
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => PqrsModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => PqrsModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Stream<List<PqrsModel>> watchMyPqrs(String communityId, String uid) {
@@ -194,9 +209,11 @@ class PremiumRepository {
         .where('residentUid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => PqrsModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => PqrsModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> createPqrs(String communityId, PqrsModel pqrs) async {
@@ -231,10 +248,34 @@ class PremiumRepository {
     Query query = _firestore
         .collection(FirestorePaths.finances(communityId))
         .orderBy('date', descending: true);
-    return query.snapshots().map((snap) => snap.docs
-        .map((doc) =>
-            FinanceEntryModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
-        .toList());
+    return query.snapshots().map(
+      (snap) => snap.docs
+          .map(
+            (doc) => FinanceEntryModel.fromFirestore(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Stream<int> watchMonthlyIncome(String communityId, DateTime startOfMonth) {
+    return _firestore
+        .collection(FirestorePaths.finances(communityId))
+        .where('type', isEqualTo: 'income')
+        .snapshots()
+        .map((snap) {
+          var total = 0;
+          for (final doc in snap.docs) {
+            final data = doc.data();
+            final ts = data['date'];
+            if (ts is Timestamp && !ts.toDate().isBefore(startOfMonth)) {
+              total += (data['amount'] ?? 0) as int;
+            }
+          }
+          return total;
+        });
   }
 
   Stream<AccountStatementModel?> watchAccountStatement(
@@ -247,12 +288,12 @@ class PremiumRepository {
         .limit(1)
         .snapshots()
         .map((snap) {
-      if (snap.docs.isEmpty) return null;
-      return AccountStatementModel.fromFirestore(
-        snap.docs.first.data(),
-        snap.docs.first.id,
-      );
-    });
+          if (snap.docs.isEmpty) return null;
+          return AccountStatementModel.fromFirestore(
+            snap.docs.first.data(),
+            snap.docs.first.id,
+          );
+        });
   }
 
   // ==================== ASAMBLEAS ====================
@@ -261,10 +302,11 @@ class PremiumRepository {
         .collection(FirestorePaths.assemblies(communityId))
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) =>
-                AssemblyModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => AssemblyModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> createAssembly(

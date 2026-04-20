@@ -42,7 +42,9 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
       context.showErrorSnackBar('Describe el motivo');
       return;
     }
-    final amount = int.tryParse(_amountController.text.replaceAll('.', '').replaceAll(',', ''));
+    final amount = int.tryParse(
+      _amountController.text.replaceAll('.', '').replaceAll(',', ''),
+    );
     if (amount == null || amount <= 0) {
       context.showErrorSnackBar('Ingresa un monto válido');
       return;
@@ -57,7 +59,9 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
       unitNumber: _unitController.text.trim(),
       amount: amount,
       reason: _reasonController.text.trim(),
-      manualArticle: _articleController.text.trim().isEmpty ? null : _articleController.text.trim(),
+      manualArticle: _articleController.text.trim().isEmpty
+          ? null
+          : _articleController.text.trim(),
       status: FineStatus.notified,
       defenseDeadline: DateTime.now().add(Duration(days: _defenseDays)),
       createdAt: DateTime.now(),
@@ -89,7 +93,14 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
               onPressed: _isLoading ? null : _create,
               style: FilledButton.styleFrom(backgroundColor: AppColors.error),
               child: _isLoading
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Registrar'),
             ),
           ),
@@ -100,97 +111,106 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // Unidad
-          TextField(
-            controller: _unitController,
-            decoration: const InputDecoration(
-              labelText: 'Unidad / Apartamento',
-              hintText: 'Ej: T2-801',
-              prefixIcon: Icon(Icons.home),
+            // Unidad
+            TextField(
+              controller: _unitController,
+              decoration: const InputDecoration(
+                labelText: 'Unidad / Apartamento',
+                hintText: 'Ej: T2-801',
+                prefixIcon: Icon(Icons.home),
+              ),
+              textCapitalization: TextCapitalization.characters,
             ),
-            textCapitalization: TextCapitalization.characters,
-          ),
-          const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.md),
 
-          // Monto
-          TextField(
-            controller: _amountController,
-            decoration: const InputDecoration(
-              labelText: 'Monto (COP)',
-              hintText: 'Ej: 200000',
-              prefixIcon: Icon(Icons.attach_money),
+            // Monto
+            TextField(
+              controller: _amountController,
+              decoration: const InputDecoration(
+                labelText: 'Monto (COP)',
+                hintText: 'Ej: 200000',
+                prefixIcon: Icon(Icons.attach_money),
+              ),
+              keyboardType: TextInputType.number,
             ),
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.md),
 
-          // Motivo
-          TextField(
-            controller: _reasonController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Motivo de la multa',
-              hintText: 'Describe la infracción...',
-              alignLabelWithHint: true,
+            // Motivo
+            TextField(
+              controller: _reasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Motivo de la multa',
+                hintText: 'Describe la infracción...',
+                alignLabelWithHint: true,
+              ),
+              textCapitalization: TextCapitalization.sentences,
             ),
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.md),
 
-          // Artículo del manual
-          TextField(
-            controller: _articleController,
-            decoration: const InputDecoration(
-              labelText: 'Artículo del manual (opcional)',
-              hintText: 'Ej: Art. 23 — Horarios de silencio',
-              prefixIcon: Icon(Icons.menu_book),
+            // Artículo del manual
+            TextField(
+              controller: _articleController,
+              decoration: const InputDecoration(
+                labelText: 'Artículo del manual (opcional)',
+                hintText: 'Ej: Art. 23 — Horarios de silencio',
+                prefixIcon: Icon(Icons.menu_book),
+              ),
             ),
-          ),
-          const SizedBox(height: AppSizes.lg),
+            const SizedBox(height: AppSizes.lg),
 
-          // Plazo de descargos
-          Text('Plazo para descargos', style: AppTextStyles.heading3),
-          const SizedBox(height: AppSizes.sm),
-          Wrap(
-            spacing: 8,
-            children: [3, 5, 7, 10].map((days) {
-              final selected = _defenseDays == days;
-              return ChoiceChip(
-                label: Text('$days días', style: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontSize: 13)),
-                selected: selected,
-                onSelected: (_) => setState(() => _defenseDays = days),
-                selectedColor: AppColors.warning,
-                labelStyle: TextStyle(
-                  color: selected ? Colors.white : AppColors.textPrimary,
-                  fontSize: 13,
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: AppSizes.lg),
-
-          // Info
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.warningLight,
-              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.info_outline, color: AppColors.warning, size: 20),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'El residente será notificado y tendrá el plazo indicado para presentar descargos.',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            // Plazo de descargos
+            Text('Plazo para descargos', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSizes.sm),
+            Wrap(
+              spacing: 8,
+              children: [3, 5, 7, 10].map((days) {
+                final selected = _defenseDays == days;
+                return ChoiceChip(
+                  label: Text(
+                    '$days días',
+                    style: TextStyle(
+                      color: selected ? Colors.white : AppColors.textPrimary,
+                      fontSize: 13,
+                    ),
                   ),
-                ),
-              ],
+                  selected: selected,
+                  onSelected: (_) => setState(() => _defenseDays = days),
+                  selectedColor: AppColors.warning,
+                  labelStyle: TextStyle(
+                    color: selected ? Colors.white : AppColors.textPrimary,
+                    fontSize: 13,
+                  ),
+                );
+              }).toList(),
             ),
-          ),
-        ],
+
+            const SizedBox(height: AppSizes.lg),
+
+            // Info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.warningLight,
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.warning, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'El residente será notificado y tendrá el plazo indicado para presentar descargos.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

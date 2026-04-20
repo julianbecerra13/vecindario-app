@@ -14,7 +14,10 @@ class TermsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Términos y Condiciones de Uso', style: AppTextStyles.heading2),
+            Text(
+              'Términos y Condiciones de Uso',
+              style: AppTextStyles.heading2,
+            ),
             const SizedBox(height: AppSizes.sm),
             const Text(
               'Última actualización: Abril 2026',
@@ -92,12 +95,14 @@ class _Section extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: AppTextStyles.bodyMedium
-                  .copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            title,
+            style: AppTextStyles.bodyMedium.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: AppSizes.xs),
-          Text(body,
-              style: const TextStyle(fontSize: 14, height: 1.6)),
+          Text(body, style: const TextStyle(fontSize: 14, height: 1.6)),
         ],
       ),
     );

@@ -24,10 +24,16 @@ class ServicesRepository {
     return query
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) =>
-                ServiceModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map(
+                (doc) => ServiceModel.fromFirestore(
+                  doc.data() as Map<String, dynamic>,
+                  doc.id,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<ServiceModel?> getService(String serviceId) async {
@@ -70,9 +76,11 @@ class ServicesRepository {
         .where('targetType', isEqualTo: 'service')
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => ReviewModel.fromFirestore(doc.data(), doc.id))
-            .toList());
+        .map(
+          (snap) => snap.docs
+              .map((doc) => ReviewModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
   }
 
   Future<void> addReview(ReviewModel review) async {

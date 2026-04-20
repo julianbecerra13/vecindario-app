@@ -32,7 +32,9 @@ final myFinesProvider = StreamProvider<List<FineModel>>((ref) {
   final communityId = ref.watch(currentCommunityIdProvider);
   final user = ref.watch(currentUserProvider).value;
   if (communityId == null || user == null) return Stream.value([]);
-  return ref.watch(premiumRepositoryProvider).watchMyFines(communityId, user.id);
+  return ref
+      .watch(premiumRepositoryProvider)
+      .watchMyFines(communityId, user.id);
 });
 
 // ==================== AMENIDADES ====================
@@ -74,8 +76,9 @@ final financesProvider = StreamProvider<List<FinanceEntryModel>>((ref) {
   return ref.watch(premiumRepositoryProvider).watchFinances(communityId);
 });
 
-final myAccountStatementProvider =
-    StreamProvider<AccountStatementModel?>((ref) {
+final myAccountStatementProvider = StreamProvider<AccountStatementModel?>((
+  ref,
+) {
   final communityId = ref.watch(currentCommunityIdProvider);
   final user = ref.watch(currentUserProvider).value;
   if (communityId == null || user == null) return Stream.value(null);
@@ -85,8 +88,10 @@ final myAccountStatementProvider =
 });
 
 // ==================== DETALLE DE MULTA ====================
-final fineDetailProvider =
-    StreamProvider.family<FineModel?, String>((ref, fineId) {
+final fineDetailProvider = StreamProvider.family<FineModel?, String>((
+  ref,
+  fineId,
+) {
   final communityId = ref.watch(currentCommunityIdProvider);
   if (communityId == null) return Stream.value(null);
   return ref.watch(premiumRepositoryProvider).watchFine(communityId, fineId);
@@ -97,4 +102,32 @@ final assembliesProvider = StreamProvider<List<AssemblyModel>>((ref) {
   final communityId = ref.watch(currentCommunityIdProvider);
   if (communityId == null) return Stream.value([]);
   return ref.watch(premiumRepositoryProvider).watchAssemblies(communityId);
+});
+
+final assemblyDetailProvider = StreamProvider.family<AssemblyModel?, String>((
+  ref,
+  assemblyId,
+) {
+  final communityId = ref.watch(currentCommunityIdProvider);
+  if (communityId == null) return Stream.value(null);
+  return ref.watch(premiumRepositoryProvider).watchAssemblies(communityId).map((
+    list,
+  ) {
+    for (final a in list) {
+      if (a.id == assemblyId) return a;
+    }
+    return null;
+  });
+});
+
+// ==================== RECAUDO MENSUAL ====================
+final monthlyRevenueProvider = StreamProvider.family<int, String>((
+  ref,
+  communityId,
+) {
+  final now = DateTime.now();
+  final startOfMonth = DateTime(now.year, now.month, 1);
+  return ref
+      .watch(premiumRepositoryProvider)
+      .watchMonthlyIncome(communityId, startOfMonth);
 });

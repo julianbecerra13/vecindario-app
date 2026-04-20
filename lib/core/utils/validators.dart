@@ -62,7 +62,10 @@ class Validators {
     return null;
   }
 
-  static String? validateRequired(String? value, [String field = 'Este campo']) {
+  static String? validateRequired(
+    String? value, [
+    String field = 'Este campo',
+  ]) {
     if (value == null || value.trim().isEmpty) {
       return '$field es obligatorio';
     }

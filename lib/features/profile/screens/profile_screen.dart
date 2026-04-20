@@ -193,14 +193,8 @@ class _StatsRow extends StatelessWidget {
               error: (_, __) => '—',
             ),
           ),
-          _StatItem(
-            label: 'Pedidos',
-            value: ordersCount.toString(),
-          ),
-          _StatItem(
-            label: 'Miembro desde',
-            value: '${memberSince.year}',
-          ),
+          _StatItem(label: 'Pedidos', value: ordersCount.toString()),
+          _StatItem(label: 'Miembro desde', value: '${memberSince.year}'),
         ],
       ),
     );
@@ -211,10 +205,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({
-    required this.label,
-    required this.value,
-  });
+  const _StatItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -222,16 +213,12 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTextStyles.heading3.copyWith(
-            color: AppColors.primary,
-          ),
+          style: AppTextStyles.heading3.copyWith(color: AppColors.primary),
         ),
         const SizedBox(height: AppSizes.xs),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
         ),
       ],
     );
@@ -246,12 +233,12 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-        AppSizes.md, AppSizes.md, AppSizes.md, AppSizes.xs,
+        AppSizes.md,
+        AppSizes.md,
+        AppSizes.md,
+        AppSizes.xs,
       ),
-      child: Text(
-        title.toUpperCase(),
-        style: AppTextStyles.label,
-      ),
+      child: Text(title.toUpperCase(), style: AppTextStyles.label),
     );
   }
 }

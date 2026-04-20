@@ -200,8 +200,11 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
     final query = _searchQuery.toLowerCase();
     return _chapters.where((chapter) {
       if (chapter.title.toLowerCase().contains(query)) return true;
-      return chapter.items
-          .any((a) => a.title.toLowerCase().contains(query) || a.content.toLowerCase().contains(query));
+      return chapter.items.any(
+        (a) =>
+            a.title.toLowerCase().contains(query) ||
+            a.content.toLowerCase().contains(query),
+      );
     }).toList();
   }
 
@@ -246,7 +249,10 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
                     : null,
                 filled: true,
                 fillColor: AppColors.surfaceVariant,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   borderSide: BorderSide.none,
@@ -262,11 +268,17 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.search_off, size: 48, color: AppColors.textHint),
+                        const Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: AppColors.textHint,
+                        ),
                         const SizedBox(height: AppSizes.sm),
                         Text(
                           'No se encontraron resultados',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -318,7 +330,9 @@ class _ChapterTile extends StatelessWidget {
               color: hasLinkedFines && isExpanded
                   ? const Color(0xFF8B5CF6).withValues(alpha: 0.05)
                   : null,
-              border: const Border(bottom: BorderSide(color: AppColors.border, width: 0.5)),
+              border: const Border(
+                bottom: BorderSide(color: AppColors.border, width: 0.5),
+              ),
             ),
             child: Row(
               children: [
@@ -330,7 +344,9 @@ class _ChapterTile extends StatelessWidget {
                         chapter.title,
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: hasLinkedFines ? const Color(0xFF8B5CF6) : AppColors.textPrimary,
+                          color: hasLinkedFines
+                              ? const Color(0xFF8B5CF6)
+                              : AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -362,9 +378,14 @@ class _ChapterTile extends StatelessWidget {
         ),
         if (isExpanded)
           ...chapter.items.map((article) {
-            final matchesSearch = searchQuery.isNotEmpty &&
-                (article.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-                    article.content.toLowerCase().contains(searchQuery.toLowerCase()));
+            final matchesSearch =
+                searchQuery.isNotEmpty &&
+                (article.title.toLowerCase().contains(
+                      searchQuery.toLowerCase(),
+                    ) ||
+                    article.content.toLowerCase().contains(
+                      searchQuery.toLowerCase(),
+                    ));
 
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -372,7 +393,9 @@ class _ChapterTile extends StatelessWidget {
                 color: matchesSearch
                     ? AppColors.primary.withValues(alpha: 0.05)
                     : AppColors.surfaceVariant.withValues(alpha: 0.5),
-                border: const Border(bottom: BorderSide(color: AppColors.border, width: 0.3)),
+                border: const Border(
+                  bottom: BorderSide(color: AppColors.border, width: 0.3),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

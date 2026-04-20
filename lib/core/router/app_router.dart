@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/features/admin/screens/admin_panel_screen.dart';
+import 'package:vecindario_app/features/admin/screens/community_settings_screen.dart';
 import 'package:vecindario_app/features/admin/screens/pending_approvals_screen.dart';
 import 'package:vecindario_app/features/auth/screens/forgot_password_screen.dart';
 import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
@@ -33,8 +34,10 @@ import 'package:vecindario_app/features/premium/finances/screens/finances_screen
 import 'package:vecindario_app/features/premium/finances/screens/account_statement_screen.dart';
 import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/assemblies/screens/assemblies_screen.dart';
+import 'package:vecindario_app/features/premium/assemblies/screens/assembly_detail_screen.dart';
 import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dart';
 import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
+import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
 import 'package:vecindario_app/features/premium/circulars/screens/create_circular_screen.dart';
 import 'package:vecindario_app/features/premium/fines/screens/create_fine_screen.dart';
 import 'package:vecindario_app/features/premium/fines/screens/fine_detail_screen.dart';
@@ -44,6 +47,8 @@ import 'package:vecindario_app/features/profile/screens/terms_screen.dart';
 import 'package:vecindario_app/features/profile/screens/privacy_policy_screen.dart';
 import 'package:vecindario_app/features/stores/screens/store_panel_screen.dart';
 import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
+import 'package:vecindario_app/features/super_admin/screens/community_detail_admin_screen.dart';
+import 'package:vecindario_app/features/super_admin/screens/create_community_screen.dart';
 import 'package:vecindario_app/features/super_admin/screens/super_admin_panel_screen.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
@@ -55,7 +60,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: '/feed',
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
-      final isAuthRoute = state.matchedLocation == '/login' ||
+      final isAuthRoute =
+          state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/forgot-password' ||
           state.matchedLocation == '/onboarding' ||
@@ -77,25 +83,46 @@ final routerProvider = Provider<GoRouter>((ref) {
         final user = currentUser.valueOrNull;
         final isLoading = currentUser.isLoading;
 
+        // Redirect forzado: super_admin siempre a /super-admin (excepto /profile)
+        if (user != null && user.role.toValue() == 'super_admin') {
+          final isSuperAdminArea = state.matchedLocation.startsWith(
+            '/super-admin',
+          );
+          final isProfileArea = state.matchedLocation.startsWith('/profile');
+          if (!isSuperAdminArea && !isProfileArea) {
+            return '/super-admin';
+          }
+        }
+
         // Guard: /admin y /premium solo para admin o super_admin
-        final isAdminRoute = state.matchedLocation.startsWith('/admin') ||
+        final isAdminRoute =
+            state.matchedLocation.startsWith('/admin') ||
             state.matchedLocation.startsWith('/premium');
-        if (isAdminRoute && isLoading) return '/feed';
-        if (isAdminRoute && user != null && user.role.toValue() != 'admin' && user.role.toValue() != 'super_admin') {
+        if (isAdminRoute && isLoading) return null;
+        if (isAdminRoute &&
+            user != null &&
+            user.role.toValue() != 'admin' &&
+            user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: /super-admin exclusivo para super_admin de plataforma
-        final isSuperAdminRoute = state.matchedLocation.startsWith('/super-admin');
+        final isSuperAdminRoute = state.matchedLocation.startsWith(
+          '/super-admin',
+        );
         if (isSuperAdminRoute && isLoading) return '/feed';
-        if (isSuperAdminRoute && user != null && user.role.toValue() != 'super_admin') {
+        if (isSuperAdminRoute &&
+            user != null &&
+            user.role.toValue() != 'super_admin') {
           return '/feed';
         }
 
         // Guard: store-panel solo para storeOwner
         final isStorePanel = state.matchedLocation.startsWith('/store-panel');
         if (isStorePanel && isLoading) return '/feed';
-        if (isStorePanel && user != null && user.role.toValue() != 'store_owner') {
+        if (isStorePanel &&
+            user != null &&
+            user.role.toValue() != 'store_owner') {
           return '/feed';
         }
       }
@@ -108,14 +135,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/onboarding',
         builder: (_, __) => const OnboardingScreen(),
       ),
-      GoRoute(
-        path: '/login',
-        builder: (_, __) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (_, __) => const RegisterScreen(),
-      ),
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
       GoRoute(
         path: '/forgot-password',
         builder: (_, __) => const ForgotPasswordScreen(),
@@ -238,18 +259,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
         routes: [
-          GoRoute(
-            path: 'edit',
-            builder: (_, __) => const EditProfileScreen(),
-          ),
-          GoRoute(
-            path: 'privacy',
-            builder: (_, __) => const PrivacyScreen(),
-          ),
-          GoRoute(
-            path: 'terms',
-            builder: (_, __) => const TermsScreen(),
-          ),
+          GoRoute(path: 'edit', builder: (_, __) => const EditProfileScreen()),
+          GoRoute(path: 'privacy', builder: (_, __) => const PrivacyScreen()),
+          GoRoute(path: 'terms', builder: (_, __) => const TermsScreen()),
           GoRoute(
             path: 'privacy-policy',
             builder: (_, __) => const PrivacyPolicyScreen(),
@@ -272,13 +284,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'pending',
             builder: (_, __) => const PendingApprovalsScreen(),
           ),
+          GoRoute(
+            path: 'settings',
+            builder: (_, __) => const CommunitySettingsScreen(),
+          ),
         ],
       ),
 
       // Rutas Premium (Vecindario Admin)
+      GoRoute(path: '/premium', builder: (_, __) => const AdminShell()),
       GoRoute(
-        path: '/premium',
-        builder: (_, __) => const AdminShell(),
+        path: '/premium/dashboard',
+        builder: (_, __) => const PremiumDashboardScreen(),
       ),
       GoRoute(
         path: '/premium/circulars',
@@ -288,24 +305,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/premium/circulars/create',
         builder: (_, __) => const CreateCircularScreen(),
       ),
-      GoRoute(
-        path: '/premium/fines',
-        builder: (_, __) => const FinesScreen(),
-      ),
+      GoRoute(path: '/premium/fines', builder: (_, __) => const FinesScreen()),
       GoRoute(
         path: '/premium/fines/create',
         builder: (_, __) => const CreateFineScreen(),
       ),
       GoRoute(
         path: '/premium/fines/:fineId',
-        builder: (_, state) => FineDetailScreen(
-          fineId: state.pathParameters['fineId'] ?? '',
-        ),
+        builder: (_, state) =>
+            FineDetailScreen(fineId: state.pathParameters['fineId'] ?? ''),
       ),
-      GoRoute(
-        path: '/premium/pqrs',
-        builder: (_, __) => const PqrsScreen(),
-      ),
+      GoRoute(path: '/premium/pqrs', builder: (_, __) => const PqrsScreen()),
       GoRoute(
         path: '/premium/pqrs/create',
         builder: (_, __) => const CreatePqrsScreen(),
@@ -331,12 +341,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const AssembliesScreen(),
       ),
       GoRoute(
+        path: '/premium/assemblies/:assemblyId',
+        builder: (_, state) => AssemblyDetailScreen(
+          assemblyId: state.pathParameters['assemblyId'] ?? '',
+        ),
+      ),
+      GoRoute(
         path: '/premium/plans',
         builder: (_, __) => const SubscriptionPlansScreen(),
       ),
       GoRoute(
         path: '/super-admin',
         builder: (_, __) => const SuperAdminPanelScreen(),
+        routes: [
+          GoRoute(
+            path: 'create-community',
+            builder: (_, __) => const CreateCommunityScreen(),
+          ),
+          GoRoute(
+            path: 'community/:communityId',
+            builder: (_, state) => CommunityDetailAdminScreen(
+              communityId: state.pathParameters['communityId'] ?? '',
+            ),
+          ),
+        ],
       ),
     ],
   );

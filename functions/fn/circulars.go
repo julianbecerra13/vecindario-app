@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	functions.HTTP("SendCircular", sendCircular)
+	functions.HTTP("SendCircular", SendCircular)
 }
 
 type SendCircularRequest struct {
@@ -23,8 +23,8 @@ type SendCircularRequest struct {
 	RequiresAck bool     `json:"requiresAck"`
 }
 
-// sendCircular — Crea circular, envía push a todos los residentes
-func sendCircular(w http.ResponseWriter, r *http.Request) {
+// SendCircular — Crea circular, envía push a todos los residentes
+func SendCircular(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	functions.HTTP("CreateFine", createFine)
+	functions.HTTP("CreateFine", CreateFine)
 }
 
 type CreateFineRequest struct {
@@ -25,8 +25,8 @@ type CreateFineRequest struct {
 	DefenseDays    int      `json:"defenseDays"` // Días para descargo
 }
 
-// createFine — Registra multa, vincula artículo del manual, notifica al residente
-func createFine(w http.ResponseWriter, r *http.Request) {
+// CreateFine — Registra multa, vincula artículo del manual, notifica al residente
+func CreateFine(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
