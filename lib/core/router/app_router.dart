@@ -30,6 +30,8 @@ import 'package:vecindario_app/features/stores/screens/my_orders_screen.dart';
 import 'package:vecindario_app/features/premium/circulars/screens/circulars_screen.dart';
 import 'package:vecindario_app/features/premium/fines/screens/fines_screen.dart';
 import 'package:vecindario_app/features/premium/amenities/screens/amenities_screen.dart';
+import 'package:vecindario_app/features/premium/amenities/screens/create_amenity_screen.dart';
+import 'package:vecindario_app/features/premium/finances/screens/create_finance_entry_screen.dart';
 import 'package:vecindario_app/features/premium/finances/screens/finances_screen.dart';
 import 'package:vecindario_app/features/premium/finances/screens/account_statement_screen.dart';
 import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
@@ -338,8 +340,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const AmenitiesScreen(),
       ),
       GoRoute(
+        path: '/premium/amenities/create',
+        builder: (_, __) => const CreateAmenityScreen(),
+      ),
+      GoRoute(
         path: '/premium/finances',
         builder: (_, __) => const FinancesScreen(),
+      ),
+      GoRoute(
+        path: '/premium/finances/create',
+        builder: (_, __) => const CreateFinanceEntryScreen(),
       ),
       GoRoute(
         path: '/premium/account-statement',

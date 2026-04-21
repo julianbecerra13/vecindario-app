@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
@@ -21,9 +22,17 @@ class AmenitiesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final amenitiesAsync = ref.watch(amenitiesProvider);
+    final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Zonas Sociales')),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/premium/amenities/create'),
+              icon: const Icon(Icons.add),
+              label: const Text('Nueva'),
+            )
+          : null,
       body: amenitiesAsync.when(
         data: (amenities) {
           if (amenities.isEmpty) {

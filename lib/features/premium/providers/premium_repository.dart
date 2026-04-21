@@ -190,6 +190,21 @@ class PremiumRepository {
         .add(booking.toFirestore());
   }
 
+  Future<void> createAmenity(String communityId, AmenityModel amenity) async {
+    await _firestore
+        .collection(FirestorePaths.amenities(communityId))
+        .add(amenity.toFirestore());
+  }
+
+  Future<void> createFinanceEntry(
+    String communityId,
+    FinanceEntryModel entry,
+  ) async {
+    await _firestore
+        .collection(FirestorePaths.finances(communityId))
+        .add(entry.toFirestore());
+  }
+
   // ==================== PQRS ====================
   Stream<List<PqrsModel>> watchAllPqrs(String communityId) {
     return _firestore
