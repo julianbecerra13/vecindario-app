@@ -264,15 +264,29 @@ class _BudgetVsExecutionChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (categories.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSizes.lg),
+          child: Text(
+            'Registra egresos por categoría para ver el gráfico',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.caption,
+          ),
+        ),
+      );
+    }
+
     final maxValue = [
       ...budget.values,
       ...executed.values,
     ].fold(0, (a, b) => a > b ? a : b).toDouble();
+    final safeMaxY = maxValue > 0 ? maxValue * 1.2 : 100.0;
 
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: maxValue * 1.2,
+        maxY: safeMaxY,
         barTouchData: BarTouchData(enabled: false),
         titlesData: FlTitlesData(
           show: true,
