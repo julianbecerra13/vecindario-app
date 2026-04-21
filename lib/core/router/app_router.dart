@@ -94,6 +94,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
+        // Redirect forzado: si el user no tiene comunidad, debe unirse primero.
+        // Si la tiene pero no está verified, debe esperar aprobación.
+        if (user != null && user.role.toValue() != 'super_admin') {
+          final onJoin = state.matchedLocation == '/join-community';
+          final onPending = state.matchedLocation == '/pending-approval';
+          if (user.communityId == null && !onJoin) {
+            return '/join-community';
+          }
+          if (user.communityId != null && !user.verified && !onPending) {
+            return '/pending-approval';
+          }
+        }
+
         // Guard: /admin y /premium solo para admin o super_admin
         final isAdminRoute =
             state.matchedLocation.startsWith('/admin') ||
