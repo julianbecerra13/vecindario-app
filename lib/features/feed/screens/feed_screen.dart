@@ -147,7 +147,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
             child: GestureDetector(
-              onTap: () => context.go('/profile'),
+              onTap: () => context.push('/profile'),
               child: userAsync.when(
                 data: (user) => CachedAvatar(
                   imageUrl: user?.photoURL,
