@@ -29,12 +29,11 @@ class PqrsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('PQRS'),
         actions: [
-          if (!isAdmin)
-            TextButton.icon(
-              onPressed: () => context.push('/premium/pqrs/create'),
-              icon: const Icon(Icons.add),
-              label: const Text('Nuevo'),
-            ),
+          TextButton.icon(
+            onPressed: () => context.push('/premium/pqrs/create'),
+            icon: const Icon(Icons.add),
+            label: const Text('Nuevo'),
+          ),
         ],
       ),
       body: Column(

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -43,6 +44,11 @@ class _AdminFinancesView extends ConsumerWidget {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/premium/finances/create'),
+        icon: const Icon(Icons.add),
+        label: const Text('Nuevo'),
       ),
       body: financesAsync.when(
         data: (entries) {
