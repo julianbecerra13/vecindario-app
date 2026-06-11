@@ -28,6 +28,7 @@ class AmenitiesScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Zonas Sociales')),
       floatingActionButton: isAdmin
           ? FloatingActionButton.extended(
+              heroTag: 'amenities_fab',
               onPressed: () => context.push('/premium/amenities/create'),
               icon: const Icon(Icons.add),
               label: const Text('Nueva'),

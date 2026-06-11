@@ -94,6 +94,52 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.push('/premium'),
                 ),
               ],
+              // Mi conjunto (residentes + admin, todos los vecinos)
+              if (user.role != UserRole.superAdmin &&
+                  user.communityId != null) ...[
+                const Divider(),
+                _SectionTitle('Mi conjunto'),
+                _SettingsTile(
+                  icon: Icons.campaign_outlined,
+                  title: 'Circulares',
+                  subtitle: 'Comunicados de la administración',
+                  onTap: () => context.push('/premium/circulars'),
+                ),
+                _SettingsTile(
+                  icon: Icons.pool_outlined,
+                  title: 'Reservar zona',
+                  subtitle: 'Salón, gimnasio, BBQ, piscina',
+                  onTap: () => context.push('/premium/amenities'),
+                ),
+                _SettingsTile(
+                  icon: Icons.assignment_outlined,
+                  title: 'PQRS',
+                  subtitle: 'Peticiones, quejas, reclamos',
+                  onTap: () => context.push('/premium/pqrs'),
+                ),
+                _SettingsTile(
+                  icon: Icons.receipt_long_outlined,
+                  title: 'Mis multas',
+                  subtitle: 'Ver multas activas',
+                  onTap: () => context.push('/premium/fines'),
+                ),
+                _SettingsTile(
+                  icon: Icons.account_balance_wallet_outlined,
+                  title: 'Estado de cuenta',
+                  onTap: () => context.push('/premium/account-statement'),
+                ),
+                _SettingsTile(
+                  icon: Icons.how_to_vote_outlined,
+                  title: 'Asambleas',
+                  subtitle: 'Convocatorias y votaciones',
+                  onTap: () => context.push('/premium/assemblies'),
+                ),
+                _SettingsTile(
+                  icon: Icons.menu_book_outlined,
+                  title: 'Manual de convivencia',
+                  onTap: () => context.push('/premium/manual'),
+                ),
+              ],
               // Store panel (solo para store_owner)
               if (user.role == UserRole.storeOwner) ...[
                 const Divider(),

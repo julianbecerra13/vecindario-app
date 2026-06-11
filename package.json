@@ -5,6 +5,7 @@
     "jest": "^30.3.0"
   },
   "dependencies": {
-    "firebase": "^12.11.0"
+    "firebase": "^12.11.0",
+    "pdfkit": "^0.18.0"
   }
 }

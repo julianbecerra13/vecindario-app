@@ -6,6 +6,7 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/widgets/post_card.dart';
+import 'package:vecindario_app/shared/models/user_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
@@ -43,6 +44,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     final postsAsync = ref.watch(feedPostsProvider);
     final communityAsync = ref.watch(currentCommunityProvider);
     final userAsync = ref.watch(currentUserProvider);
+    final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -144,6 +146,24 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               );
             },
           ),
+          if (isAdmin)
+            IconButton(
+              icon: const Icon(
+                Icons.admin_panel_settings_outlined,
+                color: AppColors.primary,
+              ),
+              tooltip: 'Panel de administración',
+              onPressed: () => context.push('/premium'),
+            ),
+          if (userAsync.value?.role == UserRole.storeOwner)
+            IconButton(
+              icon: const Icon(
+                Icons.storefront_outlined,
+                color: AppColors.primary,
+              ),
+              tooltip: 'Mi tienda',
+              onPressed: () => context.push('/store-panel'),
+            ),
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
             child: GestureDetector(
@@ -201,7 +221,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         },
         loading: () => const LoadingIndicator(),
         error: (e, _) => ErrorDisplay(
-          message: 'Error al cargar noticias',
+          message: 'Error al cargar noticias\n\n$e',
           onRetry: () => ref.invalidate(feedPostsProvider),
         ),
       ),

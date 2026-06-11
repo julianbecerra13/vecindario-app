@@ -46,6 +46,7 @@ class _AdminFinancesView extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'finances_fab',
         onPressed: () => context.push('/premium/finances/create'),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo'),

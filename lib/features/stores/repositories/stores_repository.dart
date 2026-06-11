@@ -79,18 +79,21 @@ class StoresRepository {
         );
   }
 
-  Stream<List<OrderModel>> watchStoreOrders(String storeId) {
+  Stream<List<OrderModel>> watchStoreOrders(String storeId, String ownerUid) {
+    // Solo filtro por storeOwnerUid (rule requires it). Ordeno in-memory
+    // para no depender de índice compuesto en la colección orders.
     return _firestore
         .collection(FirestorePaths.orders)
-        .where('storeId', isEqualTo: storeId)
-        .orderBy('createdAt', descending: true)
-        .limit(50)
+        .where('storeOwnerUid', isEqualTo: ownerUid)
         .snapshots()
-        .map(
-          (snap) => snap.docs
+        .map((snap) {
+          final orders = snap.docs
               .map((doc) => OrderModel.fromFirestore(doc.data(), doc.id))
-              .toList(),
-        );
+              .where((o) => o.storeId == storeId)
+              .toList();
+          orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return orders;
+        });
   }
 
   Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
@@ -136,5 +139,63 @@ class StoresRepository {
               .map((doc) => StoreModel.fromFirestore(doc.data(), doc.id))
               .toList(),
         );
+  }
+
+  Stream<List<StoreItemModel>> watchAllStoreItems(String storeId) {
+    return _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .collection('items')
+        .orderBy('sortOrder')
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((doc) => StoreItemModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
+  }
+
+  Future<String> createStore(StoreModel store) async {
+    final doc = await _firestore
+        .collection(FirestorePaths.stores)
+        .add(store.toFirestore());
+    return doc.id;
+  }
+
+  Future<void> updateStore(String storeId, Map<String, dynamic> data) async {
+    await _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .update(data);
+  }
+
+  Future<void> addStoreItem(String storeId, StoreItemModel item) async {
+    await _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .collection('items')
+        .add(item.toFirestore());
+  }
+
+  Future<void> updateStoreItem(
+    String storeId,
+    String itemId,
+    Map<String, dynamic> data,
+  ) async {
+    await _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .collection('items')
+        .doc(itemId)
+        .update(data);
+  }
+
+  Future<void> deleteStoreItem(String storeId, String itemId) async {
+    await _firestore
+        .collection(FirestorePaths.stores)
+        .doc(storeId)
+        .collection('items')
+        .doc(itemId)
+        .delete();
   }
 }

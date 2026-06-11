@@ -6,6 +6,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
@@ -105,6 +106,32 @@ class SuperAdminPanelScreen extends ConsumerWidget {
             icon: const Icon(Icons.add_business),
             tooltip: 'Crear comunidad',
             onPressed: () => context.push('/super-admin/create-community'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: AppColors.error),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Cerrar sesión'),
+                  content: const Text('¿Seguro que quieres salir?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Salir'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirmed == true) {
+                await ref.read(authNotifierProvider.notifier).logout();
+              }
+            },
           ),
         ],
       ),

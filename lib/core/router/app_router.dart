@@ -37,6 +37,7 @@ import 'package:vecindario_app/features/premium/finances/screens/account_stateme
 import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
 import 'package:vecindario_app/features/premium/assemblies/screens/assemblies_screen.dart';
 import 'package:vecindario_app/features/premium/assemblies/screens/assembly_detail_screen.dart';
+import 'package:vecindario_app/features/premium/assemblies/screens/create_assembly_screen.dart';
 import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dart';
 import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
 import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
@@ -109,12 +110,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
-        // Guard: /admin y /premium solo para admin o super_admin
-        final isAdminRoute =
+        // Guard: /admin y /premium (shell admin) solo para admin o super_admin.
+        // Las subrutas de /premium (circulares, pqrs, amenities, etc.) son
+        // accesibles a residentes — cada pantalla controla qué ven por rol.
+        final isAdminShellRoute =
             state.matchedLocation.startsWith('/admin') ||
-            state.matchedLocation.startsWith('/premium');
-        if (isAdminRoute && isLoading) return null;
-        if (isAdminRoute &&
+            state.matchedLocation == '/premium';
+        if (isAdminShellRoute && isLoading) return null;
+        if (isAdminShellRoute &&
             user != null &&
             user.role.toValue() != 'admin' &&
             user.role.toValue() != 'super_admin') {
@@ -362,6 +365,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/premium/assemblies',
         builder: (_, __) => const AssembliesScreen(),
+      ),
+      GoRoute(
+        path: '/premium/assemblies/create',
+        builder: (_, __) => const CreateAssemblyScreen(),
       ),
       GoRoute(
         path: '/premium/assemblies/:assemblyId',

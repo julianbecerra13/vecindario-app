@@ -1,0 +1,13 @@
+{
+  "name": "vecindario-demo-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scripts para seed y promoción de cuentas para demo de Vecindario",
+  "scripts": {
+    "seed": "node seed_demo.js",
+    "promote": "node promote_account.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

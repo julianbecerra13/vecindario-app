@@ -20,9 +20,18 @@ class AssembliesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final assembliesAsync = ref.watch(assembliesProvider);
+    final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Asambleas')),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              heroTag: 'assemblies_fab',
+              onPressed: () => context.push('/premium/assemblies/create'),
+              icon: const Icon(Icons.add),
+              label: const Text('Convocar'),
+            )
+          : null,
       body: assembliesAsync.when(
         data: (assemblies) {
           if (assemblies.isEmpty) {
