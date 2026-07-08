@@ -165,7 +165,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
               credential.smsCode ?? '',
             );
             state = state.copyWith(isLoading: false, phoneVerified: true);
-          } catch (_) {}
+          } catch (e) {
+            AppLogger.error('Error en auto-verificación de teléfono', e);
+          }
         },
         onFailed: (message) {
           state = state.copyWith(isLoading: false, error: message);

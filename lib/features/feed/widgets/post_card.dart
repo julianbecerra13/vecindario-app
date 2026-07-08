@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
@@ -129,15 +130,20 @@ class PostCard extends ConsumerWidget {
                           ),
                         ),
                       PopupMenuButton<String>(
-                        onSelected: (value) {
+                        onSelected: (value) async {
                           if (value == 'delete') {
                             ref
                                 .read(postNotifierProvider.notifier)
                                 .deletePost(post.id);
                           } else if (value == 'pin') {
-                            ref
+                            final ok = await ref
                                 .read(postNotifierProvider.notifier)
                                 .pinPost(post.id, !post.pinned);
+                            if (!ok && context.mounted) {
+                              context.showErrorSnackBar(
+                                'No se pudo fijar la publicación',
+                              );
+                            }
                           } else if (value == 'report') {
                             _showReportDialog(
                               context,
@@ -200,11 +206,16 @@ class PostCard extends ConsumerWidget {
                         icon: isLiked ? Icons.favorite : Icons.favorite_border,
                         label: '${post.likes}',
                         color: isLiked ? AppColors.error : null,
-                        onTap: () {
+                        onTap: () async {
                           if (currentUser == null) return;
-                          ref
+                          final ok = await ref
                               .read(postNotifierProvider.notifier)
                               .toggleLike(post.id, currentUser.id, isLiked);
+                          if (!ok && context.mounted) {
+                            context.showErrorSnackBar(
+                              'No se pudo registrar tu like',
+                            );
+                          }
                         },
                       ),
                       const SizedBox(width: AppSizes.md),
@@ -259,14 +270,17 @@ void _showReportDialog(
           ...reasons.map(
             (reason) => ListTile(
               title: Text(reason),
-              onTap: () {
-                ref
+              onTap: () async {
+                final ok = await ref
                     .read(postNotifierProvider.notifier)
                     .reportPost(post.id, uid, reason);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Reporte enviado')),
-                );
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (!context.mounted) return;
+                if (ok) {
+                  context.showSnackBar('Reporte enviado');
+                } else {
+                  context.showErrorSnackBar('No se pudo enviar el reporte');
+                }
               },
             ),
           ),

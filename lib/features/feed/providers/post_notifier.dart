@@ -40,47 +40,55 @@ class PostNotifier extends StateNotifier<PostActionState> {
     }
   }
 
-  Future<void> toggleLike(String postId, String uid, bool isLiked) async {
-    if (_communityId == null) return;
+  Future<bool> toggleLike(String postId, String uid, bool isLiked) async {
+    if (_communityId == null) return false;
     try {
       await _ref
           .read(feedRepositoryProvider)
           .toggleLike(_communityId!, postId, uid, isLiked);
+      return true;
     } catch (e) {
       AppLogger.error('Error en like', e);
+      return false;
     }
   }
 
-  Future<void> pinPost(String postId, bool pinned) async {
-    if (_communityId == null) return;
+  Future<bool> pinPost(String postId, bool pinned) async {
+    if (_communityId == null) return false;
     try {
       await _ref
           .read(feedRepositoryProvider)
           .pinPost(_communityId!, postId, pinned);
+      return true;
     } catch (e) {
       AppLogger.error('Error fijando post', e);
+      return false;
     }
   }
 
-  Future<void> reportPost(String postId, String uid, String reason) async {
-    if (_communityId == null) return;
+  Future<bool> reportPost(String postId, String uid, String reason) async {
+    if (_communityId == null) return false;
     try {
       await _ref
           .read(feedRepositoryProvider)
           .reportPost(_communityId!, postId, uid, reason);
+      return true;
     } catch (e) {
       AppLogger.error('Error reportando post', e);
+      return false;
     }
   }
 
-  Future<void> votePoll(String postId, int optionIndex, String uid) async {
-    if (_communityId == null) return;
+  Future<bool> votePoll(String postId, int optionIndex, String uid) async {
+    if (_communityId == null) return false;
     try {
       await _ref
           .read(feedRepositoryProvider)
           .votePoll(_communityId!, postId, optionIndex, uid);
+      return true;
     } catch (e) {
       AppLogger.error('Error votando', e);
+      return false;
     }
   }
 }

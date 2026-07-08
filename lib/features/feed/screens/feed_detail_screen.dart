@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
+import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -233,15 +235,19 @@ class FeedDetailScreen extends ConsumerWidget {
                       child: TextButton.icon(
                         onPressed: currentUser == null
                             ? null
-                            : () {
-                                ref
-                                    .read(feedRepositoryProvider)
+                            : () async {
+                                final ok = await ref
+                                    .read(postNotifierProvider.notifier)
                                     .toggleLike(
-                                      '',
                                       postId,
                                       currentUser.id,
                                       isLiked,
                                     );
+                                if (!ok && context.mounted) {
+                                  context.showErrorSnackBar(
+                                    'No se pudo registrar tu like',
+                                  );
+                                }
                               },
                         icon: Icon(
                           isLiked ? Icons.favorite : Icons.favorite_outline,

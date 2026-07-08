@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
 
@@ -77,10 +78,13 @@ class PollWidget extends ConsumerWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSizes.sm),
             child: OutlinedButton(
-              onPressed: () {
-                ref
+              onPressed: () async {
+                final ok = await ref
                     .read(postNotifierProvider.notifier)
                     .votePoll(postId, index, currentUid);
+                if (!ok && context.mounted) {
+                  context.showErrorSnackBar('No se pudo registrar tu voto');
+                }
               },
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 40),
