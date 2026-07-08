@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/router/app_router.dart';
 import 'package:vecindario_app/core/theme/app_theme.dart';
+import 'package:vecindario_app/l10n/app_localizations.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/features/notifications/providers/notification_providers.dart';
 
@@ -28,7 +30,13 @@ class VecindarioApp extends ConsumerWidget {
       themeMode: ThemeMode.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      locale: const Locale('es'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

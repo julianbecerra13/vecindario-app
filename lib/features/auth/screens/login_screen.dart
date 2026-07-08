@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/constants/app_strings.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/utils/validators.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
@@ -86,7 +87,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: AppSizes.xs),
                   Text(
-                    AppStrings.appSlogan,
+                    context.l10n.appSlogan,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
@@ -98,9 +99,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     validator: Validators.validateEmail,
-                    decoration: const InputDecoration(
-                      labelText: 'Correo electrónico',
-                      prefixIcon: Icon(Icons.email_outlined),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.email,
+                      prefixIcon: const Icon(Icons.email_outlined),
                     ),
                   ),
                   const SizedBox(height: AppSizes.md),
@@ -111,7 +112,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     validator: Validators.validatePassword,
                     onFieldSubmitted: (_) => _handleLogin(),
                     decoration: InputDecoration(
-                      labelText: 'Contraseña',
+                      labelText: context.l10n.password,
                       prefixIcon: const Icon(Icons.lock_outlined),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -129,7 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () => context.push('/forgot-password'),
-                      child: const Text('¿Olvidaste tu contraseña?'),
+                      child: Text(context.l10n.forgotPassword),
                     ),
                   ),
                   const SizedBox(height: AppSizes.sm),
@@ -144,7 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Iniciar Sesión'),
+                        : Text(context.l10n.login),
                   ),
                   const SizedBox(height: AppSizes.md),
                   Row(
@@ -155,7 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           horizontal: AppSizes.md,
                         ),
                         child: Text(
-                          'o continúa con',
+                          context.l10n.authOrContinueWith,
                           style: AppTextStyles.bodySmall,
                         ),
                       ),
@@ -166,22 +167,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   OutlinedButton.icon(
                     onPressed: authState.isLoading ? null : _handleGoogleLogin,
                     icon: const Icon(Icons.g_mobiledata, size: 24),
-                    label: const Text('Continuar con Google'),
+                    label: Text(context.l10n.continueWithGoogle),
                   ),
                   const SizedBox(height: AppSizes.sm),
                   OutlinedButton.icon(
                     onPressed: authState.isLoading ? null : _handleAppleLogin,
                     icon: const Icon(Icons.apple, size: 24),
-                    label: const Text('Continuar con Apple'),
+                    label: Text(context.l10n.authContinueWithApple),
                   ),
                   const SizedBox(height: AppSizes.xl),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('¿No tienes cuenta? '),
+                      Text(context.l10n.authNoAccount),
                       TextButton(
                         onPressed: () => context.push('/register'),
-                        child: const Text('Regístrate'),
+                        child: Text(context.l10n.authSignUpAction),
                       ),
                     ],
                   ),

@@ -127,4 +127,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get privacyPolicy => 'Política de privacidad';
+
+  @override
+  String get authOrContinueWith => 'o continúa con';
+
+  @override
+  String get authContinueWithApple => 'Continuar con Apple';
+
+  @override
+  String get authNoAccount => '¿No tienes cuenta? ';
+
+  @override
+  String get authSignUpAction => 'Regístrate';
 }

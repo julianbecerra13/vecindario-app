@@ -39,5 +39,9 @@
   "downloadData": "Descargar mis datos",
   "deleteAccount": "Eliminar mi cuenta",
   "termsOfUse": "Términos de uso",
-  "privacyPolicy": "Política de privacidad"
+  "privacyPolicy": "Política de privacidad",
+  "authOrContinueWith": "o continúa con",
+  "authContinueWithApple": "Continuar con Apple",
+  "authNoAccount": "¿No tienes cuenta? ",
+  "authSignUpAction": "Regístrate"
 }

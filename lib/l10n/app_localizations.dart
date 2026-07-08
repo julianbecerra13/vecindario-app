@@ -337,6 +337,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Política de privacidad'**
   String get privacyPolicy;
+
+  /// No description provided for @authOrContinueWith.
+  ///
+  /// In es, this message translates to:
+  /// **'o continúa con'**
+  String get authOrContinueWith;
+
+  /// No description provided for @authContinueWithApple.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar con Apple'**
+  String get authContinueWithApple;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No tienes cuenta? '**
+  String get authNoAccount;
+
+  /// No description provided for @authSignUpAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Regístrate'**
+  String get authSignUpAction;
 }
 
 class _AppLocalizationsDelegate
