@@ -31,6 +31,21 @@ class _AdminFinancesView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final financesAsync = ref.watch(financesProvider);
+    final budgetByCategory =
+        ref.watch(budgetsProvider).value ?? const <String, int>{};
+    final statements =
+        ref.watch(communityStatementsProvider).value ??
+        const <AccountStatementModel>[];
+
+    // Cartera con datos reales: lo que deben los residentes (saldo positivo)
+    final carteraMorosa = statements
+        .where((s) => s.balance > 0)
+        .fold(0, (sum, s) => sum + s.balance);
+    // Tasa de recaudo = unidades al día / unidades con estado de cuenta
+    final upToDate = statements.where((s) => s.isUpToDate).length;
+    final recaudoRate = statements.isNotEmpty
+        ? upToDate / statements.length
+        : 0.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,22 +76,13 @@ class _AdminFinancesView extends ConsumerWidget {
               .fold(0, (sum, e) => sum + e.amount);
           final balance = incomes - expenses;
 
-          // Agrupar por categoría para el gráfico
+          // Agrupar egresos por categoría (ejecución real)
           final expenseByCategory = <String, int>{};
-          final budgetByCategory = <String, int>{};
           for (final e in entries.where((e) => e.type == FinanceType.expense)) {
             expenseByCategory[e.category] =
                 (expenseByCategory[e.category] ?? 0) + e.amount;
           }
-          // Presupuesto estimado (1.3x del gasto real como placeholder)
-          for (final cat in expenseByCategory.keys) {
-            budgetByCategory[cat] = (expenseByCategory[cat]! * 1.3).round();
-          }
-
-          // Tasa de recaudo (ingresos / (ingresos + cartera))
-          final recaudoRate = incomes > 0
-              ? (incomes / (incomes + expenses * 0.1))
-              : 0.0;
+          final hasBudget = budgetByCategory.isNotEmpty;
 
           return ListView(
             padding: const EdgeInsets.all(AppSizes.md),
@@ -133,7 +139,7 @@ class _AdminFinancesView extends ConsumerWidget {
               if (expenseByCategory.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.lg),
                 Text(
-                  'Presupuesto vs. Ejecución',
+                  hasBudget ? 'Presupuesto vs. Ejecución' : 'Ejecución',
                   style: AppTextStyles.heading3,
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -152,20 +158,27 @@ class _AdminFinancesView extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSizes.sm),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _ChartLegend(
-                      color: AppColors.primary,
-                      label: 'Presupuesto',
-                    ),
-                    const SizedBox(width: AppSizes.md),
-                    _ChartLegend(color: AppColors.success, label: 'Ejecutado'),
-                  ],
-                ),
+                if (hasBudget)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _ChartLegend(
+                        color: AppColors.primary,
+                        label: 'Presupuesto',
+                      ),
+                      const SizedBox(width: AppSizes.md),
+                      _ChartLegend(color: AppColors.success, label: 'Ejecutado'),
+                    ],
+                  )
+                else
+                  Text(
+                    'Configura presupuestos para comparar con la ejecución',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.caption,
+                  ),
               ],
 
-              // Tasa de recaudo
+              // Cartera
               const SizedBox(height: AppSizes.lg),
               Text('Cartera', style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.sm),
@@ -176,65 +189,73 @@ class _AdminFinancesView extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Tasa de recaudo',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '${(recaudoRate * 100).toStringAsFixed(0)}%',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.success,
-                              ),
-                            ),
-                          ],
+                child: statements.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: AppSizes.sm),
+                        child: Text(
+                          'Sin estados de cuenta cargados',
+                          style: TextStyle(color: AppColors.textSecondary),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'Cartera morosa',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Tasa de recaudo',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${(recaudoRate * 100).toStringAsFixed(0)}%',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.success,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              formatCOP((expenses * 0.1).round()),
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.error,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    'Cartera morosa',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                  Text(
+                                    formatCOP(carteraMorosa),
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSizes.sm),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: recaudoRate.clamp(0.0, 1.0),
+                              backgroundColor: AppColors.border,
+                              color: AppColors.success,
+                              minHeight: 6,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.sm),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: recaudoRate.clamp(0.0, 1.0),
-                        backgroundColor: AppColors.border,
-                        color: AppColors.success,
-                        minHeight: 6,
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: AppSizes.lg),

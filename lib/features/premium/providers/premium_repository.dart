@@ -311,6 +311,40 @@ class PremiumRepository {
         });
   }
 
+  // Estados de cuenta de toda la comunidad (solo admin puede leerlos)
+  Stream<List<AccountStatementModel>> watchAccountStatements(
+    String communityId,
+  ) {
+    return _firestore
+        .collection(FirestorePaths.accountStatements(communityId))
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map(
+                (doc) =>
+                    AccountStatementModel.fromFirestore(doc.data(), doc.id),
+              )
+              .toList(),
+        );
+  }
+
+  // Presupuesto por categoría: categoría -> monto presupuestado
+  Stream<Map<String, int>> watchBudgets(String communityId) {
+    return _firestore
+        .collection(FirestorePaths.budgets(communityId))
+        .snapshots()
+        .map((snap) {
+          final result = <String, int>{};
+          for (final doc in snap.docs) {
+            final data = doc.data();
+            final category = data['category'] as String?;
+            if (category == null || category.isEmpty) continue;
+            result[category] = (data['amount'] ?? 0) as int;
+          }
+          return result;
+        });
+  }
+
   // ==================== ASAMBLEAS ====================
   Stream<List<AssemblyModel>> watchAssemblies(String communityId) {
     return _firestore
