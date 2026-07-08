@@ -1,10 +1,10 @@
 package fn
 
 import (
-	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -108,56 +108,73 @@ func TestSplitReference_MultipleUnderscores(t *testing.T) {
 	}
 }
 
-func TestVerifyWompiSignature_Valid(t *testing.T) {
-	secret := "test-secret"
-
-	// Create a WompiEvent
-	event := WompiEvent{
-		Event: "transaction.updated",
-		Data: WompiData{
-			Transaction: WompiTransaction{
-				ID:            "evt_12345",
-				Status:        "APPROVED",
-				AmountInCents: 50000,
-			},
+// wompiTestData replica el data del webhook como lo entrega Wompi:
+// los números llegan deserializados como float64.
+func wompiTestData() map[string]interface{} {
+	return map[string]interface{}{
+		"transaction": map[string]interface{}{
+			"id":              "evt_12345",
+			"status":          "APPROVED",
+			"amount_in_cents": float64(50000),
 		},
 	}
-	event.Signature.Properties = []string{"evt_12345", "APPROVED", "50000"}
+}
 
-	// Calculate expected signature
-	tx := event.Data.Transaction
-	data := fmt.Sprintf("%s%s%d%s", tx.ID, tx.Status, tx.AmountInCents, event.Signature.Properties)
-	data += secret
+// wompiTestChecksum calcula el checksum tal como lo hace Wompi:
+// valores en el orden de properties + timestamp + secreto, todo bajo SHA256.
+func wompiTestChecksum(props []string, timestamp int64, secret string) string {
+	concat := ""
+	data := wompiTestData()
+	for _, p := range props {
+		concat += resolveSignatureValue(data, p)
+	}
+	concat += strconv.FormatInt(timestamp, 10)
+	concat += secret
 
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(data))
-	expectedChecksum := hex.EncodeToString(h.Sum(nil))
-	event.Signature.Checksum = expectedChecksum
+	sum := sha256.Sum256([]byte(concat))
+	return hex.EncodeToString(sum[:])
+}
 
-	// Test
-	if !verifyWompiSignature(event, secret) {
+func TestVerifyWompiSignature_Valid(t *testing.T) {
+	secret := "test-secret"
+	props := []string{"transaction.id", "transaction.status", "transaction.amount_in_cents"}
+	var timestamp int64 = 1704067200
+
+	event := WompiEvent{
+		Event:     "transaction.updated",
+		Timestamp: timestamp,
+	}
+	event.Signature.Properties = props
+	event.Signature.Checksum = wompiTestChecksum(props, timestamp, secret)
+
+	if !verifyWompiSignature(event, wompiTestData(), secret) {
 		t.Error("Expected valid signature to be verified")
+	}
+}
+
+func TestVerifyWompiSignature_UppercaseChecksum(t *testing.T) {
+	secret := "test-secret"
+	props := []string{"transaction.id", "transaction.status", "transaction.amount_in_cents"}
+	var timestamp int64 = 1704067200
+
+	event := WompiEvent{Timestamp: timestamp}
+	event.Signature.Properties = props
+	// Wompi envía el checksum en mayúsculas
+	event.Signature.Checksum = strings.ToUpper(wompiTestChecksum(props, timestamp, secret))
+
+	if !verifyWompiSignature(event, wompiTestData(), secret) {
+		t.Error("Expected uppercase checksum to be verified")
 	}
 }
 
 func TestVerifyWompiSignature_Invalid(t *testing.T) {
 	secret := "test-secret"
 
-	event := WompiEvent{
-		Event: "transaction.updated",
-		Data: WompiData{
-			Transaction: WompiTransaction{
-				ID:            "evt_12345",
-				Status:        "APPROVED",
-				AmountInCents: 50000,
-			},
-		},
-	}
-	event.Signature.Properties = []string{"evt_12345", "APPROVED", "50000"}
+	event := WompiEvent{Timestamp: 1704067200}
+	event.Signature.Properties = []string{"transaction.id", "transaction.status", "transaction.amount_in_cents"}
 	event.Signature.Checksum = "invalid-checksum-123456"
 
-	// Test
-	if verifyWompiSignature(event, secret) {
+	if verifyWompiSignature(event, wompiTestData(), secret) {
 		t.Error("Expected invalid signature to not be verified")
 	}
 }
@@ -165,30 +182,15 @@ func TestVerifyWompiSignature_Invalid(t *testing.T) {
 func TestVerifyWompiSignature_WrongSecret(t *testing.T) {
 	secret := "test-secret"
 	wrongSecret := "wrong-secret"
+	props := []string{"transaction.id", "transaction.status", "transaction.amount_in_cents"}
+	var timestamp int64 = 1704067200
 
-	event := WompiEvent{
-		Event: "transaction.updated",
-		Data: WompiData{
-			Transaction: WompiTransaction{
-				ID:            "evt_12345",
-				Status:        "APPROVED",
-				AmountInCents: 50000,
-			},
-		},
-	}
-	event.Signature.Properties = []string{"evt_12345", "APPROVED", "50000"}
+	event := WompiEvent{Timestamp: timestamp}
+	event.Signature.Properties = props
+	event.Signature.Checksum = wompiTestChecksum(props, timestamp, secret)
 
-	// Calculate signature with correct secret
-	tx := event.Data.Transaction
-	data := fmt.Sprintf("%s%s%d%s", tx.ID, tx.Status, tx.AmountInCents, event.Signature.Properties)
-	data += secret
-
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(data))
-	event.Signature.Checksum = hex.EncodeToString(h.Sum(nil))
-
-	// Test with wrong secret - should fail
-	if verifyWompiSignature(event, wrongSecret) {
+	// Con secreto incorrecto la verificación debe fallar
+	if verifyWompiSignature(event, wompiTestData(), wrongSecret) {
 		t.Error("Expected signature verification to fail with wrong secret")
 	}
 }

@@ -2,14 +2,17 @@ package fn
 
 import (
 	"context"
-	"crypto/hmac"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -55,18 +58,31 @@ func WompiWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var event WompiEvent
-	if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	// Verificar firma del webhook
-	secret := os.Getenv("WOMPI_EVENTS_SECRET")
-	if secret != "" && !verifyWompiSignature(event, secret) {
-		http.Error(w, "Invalid signature", http.StatusUnauthorized)
+	var event WompiEvent
+	if err := json.Unmarshal(body, &event); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
+	}
+
+	// Verificar firma del webhook. Wompi arma el checksum navegando data por las
+	// rutas de signature.properties, así que necesitamos data como mapa dinámico.
+	secret := os.Getenv("WOMPI_EVENTS_SECRET")
+	if secret != "" {
+		var payload struct {
+			Data map[string]interface{} `json:"data"`
+		}
+		_ = json.Unmarshal(body, &payload)
+		if !verifyWompiSignature(event, payload.Data, secret) {
+			http.Error(w, "Invalid signature", http.StatusUnauthorized)
+			return
+		}
 	}
 
 	ctx := r.Context()
@@ -98,16 +114,53 @@ func WompiWebhook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
 
-func verifyWompiSignature(event WompiEvent, secret string) bool {
-	// Construir string de verificación según docs de Wompi
-	tx := event.Data.Transaction
-	data := fmt.Sprintf("%s%s%d%s", tx.ID, tx.Status, tx.AmountInCents, event.Signature.Properties)
-	data += secret
+func verifyWompiSignature(event WompiEvent, data map[string]interface{}, secret string) bool {
+	// Wompi concatena, en el orden de properties, cada valor apuntado por su ruta,
+	// luego el timestamp y por último el secreto de eventos; sobre eso aplica SHA256.
+	var sb strings.Builder
+	for _, prop := range event.Signature.Properties {
+		sb.WriteString(resolveSignatureValue(data, prop))
+	}
+	sb.WriteString(strconv.FormatInt(event.Timestamp, 10))
+	sb.WriteString(secret)
 
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(data))
-	expected := hex.EncodeToString(h.Sum(nil))
-	return hmac.Equal([]byte(expected), []byte(event.Signature.Checksum))
+	sum := sha256.Sum256([]byte(sb.String()))
+	expected := hex.EncodeToString(sum[:])
+
+	// Wompi manda el checksum en mayúsculas; comparamos sin distinguir caso.
+	return subtle.ConstantTimeCompare(
+		[]byte(strings.ToLower(expected)),
+		[]byte(strings.ToLower(event.Signature.Checksum)),
+	) == 1
+}
+
+// resolveSignatureValue navega data siguiendo una ruta con puntos
+// (ej. "transaction.amount_in_cents") y devuelve el valor como string.
+func resolveSignatureValue(data map[string]interface{}, path string) string {
+	var current interface{} = data
+	for _, key := range strings.Split(path, ".") {
+		m, ok := current.(map[string]interface{})
+		if !ok {
+			return ""
+		}
+		current = m[key]
+	}
+
+	switch v := current.(type) {
+	case string:
+		return v
+	case float64:
+		// JSON decodifica los números como float64; los enteros (montos, etc.)
+		// se serializan sin decimales.
+		if v == float64(int64(v)) {
+			return strconv.FormatInt(int64(v), 10)
+		}
+		return strconv.FormatFloat(v, 'f', -1, 64)
+	case nil:
+		return ""
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }
 
 func handleApprovedPayment(ctx context.Context, fs *firestore.Client, ref string, tx WompiTransaction) error {
