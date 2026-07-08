@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -306,18 +307,38 @@ func CreateWompiTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Construir URL de checkout de Wompi
-	checkoutURL := fmt.Sprintf(
-		"https://checkout.wompi.co/p/?public-key=%s&currency=%s&amount-in-cents=%d&reference=%s&redirect-url=%s",
-		pubKey,
-		req.Currency,
-		req.Amount*100, // Convertir a centavos
-		req.Reference,
-		req.RedirectURL,
-	)
+	checkoutURL := buildWompiCheckoutURL(pubKey, req, os.Getenv("WOMPI_INTEGRITY_SECRET"))
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"checkout_url": checkoutURL,
 	})
+}
+
+// buildWompiCheckoutURL arma la URL del Web Checkout de Wompi. Cuando hay secreto
+// de integridad, agrega signature:integrity = SHA256(reference + amount_in_cents +
+// currency + secreto), que Wompi exige para checkouts con monto fijo.
+func buildWompiCheckoutURL(pubKey string, req CreatePaymentRequest, integritySecret string) string {
+	amountInCents := req.Amount * 100 // el request llega en pesos
+
+	params := url.Values{}
+	params.Set("public-key", pubKey)
+	params.Set("currency", req.Currency)
+	params.Set("amount-in-cents", strconv.FormatInt(amountInCents, 10))
+	params.Set("reference", req.Reference)
+	if req.RedirectURL != "" {
+		params.Set("redirect-url", req.RedirectURL)
+	}
+
+	checkoutURL := "https://checkout.wompi.co/p/?" + params.Encode()
+
+	// La firma va con dos puntos literales en la clave, así que se anexa a mano
+	// para que url.Values no los codifique.
+	if integritySecret != "" {
+		raw := fmt.Sprintf("%s%d%s%s", req.Reference, amountInCents, req.Currency, integritySecret)
+		sum := sha256.Sum256([]byte(raw))
+		checkoutURL += "&signature:integrity=" + hex.EncodeToString(sum[:])
+	}
+
+	return checkoutURL
 }

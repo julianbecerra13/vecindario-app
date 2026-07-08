@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:vecindario_app/core/utils/logger.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
+import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 
 /// Tipos de pago soportados
 enum PaymentType {
@@ -74,17 +76,11 @@ class PaymentRecord {
 class PaymentService {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
+  final CloudFunctionsService _functions;
 
-  /// Llave pública de Wompi (sandbox para desarrollo)
-  static const _wompiPublicKey =
-      'pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7';
+  PaymentService(this._firestore, this._auth, this._functions);
 
-  /// URL base de Wompi checkout
-  static const _wompiCheckoutBase = 'https://checkout.wompi.co/p/';
-
-  PaymentService(this._firestore, this._auth);
-
-  /// Iniciar pago con Wompi (abre widget de checkout)
+  /// Iniciar pago con Wompi (abre el checkout en el navegador)
   Future<bool> startPayment({
     required String reference,
     required int amountCOP,
@@ -110,18 +106,23 @@ class PaymentService {
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    // Construir URL de checkout de Wompi
-    final uri = Uri.parse(_wompiCheckoutBase).replace(
-      queryParameters: {
-        'public-key': _wompiPublicKey,
-        'currency': currency,
-        'amount-in-cents': '${amountCOP * 100}',
-        'reference': reference,
-        'customer-data:email': customerEmail,
-      },
-    );
+    // El backend arma la URL de checkout con la firma de integridad que exige
+    // Wompi; el cliente nunca maneja llaves ni construye la firma.
+    final result = await _functions.callFunction('CreateWompiTransaction', {
+      'reference': reference,
+      'amount': amountCOP,
+      'currency': currency,
+      'description': type.label,
+      'customer_email': customerEmail,
+    });
 
-    // Abrir en navegador
+    final checkoutUrl = result['checkout_url'] as String?;
+    if (checkoutUrl == null || checkoutUrl.isEmpty) {
+      AppLogger.error('Wompi no devolvió checkout_url', result);
+      return false;
+    }
+
+    final uri = Uri.parse(checkoutUrl);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
       return true;
@@ -157,6 +158,7 @@ final paymentServiceProvider = Provider<PaymentService>((ref) {
   return PaymentService(
     ref.watch(firestoreProvider),
     ref.watch(firebaseAuthProvider),
+    ref.watch(cloudFunctionsProvider),
   );
 });
 
@@ -187,12 +189,17 @@ class PaymentButton extends ConsumerWidget {
       child: FilledButton.icon(
         onPressed: () async {
           final service = ref.read(paymentServiceProvider);
-          final launched = await service.startPayment(
-            reference: reference,
-            amountCOP: amountCOP,
-            customerEmail: customerEmail,
-            type: type,
-          );
+          bool launched = false;
+          try {
+            launched = await service.startPayment(
+              reference: reference,
+              amountCOP: amountCOP,
+              customerEmail: customerEmail,
+              type: type,
+            );
+          } catch (e) {
+            AppLogger.error('Error iniciando pago', e);
+          }
           if (!launched && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
