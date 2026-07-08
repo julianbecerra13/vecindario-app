@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,33 +6,24 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
-import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 final _communityDetailProvider = StreamProvider.family<CommunityModel?, String>(
   (ref, communityId) {
     return ref
-        .watch(firestoreProvider)
-        .collection('communities')
-        .doc(communityId)
-        .snapshots()
-        .map((doc) {
-          if (!doc.exists || doc.data() == null) return null;
-          return CommunityModel.fromFirestore(doc.data()!, doc.id);
-        });
+        .watch(superAdminRepositoryProvider)
+        .watchCommunity(communityId);
   },
 );
 
 final _communitySubscriptionProvider =
     StreamProvider.family<Map<String, dynamic>?, String>((ref, communityId) {
       return ref
-          .watch(firestoreProvider)
-          .collection('subscriptions')
-          .doc(communityId)
-          .snapshots()
-          .map((doc) => doc.exists ? doc.data() : null);
+          .watch(superAdminRepositoryProvider)
+          .watchSubscription(communityId);
     });
 
 class CommunityDetailAdminScreen extends ConsumerWidget {
@@ -197,15 +187,9 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
               final uid = uidController.text.trim();
               if (uid.isEmpty) return;
               try {
-                final fs = ref.read(firestoreProvider);
-                await fs.collection('communities').doc(c.id).update({
-                  'adminUid': uid,
-                });
-                await fs.collection('users').doc(uid).update({
-                  'role': 'admin',
-                  'communityId': c.id,
-                  'verified': true,
-                });
+                await ref
+                    .read(superAdminRepositoryProvider)
+                    .assignAdmin(communityId: c.id, uid: uid);
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   context.showSuccessSnackBar('Admin asignado');
@@ -263,18 +247,9 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
             FilledButton(
               onPressed: () async {
                 try {
-                  final fs = ref.read(firestoreProvider);
-                  final now = DateTime.now();
-                  await fs.collection('subscriptions').doc(c.id).set({
-                    'plan': selectedPlan,
-                    'status': 'trial',
-                    'trialStartedAt': Timestamp.fromDate(now),
-                    'trialEndsAt': Timestamp.fromDate(
-                      now.add(const Duration(days: 30)),
-                    ),
-                    'createdAt': Timestamp.fromDate(now),
-                    'createdBy': 'super_admin',
-                  });
+                  await ref
+                      .read(superAdminRepositoryProvider)
+                      .activatePlan(communityId: c.id, plan: selectedPlan);
                   if (ctx.mounted) {
                     Navigator.pop(ctx);
                     context.showSuccessSnackBar(
@@ -311,9 +286,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
     if (!confirm) return;
 
     try {
-      final fs = ref.read(firestoreProvider);
-      await fs.collection('communities').doc(c.id).delete();
-      await fs.collection('subscriptions').doc(c.id).delete();
+      await ref.read(superAdminRepositoryProvider).deleteCommunity(c.id);
       if (context.mounted) {
         context.showSuccessSnackBar('Comunidad eliminada');
         context.pop();

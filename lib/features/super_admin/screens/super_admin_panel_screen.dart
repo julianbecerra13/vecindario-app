@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,53 +6,9 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
+import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/providers/firebase_providers.dart';
-
-// === PROVIDERS ===
-
-final allCommunitiesProvider = StreamProvider<List<CommunityModel>>((ref) {
-  return ref
-      .watch(firestoreProvider)
-      .collection('communities')
-      .orderBy('createdAt', descending: true)
-      .snapshots()
-      .map(
-        (snap) => snap.docs
-            .map((doc) => CommunityModel.fromFirestore(doc.data(), doc.id))
-            .toList(),
-      );
-});
-
-final communityUsersCountProvider = FutureProvider.family<int, String>((
-  ref,
-  communityId,
-) async {
-  final snap = await ref
-      .watch(firestoreProvider)
-      .collection('users')
-      .where('communityId', isEqualTo: communityId)
-      .where('verified', isEqualTo: true)
-      .count()
-      .get();
-  return snap.count ?? 0;
-});
-
-final allSubscriptionsProvider =
-    StreamProvider<Map<String, Map<String, dynamic>>>((ref) {
-      return ref
-          .watch(firestoreProvider)
-          .collection('subscriptions')
-          .snapshots()
-          .map((snap) {
-            final map = <String, Map<String, dynamic>>{};
-            for (final doc in snap.docs) {
-              map[doc.id] = doc.data();
-            }
-            return map;
-          });
-    });
 
 // === PANTALLA PRINCIPAL ===
 
@@ -445,15 +400,9 @@ class _CommunityCard extends ConsumerWidget {
             onPressed: () async {
               final uid = uidController.text.trim();
               if (uid.isEmpty) return;
-              final fs = ref.read(firestoreProvider);
-              await fs.collection('communities').doc(community.id).update({
-                'adminUid': uid,
-              });
-              await fs.collection('users').doc(uid).update({
-                'role': 'admin',
-                'communityId': community.id,
-                'verified': true,
-              });
+              await ref
+                  .read(superAdminRepositoryProvider)
+                  .assignAdmin(communityId: community.id, uid: uid);
               if (ctx.mounted) {
                 Navigator.pop(ctx);
                 context.showSuccessSnackBar('Admin asignado');
@@ -505,18 +454,9 @@ class _CommunityCard extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                final fs = ref.read(firestoreProvider);
-                final now = DateTime.now();
-                await fs.collection('subscriptions').doc(community.id).set({
-                  'plan': selectedPlan,
-                  'status': 'trial',
-                  'trialStartedAt': Timestamp.fromDate(now),
-                  'trialEndsAt': Timestamp.fromDate(
-                    now.add(const Duration(days: 30)),
-                  ),
-                  'createdAt': Timestamp.fromDate(now),
-                  'createdBy': 'super_admin',
-                });
+                await ref
+                    .read(superAdminRepositoryProvider)
+                    .activatePlan(communityId: community.id, plan: selectedPlan);
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   context.showSuccessSnackBar(

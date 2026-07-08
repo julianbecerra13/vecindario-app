@@ -7,8 +7,8 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
-import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 
 class CreateCommunityScreen extends ConsumerStatefulWidget {
   const CreateCommunityScreen({super.key});
@@ -61,9 +61,8 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
       );
 
       await ref
-          .read(firestoreProvider)
-          .collection('communities')
-          .add(community.toFirestore());
+          .read(superAdminRepositoryProvider)
+          .createCommunity(community);
 
       if (!mounted) return;
       context.showSuccessSnackBar(
