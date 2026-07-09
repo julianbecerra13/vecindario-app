@@ -456,7 +456,10 @@ class _CommunityCard extends ConsumerWidget {
               onPressed: () async {
                 await ref
                     .read(superAdminRepositoryProvider)
-                    .activatePlan(communityId: community.id, plan: selectedPlan);
+                    .activatePlan(
+                      communityId: community.id,
+                      plan: selectedPlan,
+                    );
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   context.showSuccessSnackBar(

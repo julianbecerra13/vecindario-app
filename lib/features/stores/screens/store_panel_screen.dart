@@ -93,11 +93,7 @@ class _NoStoreView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.storefront,
-                size: 80,
-                color: AppColors.textHint,
-              ),
+              const Icon(Icons.storefront, size: 80, color: AppColors.textHint),
               const SizedBox(height: AppSizes.md),
               Text(
                 'Aún no tienes tienda',
@@ -191,7 +187,9 @@ class _NoStoreView extends ConsumerWidget {
       return;
     }
 
-    await ref.read(storesRepositoryProvider).createStore(
+    await ref
+        .read(storesRepositoryProvider)
+        .createStore(
           StoreModel(
             id: '',
             ownerUid: user.id,
@@ -328,11 +326,12 @@ class _ItemsTab extends ConsumerWidget {
             itemBuilder: (_, i) => _ItemManageCard(
               item: items[i],
               onEdit: () => _showItemDialog(context, ref, items[i]),
-              onToggle: () => ref
-                  .read(storesRepositoryProvider)
-                  .updateStoreItem(store.id, items[i].id, {
-                    'available': !items[i].available,
-                  }),
+              onToggle: () =>
+                  ref.read(storesRepositoryProvider).updateStoreItem(
+                    store.id,
+                    items[i].id,
+                    {'available': !items[i].available},
+                  ),
               onDelete: () async {
                 final ok = await showDialog<bool>(
                   context: context,
@@ -531,7 +530,10 @@ class _ItemManageCard extends StatelessWidget {
                 ),
                 const PopupMenuItem(
                   value: 'delete',
-                  child: Text('Eliminar', style: TextStyle(color: AppColors.error)),
+                  child: Text(
+                    'Eliminar',
+                    style: TextStyle(color: AppColors.error),
+                  ),
                 ),
               ],
             ),
@@ -581,9 +583,10 @@ class _InfoTab extends ConsumerWidget {
           width: double.infinity,
           height: 48,
           child: OutlinedButton.icon(
-            onPressed: () => ref
-                .read(storesRepositoryProvider)
-                .updateStore(store.id, {'active': !store.active}),
+            onPressed: () => ref.read(storesRepositoryProvider).updateStore(
+              store.id,
+              {'active': !store.active},
+            ),
             icon: Icon(store.active ? Icons.pause : Icons.play_arrow),
             label: Text(store.active ? 'Pausar tienda' : 'Reactivar tienda'),
             style: OutlinedButton.styleFrom(
@@ -655,7 +658,8 @@ class _InfoTab extends ConsumerWidget {
       'name': nameController.text.trim(),
       'description': descController.text.trim(),
       'deliveryTime': deliveryController.text.trim(),
-      'minOrder': int.tryParse(minOrderController.text.trim()) ?? store.minOrder,
+      'minOrder':
+          int.tryParse(minOrderController.text.trim()) ?? store.minOrder,
     });
     if (context.mounted) context.showSuccessSnackBar('Actualizado');
   }

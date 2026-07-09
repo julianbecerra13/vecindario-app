@@ -60,9 +60,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
         createdAt: DateTime.now(),
       );
 
-      await ref
-          .read(superAdminRepositoryProvider)
-          .createCommunity(community);
+      await ref.read(superAdminRepositoryProvider).createCommunity(community);
 
       if (!mounted) return;
       context.showSuccessSnackBar(

@@ -167,7 +167,10 @@ class _AdminFinancesView extends ConsumerWidget {
                         label: 'Presupuesto',
                       ),
                       const SizedBox(width: AppSizes.md),
-                      _ChartLegend(color: AppColors.success, label: 'Ejecutado'),
+                      _ChartLegend(
+                        color: AppColors.success,
+                        label: 'Ejecutado',
+                      ),
                     ],
                   )
                 else

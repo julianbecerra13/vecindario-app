@@ -95,14 +95,15 @@ final budgetsProvider = StreamProvider<Map<String, int>>((ref) {
 });
 
 // Estados de cuenta de toda la comunidad (admin)
-final communityStatementsProvider =
-    StreamProvider<List<AccountStatementModel>>((ref) {
-      final communityId = ref.watch(currentCommunityIdProvider);
-      if (communityId == null) return Stream.value([]);
-      return ref
-          .watch(premiumRepositoryProvider)
-          .watchAccountStatements(communityId);
-    });
+final communityStatementsProvider = StreamProvider<List<AccountStatementModel>>(
+  (ref) {
+    final communityId = ref.watch(currentCommunityIdProvider);
+    if (communityId == null) return Stream.value([]);
+    return ref
+        .watch(premiumRepositoryProvider)
+        .watchAccountStatements(communityId);
+  },
+);
 
 // ==================== DETALLE DE MULTA ====================
 final fineDetailProvider = StreamProvider.family<FineModel?, String>((

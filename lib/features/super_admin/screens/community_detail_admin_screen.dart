@@ -13,9 +13,7 @@ import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 final _communityDetailProvider = StreamProvider.family<CommunityModel?, String>(
   (ref, communityId) {
-    return ref
-        .watch(superAdminRepositoryProvider)
-        .watchCommunity(communityId);
+    return ref.watch(superAdminRepositoryProvider).watchCommunity(communityId);
   },
 );
 

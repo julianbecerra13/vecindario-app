@@ -77,16 +77,15 @@ class SuperAdminRepository {
 
   // ==================== SUSCRIPCIONES ====================
   Stream<Map<String, Map<String, dynamic>>> watchAllSubscriptions() {
-    return _firestore
-        .collection(FirestorePaths.subscriptions)
-        .snapshots()
-        .map((snap) {
-          final map = <String, Map<String, dynamic>>{};
-          for (final doc in snap.docs) {
-            map[doc.id] = doc.data();
-          }
-          return map;
-        });
+    return _firestore.collection(FirestorePaths.subscriptions).snapshots().map((
+      snap,
+    ) {
+      final map = <String, Map<String, dynamic>>{};
+      for (final doc in snap.docs) {
+        map[doc.id] = doc.data();
+      }
+      return map;
+    });
   }
 
   Stream<Map<String, dynamic>?> watchSubscription(String communityId) {
