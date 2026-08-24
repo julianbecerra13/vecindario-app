@@ -50,7 +50,7 @@ func CreateAssemblyVote(w http.ResponseWriter, r *http.Request) {
 
 	// Verificar admin
 	callerDoc, err := fs.Collection("users").Doc(callerUID).Get(ctx)
-	if err != nil || callerDoc.Data()["role"] != "admin" {
+	if err != nil || callerDoc.Data()["communityRole"] != "admin" {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}

@@ -70,7 +70,7 @@ func ApproveResident(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Caller not found", http.StatusForbidden)
 		return
 	}
-	callerRole, _ := callerDoc.Data()["role"].(string)
+	callerRole, _ := callerDoc.Data()["communityRole"].(string)
 	callerCommunity, _ := callerDoc.Data()["communityId"].(string)
 	if callerRole != "admin" || callerCommunity != req.CommunityID {
 		http.Error(w, "Only community admin can approve residents", http.StatusForbidden)
@@ -146,7 +146,7 @@ func RejectResident(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Caller not found", http.StatusForbidden)
 		return
 	}
-	callerRole, _ := callerDoc.Data()["role"].(string)
+	callerRole, _ := callerDoc.Data()["communityRole"].(string)
 	callerCommunity, _ := callerDoc.Data()["communityId"].(string)
 	if callerRole != "admin" || callerCommunity != req.CommunityID {
 		http.Error(w, "Forbidden", http.StatusForbidden)
@@ -210,7 +210,7 @@ func RotateInviteCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-	callerRole, _ := callerDoc.Data()["role"].(string)
+	callerRole, _ := callerDoc.Data()["communityRole"].(string)
 	callerCommunity, _ := callerDoc.Data()["communityId"].(string)
 	if callerRole != "admin" || callerCommunity != req.CommunityID {
 		http.Error(w, "Forbidden", http.StatusForbidden)

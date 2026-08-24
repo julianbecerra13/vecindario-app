@@ -337,7 +337,7 @@ func OnNewPQRS(ctx context.Context, e cloudevents.Event) error {
 	pqrsType := doc.Data()["type"].(string)
 
 	// Notificar a todos los admins de la comunidad
-	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("role", "==", "admin").Documents(ctx)
+	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("communityRole", "==", "admin").Documents(ctx)
 	defer iter.Stop()
 
 	for {
