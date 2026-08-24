@@ -211,7 +211,10 @@ class _AdminHomePage extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSizes.md),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1E3A5F), Color(0xFF1A2744)],
+                colors: [
+                  AppColors.adminBannerGradientStart,
+                  AppColors.adminBannerGradientEnd,
+                ],
               ),
               borderRadius: BorderRadius.circular(AppSizes.radiusLg),
             ),
@@ -225,7 +228,7 @@ class _AdminHomePage extends ConsumerWidget {
                         'CÓDIGO DE INVITACIÓN',
                         style: TextStyle(
                           fontSize: 9,
-                          color: Color(0xFF60A5FA),
+                          color: AppColors.primaryLight,
                           letterSpacing: 1,
                           fontWeight: FontWeight.w600,
                         ),
@@ -342,7 +345,7 @@ class _AdminHomePage extends ConsumerWidget {
           ),
           _QuickAction(
             icon: Icons.how_to_vote,
-            color: const Color(0xFF8B5CF6),
+            color: AppColors.accentPurple,
             title: 'Convocar Asamblea',
             subtitle: 'Crear convocatoria con agenda',
             onTap: () => context.push('/premium/assemblies'),
@@ -577,19 +580,19 @@ class _InviteCodeButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+          color: AppColors.primary.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: const Color(0xFF60A5FA)),
+            Icon(icon, size: 12, color: AppColors.primaryLight),
             const SizedBox(width: 4),
             Text(
               label,
               style: const TextStyle(
                 fontSize: 9,
-                color: Color(0xFF60A5FA),
+                color: AppColors.primaryLight,
                 fontWeight: FontWeight.w600,
               ),
             ),

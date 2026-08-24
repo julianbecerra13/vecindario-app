@@ -53,6 +53,13 @@ class AppColors {
     return estratoColors[estrato - 1];
   }
 
+  // Banner de código de invitación (Administración del conjunto)
+  static const adminBannerGradientStart = Color(0xFF1E3A5F);
+  static const adminBannerGradientEnd = Color(0xFF1A2744);
+
+  // Acento morado (ej. asambleas)
+  static const accentPurple = Color(0xFF8B5CF6);
+
   // Categorías de servicios
   static const categoryComida = Color(0xFFFF7043);
   static const categoryBelleza = Color(0xFFEC407A);

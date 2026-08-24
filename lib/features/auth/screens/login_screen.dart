@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
-import 'package:vecindario_app/core/constants/app_strings.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
@@ -81,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const SizedBox(height: AppSizes.xl),
                   Text(
-                    AppStrings.appName.toUpperCase(),
+                    context.l10n.appName.toUpperCase(),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.appTitle,
                   ),
