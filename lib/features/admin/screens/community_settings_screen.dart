@@ -11,6 +11,7 @@ import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
+import 'package:vecindario_app/shared/widgets/invite_code_card.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 class CommunitySettingsScreen extends ConsumerStatefulWidget {
@@ -70,10 +71,10 @@ class _CommunitySettingsScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _InviteCodeCard(
+                      InviteCodeCard(
                         code: community.inviteCode,
                         onCopy: () => _copyCode(community.inviteCode),
-                        onRotate: _rotating ? null : _rotateCode,
+                        onRotate: _rotateCode,
                         rotating: _rotating,
                       ),
                       const SizedBox(height: AppSizes.lg),
@@ -214,96 +215,6 @@ class _CommunitySettingsScreenState
     } finally {
       if (mounted) setState(() => _saving = false);
     }
-  }
-}
-
-class _InviteCodeCard extends StatelessWidget {
-  final String code;
-  final VoidCallback onCopy;
-  final VoidCallback? onRotate;
-  final bool rotating;
-
-  const _InviteCodeCard({
-    required this.code,
-    required this.onCopy,
-    required this.onRotate,
-    required this.rotating,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'CÓDIGO DE INVITACIÓN',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.white70,
-              letterSpacing: 1.4,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSizes.xs),
-          Text(
-            code.isEmpty ? '------' : code,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              letterSpacing: 6,
-            ),
-          ),
-          const SizedBox(height: AppSizes.sm),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onCopy,
-                  icon: const Icon(Icons.copy, color: Colors.white),
-                  label: const Text(
-                    'Copiar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white70),
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSizes.sm),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onRotate,
-                  icon: rotating
-                      ? const SizedBox(
-                          height: 14,
-                          width: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.refresh, color: Colors.white),
-                  label: const Text(
-                    'Rotar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white70),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }
 

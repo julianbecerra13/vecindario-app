@@ -9,6 +9,7 @@ import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/widgets/app_card.dart';
 
 // === PANTALLA PRINCIPAL ===
 
@@ -205,12 +206,9 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
+      child: AppCard(
+        accentColor: color,
         padding: const EdgeInsets.symmetric(vertical: AppSizes.md),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        ),
         child: Column(
           children: [
             Text(

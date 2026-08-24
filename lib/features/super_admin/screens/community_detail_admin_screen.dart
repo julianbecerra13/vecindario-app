@@ -9,6 +9,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
+import 'package:vecindario_app/shared/widgets/invite_code_card.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 final _communityDetailProvider = StreamProvider.family<CommunityModel?, String>(
@@ -48,7 +49,14 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
             children: [
               _Header(community: c, subscription: subscription),
               const SizedBox(height: AppSizes.lg),
-              _InviteCodeCard(code: c.inviteCode),
+              InviteCodeCard(
+                code: c.inviteCode,
+                compact: true,
+                onCopy: () {
+                  Clipboard.setData(ClipboardData(text: c.inviteCode));
+                  context.showSuccessSnackBar('Código copiado');
+                },
+              ),
               const SizedBox(height: AppSizes.lg),
               Text('Información', style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.sm),
@@ -347,62 +355,6 @@ class _Header extends StatelessWidget {
           Text(
             '${community.address} · ${community.city}',
             style: AppTextStyles.caption,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InviteCodeCard extends StatelessWidget {
-  final String code;
-  const _InviteCodeCard({required this.code});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E3A5F), Color(0xFF1A2744)],
-        ),
-        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.vpn_key, color: Colors.white),
-          const SizedBox(width: AppSizes.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'CÓDIGO DE INVITACIÓN',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white70,
-                    letterSpacing: 1.4,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  code,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.copy, color: Colors.white),
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: code));
-              context.showSuccessSnackBar('Código copiado');
-            },
           ),
         ],
       ),

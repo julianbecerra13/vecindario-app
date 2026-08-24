@@ -10,6 +10,7 @@ import 'package:vecindario_app/features/premium/providers/premium_provider.dart'
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/widgets/app_card.dart';
 
 class PremiumDashboardScreen extends ConsumerWidget {
   const PremiumDashboardScreen({super.key});
@@ -278,12 +279,9 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
+      child: AppCard(
+        accentColor: color,
         padding: const EdgeInsets.all(AppSizes.sm + 2),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        ),
         child: Column(
           children: [
             Text(

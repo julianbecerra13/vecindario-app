@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/shared/widgets/empty_state.dart';
 
 /// Capítulo del manual con sus artículos
 class ManualChapter {
@@ -264,24 +265,9 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
           // Lista de capítulos
           Expanded(
             child: chapters.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.search_off,
-                          size: 48,
-                          color: AppColors.textHint,
-                        ),
-                        const SizedBox(height: AppSizes.sm),
-                        Text(
-                          'No se encontraron resultados',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
+                ? const EmptyState(
+                    icon: Icons.search_off,
+                    title: 'No se encontraron resultados',
                   )
                 : ListView.builder(
                     itemCount: chapters.length,

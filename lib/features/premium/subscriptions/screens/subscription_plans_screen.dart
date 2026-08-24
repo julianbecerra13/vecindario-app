@@ -9,6 +9,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/subscriptions/models/subscription_model.dart';
 import 'package:vecindario_app/features/premium/subscriptions/repositories/subscription_repository.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/widgets/app_card.dart';
 
 class SubscriptionPlansScreen extends ConsumerStatefulWidget {
   const SubscriptionPlansScreen({super.key});
@@ -168,107 +169,104 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        border: Border.all(
-          color: isPopular
-              ? AppColors.success.withValues(alpha: 0.5)
-              : AppColors.border,
-          width: isPopular ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(plan.label, style: AppTextStyles.heading3),
-              if (isPopular) ...[
-                const SizedBox(width: AppSizes.sm),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success,
-                    borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-                  ),
-                  child: const Text(
-                    'POPULAR',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+      child: AppCard(
+        borderColor: isPopular
+            ? AppColors.success.withValues(alpha: 0.5)
+            : AppColors.border,
+        borderWidth: isPopular ? 2 : 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(plan.label, style: AppTextStyles.heading3),
+                if (isPopular) ...[
+                  const SizedBox(width: AppSizes.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
                     ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          Text(units, style: AppTextStyles.caption),
-          const SizedBox(height: AppSizes.sm),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '\$${_formatPrice(plan.priceCOP)}',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.success,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text('/mes', style: AppTextStyles.caption),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.md),
-          ...features.map(
-            (f) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                children: [
-                  Icon(
-                    f.included ? Icons.check : Icons.close,
-                    size: 16,
-                    color: f.included ? AppColors.success : AppColors.textHint,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    f.text,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: f.included
-                          ? AppColors.textPrimary
-                          : AppColors.textHint,
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusFull),
+                    ),
+                    child: const Text(
+                      'POPULAR',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
+              ],
+            ),
+            Text(units, style: AppTextStyles.caption),
+            const SizedBox(height: AppSizes.sm),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '\$${_formatPrice(plan.priceCOP)}',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.success,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text('/mes', style: AppTextStyles.caption),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.md),
+            ...features.map(
+              (f) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  children: [
+                    Icon(
+                      f.included ? Icons.check : Icons.close,
+                      size: 16,
+                      color: f.included
+                          ? AppColors.success
+                          : AppColors.textHint,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      f.text,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: f.included
+                            ? AppColors.textPrimary
+                            : AppColors.textHint,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: AppSizes.md),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: onSubscribe,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isPopular
-                    ? AppColors.success
-                    : AppColors.primary,
+            const SizedBox(height: AppSizes.md),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onSubscribe,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isPopular
+                      ? AppColors.success
+                      : AppColors.primary,
+                ),
+                child: const Text('Probar gratis 30 días'),
               ),
-              child: const Text('Probar gratis 30 días'),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

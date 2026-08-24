@@ -12,6 +12,7 @@ import 'package:vecindario_app/features/premium/providers/premium_providers.dart
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/services/payment_service.dart';
+import 'package:vecindario_app/shared/widgets/app_card.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 class FinancesScreen extends ConsumerWidget {
@@ -535,12 +536,8 @@ class _FinanceStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: AppSizes.paddingCard,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        ),
+      child: AppCard(
+        accentColor: color,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

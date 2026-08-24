@@ -9,6 +9,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/widgets/app_card.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
 class AssemblyDetailScreen extends ConsumerStatefulWidget {
@@ -294,14 +295,9 @@ class _VoteCard extends ConsumerWidget {
     final hasVoted = user != null && vote.hasVoted(user.id);
     final showResults = hasVoted || !canVote;
 
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: AppSizes.md),
-      padding: const EdgeInsets.all(AppSizes.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        border: Border.all(color: AppColors.border),
-      ),
+      borderColor: AppColors.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
