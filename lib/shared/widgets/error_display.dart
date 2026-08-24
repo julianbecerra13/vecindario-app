@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 
 class ErrorDisplay extends StatelessWidget {
   final String message;
@@ -21,9 +22,9 @@ class ErrorDisplay extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             if (onRetry != null) ...[

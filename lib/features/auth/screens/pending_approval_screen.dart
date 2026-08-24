@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -37,7 +38,7 @@ class PendingApprovalScreen extends ConsumerWidget {
                 'El administrador de tu conjunto revisará tu solicitud pronto. Te notificaremos cuando seas aprobado.',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSizes.md),
@@ -47,7 +48,7 @@ class PendingApprovalScreen extends ConsumerWidget {
                   return Container(
                     padding: AppSizes.paddingAll,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
+                      color: context.colors.surfaceVariant,
                       borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                     ),
                     child: Column(

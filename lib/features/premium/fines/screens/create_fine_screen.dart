@@ -170,7 +170,9 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                   label: Text(
                     '$days días',
                     style: TextStyle(
-                      color: selected ? Colors.white : AppColors.textPrimary,
+                      color: selected
+                          ? Colors.white
+                          : context.colors.textPrimary,
                       fontSize: 13,
                     ),
                   ),
@@ -178,7 +180,7 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                   onSelected: (_) => setState(() => _defenseDays = days),
                   selectedColor: AppColors.warning,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.colors.textPrimary,
                     fontSize: 13,
                   ),
                 );
@@ -194,16 +196,20 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                 color: AppColors.warningLight,
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.warning, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(
+                    Icons.info_outline,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'El residente será notificado y tendrá el plazo indicado para presentar descargos.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ),

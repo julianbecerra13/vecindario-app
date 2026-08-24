@@ -115,7 +115,7 @@ class _Header extends StatelessWidget {
         border: Border.all(
           color: assembly.isLive
               ? AppColors.error.withValues(alpha: 0.3)
-              : AppColors.border,
+              : context.colors.border,
         ),
       ),
       child: Column(
@@ -211,7 +211,7 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSizes.xs),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppColors.textSecondary),
+          Icon(icon, size: 16, color: context.colors.textSecondary),
           const SizedBox(width: AppSizes.sm),
           Expanded(
             child: isLink
@@ -297,7 +297,7 @@ class _VoteCard extends ConsumerWidget {
 
     return AppCard(
       margin: const EdgeInsets.only(bottom: AppSizes.md),
-      borderColor: AppColors.border,
+      borderColor: context.colors.border,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -309,7 +309,7 @@ class _VoteCard extends ConsumerWidget {
           ),
           const SizedBox(height: AppSizes.sm),
           if (showResults)
-            ..._buildResults()
+            ..._buildResults(context)
           else
             ..._buildOptions(context, ref, user?.id),
           const SizedBox(height: AppSizes.xs),
@@ -319,7 +319,7 @@ class _VoteCard extends ConsumerWidget {
     );
   }
 
-  List<Widget> _buildResults() {
+  List<Widget> _buildResults(BuildContext context) {
     return vote.options.map((option) {
       final pct = vote.percentageFor(option);
       final count = vote.results[option]?.length ?? 0;
@@ -347,7 +347,7 @@ class _VoteCard extends ConsumerWidget {
               child: LinearProgressIndicator(
                 value: pct,
                 minHeight: 8,
-                backgroundColor: AppColors.border,
+                backgroundColor: context.colors.border,
                 color: AppColors.success,
               ),
             ),

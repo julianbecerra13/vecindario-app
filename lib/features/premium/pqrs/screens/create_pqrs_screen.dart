@@ -111,7 +111,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
                   onSelected: (_) => setState(() => _type = t),
                   selectedColor: t.color,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.colors.textPrimary,
                     fontSize: 12,
                   ),
                 );
@@ -134,7 +134,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
                   onSelected: (_) => setState(() => _category = c),
                   selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.colors.textPrimary,
                     fontSize: 12,
                   ),
                 );
@@ -166,16 +166,20 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
                   color: AppColors.primary.withValues(alpha: 0.2),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.primary, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(
+                    Icons.info_outline,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Tu solicitud será enviada al administrador del conjunto. Recibirás notificación cuando sea atendida.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ),

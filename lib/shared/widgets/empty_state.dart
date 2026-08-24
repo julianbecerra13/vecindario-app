@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -26,15 +26,15 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 64, color: AppColors.textHint),
+            Icon(icon, size: 64, color: context.colors.textHint),
             const SizedBox(height: AppSizes.md),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             if (subtitle != null) ...[
@@ -42,9 +42,9 @@ class EmptyState extends StatelessWidget {
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],

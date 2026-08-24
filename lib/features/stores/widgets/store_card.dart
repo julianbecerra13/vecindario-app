@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/store_model.dart';
 
@@ -36,7 +37,7 @@ class StoreCard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
+                      color: context.colors.surfaceVariant,
                       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                     ),
                     alignment: Alignment.center,
@@ -62,14 +63,14 @@ class StoreCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: AppColors.textHint),
+                  Icon(Icons.chevron_right, color: context.colors.textHint),
                 ],
               ),
               const SizedBox(height: AppSizes.sm),
               Container(
                 padding: const EdgeInsets.only(top: AppSizes.sm),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: AppColors.border)),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: context.colors.border)),
                 ),
                 child: Row(
                   children: [
@@ -110,7 +111,7 @@ class _MetaItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: AppColors.textHint),
+        Icon(icon, size: 14, color: context.colors.textHint),
         const SizedBox(width: 4),
         Text(text, style: AppTextStyles.caption),
       ],

@@ -168,7 +168,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                           borderRadius: BorderRadius.circular(
                             AppSizes.radiusMd,
                           ),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: context.colors.border),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(

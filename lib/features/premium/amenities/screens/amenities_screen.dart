@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -126,14 +127,14 @@ class _AmenityCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: AppColors.textHint),
+                  Icon(Icons.chevron_right, color: context.colors.textHint),
                 ],
               ),
               const SizedBox(height: AppSizes.sm),
               Container(
                 padding: const EdgeInsets.only(top: AppSizes.sm),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: AppColors.border)),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: context.colors.border)),
                 ),
                 child: Row(
                   children: [
@@ -231,7 +232,7 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -338,8 +339,8 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                 fontSize: 12,
               ),
               disabledDecoration: const BoxDecoration(shape: BoxShape.circle),
-              disabledTextStyle: const TextStyle(
-                color: AppColors.textHint,
+              disabledTextStyle: TextStyle(
+                color: context.colors.textHint,
                 fontSize: 12,
               ),
             ),
@@ -558,7 +559,7 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: AppColors.textHint),
+        Icon(icon, size: 14, color: context.colors.textHint),
         const SizedBox(width: 4),
         Text(text, style: AppTextStyles.caption),
       ],
@@ -588,7 +589,7 @@ class _Legend extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 10, color: AppColors.textHint),
+          style: TextStyle(fontSize: 10, color: context.colors.textHint),
         ),
       ],
     );

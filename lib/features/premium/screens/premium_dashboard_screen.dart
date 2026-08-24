@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
@@ -30,18 +31,18 @@ class PremiumDashboardScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.lock_outline,
                   size: 64,
-                  color: AppColors.textHint,
+                  color: context.colors.textHint,
                 ),
                 const SizedBox(height: AppSizes.md),
                 Text('Vecindario Admin', style: AppTextStyles.heading3),
                 const SizedBox(height: AppSizes.sm),
-                const Text(
+                Text(
                   'Tu comunidad aún no tiene Vecindario Admin activo.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: context.colors.textSecondary),
                 ),
                 const SizedBox(height: AppSizes.lg),
                 ElevatedButton(
@@ -88,12 +89,12 @@ class PremiumDashboardScreen extends ConsumerWidget {
             _AdminStats(),
             const SizedBox(height: AppSizes.lg),
             // Acciones rápidas (cards full-width como en diseño .pen)
-            const Text(
+            Text(
               'ACCIONES RÁPIDAS',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textHint,
+                color: context.colors.textHint,
                 letterSpacing: 1.2,
               ),
             ),
@@ -130,12 +131,12 @@ class PremiumDashboardScreen extends ConsumerWidget {
           ],
 
           // === MÓDULOS ===
-          const Text(
+          Text(
             'MÓDULOS',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: AppColors.textHint,
+              color: context.colors.textHint,
               letterSpacing: 1.2,
             ),
           ),
@@ -295,7 +296,7 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(fontSize: 10, color: AppColors.textHint),
+              style: TextStyle(fontSize: 10, color: context.colors.textHint),
               textAlign: TextAlign.center,
             ),
           ],
@@ -337,19 +338,19 @@ class _QuickActionCard extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+          style: TextStyle(fontSize: 11, color: context.colors.textHint),
         ),
-        trailing: const Icon(
+        trailing: Icon(
           Icons.chevron_right,
-          color: AppColors.textHint,
+          color: context.colors.textHint,
           size: 20,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -396,7 +397,7 @@ class _ModuleTile extends StatelessWidget {
           style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+        trailing: Icon(Icons.chevron_right, color: context.colors.textHint),
       ),
     );
   }

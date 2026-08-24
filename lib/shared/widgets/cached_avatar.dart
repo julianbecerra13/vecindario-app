@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 
 class CachedAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -27,7 +28,7 @@ class CachedAvatar extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: AppColors.surfaceVariant,
+        backgroundColor: context.colors.surfaceVariant,
         child: ClipOval(
           child: CachedNetworkImage(
             imageUrl: imageUrl!,

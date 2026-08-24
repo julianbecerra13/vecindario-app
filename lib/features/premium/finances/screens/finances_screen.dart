@@ -148,9 +148,9 @@ class _AdminFinancesView extends ConsumerWidget {
                   height: 200,
                   padding: const EdgeInsets.all(AppSizes.md),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: context.colors.surface,
                     borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.colors.border),
                   ),
                   child: _BudgetVsExecutionChart(
                     categories: expenseByCategory.keys.toList(),
@@ -189,16 +189,18 @@ class _AdminFinancesView extends ConsumerWidget {
               Container(
                 padding: AppSizes.paddingCard,
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.colors.surface,
                   borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.colors.border),
                 ),
                 child: statements.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppSizes.sm),
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSizes.sm,
+                        ),
                         child: Text(
                           'Sin estados de cuenta cargados',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: context.colors.textSecondary),
                         ),
                       )
                     : Column(
@@ -209,11 +211,11 @@ class _AdminFinancesView extends ConsumerWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Tasa de recaudo',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                   Text(
@@ -229,11 +231,11 @@ class _AdminFinancesView extends ConsumerWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Cartera morosa',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                   Text(
@@ -253,7 +255,7 @@ class _AdminFinancesView extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: recaudoRate.clamp(0.0, 1.0),
-                              backgroundColor: AppColors.border,
+                              backgroundColor: context.colors.border,
                               color: AppColors.success,
                               minHeight: 6,
                             ),
@@ -327,9 +329,9 @@ class _BudgetVsExecutionChart extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       label.length > 6 ? '${label.substring(0, 6)}.' : label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9,
-                        color: AppColors.textHint,
+                        color: context.colors.textHint,
                       ),
                     ),
                   );
@@ -401,7 +403,7 @@ class _ChartLegend extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+          style: TextStyle(fontSize: 11, color: context.colors.textHint),
         ),
       ],
     );
@@ -422,21 +424,21 @@ class _ResidentFinancesView extends ConsumerWidget {
       body: statementAsync.when(
         data: (statement) {
           if (statement == null) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(AppSizes.xl),
+                padding: const EdgeInsets.all(AppSizes.xl),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.account_balance_wallet,
                       size: 64,
-                      color: AppColors.textHint,
+                      color: context.colors.textHint,
                     ),
-                    SizedBox(height: AppSizes.md),
+                    const SizedBox(height: AppSizes.md),
                     Text(
                       'Estado de cuenta no disponible',
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: context.colors.textSecondary),
                     ),
                   ],
                 ),
@@ -458,9 +460,9 @@ class _ResidentFinancesView extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       'Saldo actual',
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: context.colors.textSecondary),
                     ),
                     const SizedBox(height: AppSizes.sm),
                     Text(
@@ -638,7 +640,7 @@ class _StatementItemTile extends StatelessWidget {
               formatCOP(item.amount),
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: isPaid ? AppColors.success : AppColors.textPrimary,
+                color: isPaid ? AppColors.success : context.colors.textPrimary,
               ),
             ),
             Container(

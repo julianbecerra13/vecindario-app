@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
@@ -120,7 +119,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
                   onSelected: (_) => setState(() => _priority = p),
                   selectedColor: p.color,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.colors.textPrimary,
                     fontSize: 12,
                   ),
                 );
@@ -158,9 +157,12 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
                 'Requiere firma de acuse',
                 style: TextStyle(fontSize: 14),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Los residentes deberán firmar que lo leyeron',
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.colors.textSecondary,
+                ),
               ),
               value: _requiresSignature,
               onChanged: (v) => setState(() => _requiresSignature = v),

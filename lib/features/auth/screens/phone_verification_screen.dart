@@ -112,7 +112,7 @@ class _PhoneVerificationScreenState
                 'Enviamos un código SMS al\n+57 ${widget.phoneNumber}',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const SizedBox(height: AppSizes.xl),
@@ -178,7 +178,7 @@ class _PhoneVerificationScreenState
                 onPressed: () => context.go('/join-community'),
                 child: Text(
                   'Verificar después',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: context.colors.textSecondary),
                 ),
               ),
             ],

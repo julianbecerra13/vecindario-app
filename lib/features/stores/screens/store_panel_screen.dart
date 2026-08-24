@@ -84,7 +84,7 @@ class _NoStoreView extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.storefront, size: 80, color: AppColors.textHint),
+              Icon(Icons.storefront, size: 80, color: context.colors.textHint),
               const SizedBox(height: AppSizes.md),
               Text(
                 'Aún no tienes tienda',
@@ -466,12 +466,14 @@ class _ItemManageCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: item.available
                     ? AppColors.primary.withValues(alpha: 0.1)
-                    : AppColors.border,
+                    : context.colors.border,
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
               ),
               child: Icon(
                 Icons.fastfood,
-                color: item.available ? AppColors.primary : AppColors.textHint,
+                color: item.available
+                    ? AppColors.primary
+                    : context.colors.textHint,
               ),
             ),
             const SizedBox(width: AppSizes.sm),
@@ -486,7 +488,7 @@ class _ItemManageCard extends StatelessWidget {
                       decoration: item.available
                           ? null
                           : TextDecoration.lineThrough,
-                      color: item.available ? null : AppColors.textHint,
+                      color: item.available ? null : context.colors.textHint,
                     ),
                   ),
                   if (item.description != null && item.description!.isNotEmpty)
@@ -725,7 +727,7 @@ class _StatChip extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(fontSize: 10, color: AppColors.textHint),
+              style: TextStyle(fontSize: 10, color: context.colors.textHint),
             ),
           ],
         ),
@@ -744,10 +746,10 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSizes.sm),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w700,
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
     );

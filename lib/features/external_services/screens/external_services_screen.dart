@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/external_services/models/external_service_model.dart';
 import 'package:vecindario_app/features/external_services/providers/external_services_provider.dart';
@@ -43,7 +44,7 @@ class ExternalServicesScreen extends ConsumerWidget {
                     labelStyle: TextStyle(
                       color: selectedCategory == null
                           ? Colors.white
-                          : AppColors.textPrimary,
+                          : context.colors.textPrimary,
                     ),
                   ),
                 ),
@@ -68,7 +69,7 @@ class ExternalServicesScreen extends ConsumerWidget {
                       labelStyle: TextStyle(
                         color: isSelected
                             ? Colors.white
-                            : AppColors.textPrimary,
+                            : context.colors.textPrimary,
                       ),
                     ),
                   );
@@ -82,24 +83,24 @@ class ExternalServicesScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSizes.sm),
             decoration: BoxDecoration(
               border: Border.all(
-                color: AppColors.border,
+                color: context.colors.border,
                 style: BorderStyle.solid,
               ),
               borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.info_outline,
                   size: 16,
-                  color: AppColors.textHint,
+                  color: context.colors.textHint,
                 ),
                 const SizedBox(width: AppSizes.sm),
                 Expanded(
                   child: Text(
                     'Estos servicios son recomendados por vecinos — no son residentes del conjunto.',
                     style: AppTextStyles.caption.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
@@ -237,7 +238,10 @@ class _ExternalServiceCard extends StatelessWidget {
               const SizedBox(height: AppSizes.xs),
               Text(
                 service.description,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.colors.textSecondary,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

@@ -196,7 +196,7 @@ class _PqrsCard extends ConsumerWidget {
                     Icon(
                       pqrs.category.icon,
                       size: 12,
-                      color: AppColors.textHint,
+                      color: context.colors.textHint,
                     ),
                     const SizedBox(width: 4),
                     Text(pqrs.category.label, style: AppTextStyles.caption),

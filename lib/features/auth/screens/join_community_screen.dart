@@ -125,10 +125,10 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
           child: Column(
             children: [
               const SizedBox(height: AppSizes.lg),
-              const Icon(
+              Icon(
                 Icons.lock_outlined,
                 size: 48,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
               const SizedBox(height: AppSizes.lg),
               Text(
@@ -136,7 +136,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -157,16 +157,16 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
                       textCapitalization: TextCapitalization.characters,
                       maxLength: 1,
                       onChanged: (v) => _onCodeChanged(i, v),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                       decoration: InputDecoration(
                         counterText: '',
                         contentPadding: EdgeInsets.zero,
                         filled: true,
-                        fillColor: AppColors.surfaceVariant,
+                        fillColor: context.colors.surfaceVariant,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(

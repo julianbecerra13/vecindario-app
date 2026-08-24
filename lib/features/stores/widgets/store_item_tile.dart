@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
 
@@ -25,8 +26,8 @@ class StoreItemTile extends StatelessWidget {
         horizontal: AppSizes.md,
         vertical: AppSizes.sm + AppSizes.xs,
       ),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: context.colors.borderLight)),
       ),
       child: Row(
         children: [
@@ -93,14 +94,14 @@ class _RoundButton extends StatelessWidget {
         width: 28,
         height: 28,
         decoration: BoxDecoration(
-          color: filled ? AppColors.primary : AppColors.surfaceVariant,
+          color: filled ? AppColors.primary : context.colors.surfaceVariant,
           borderRadius: BorderRadius.circular(8),
         ),
         alignment: Alignment.center,
         child: Icon(
           icon,
           size: 16,
-          color: filled ? Colors.white : AppColors.textPrimary,
+          color: filled ? Colors.white : context.colors.textPrimary,
         ),
       ),
     );

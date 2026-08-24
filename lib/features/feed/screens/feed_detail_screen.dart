@@ -208,8 +208,8 @@ class FeedDetailScreen extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(color: AppColors.border),
-                      bottom: BorderSide(color: AppColors.border),
+                      top: BorderSide(color: context.colors.border),
+                      bottom: BorderSide(color: context.colors.border),
                     ),
                   ),
                   child: Row(
@@ -251,14 +251,16 @@ class FeedDetailScreen extends ConsumerWidget {
                               },
                         icon: Icon(
                           isLiked ? Icons.favorite : Icons.favorite_outline,
-                          color: isLiked ? AppColors.error : AppColors.textHint,
+                          color: isLiked
+                              ? AppColors.error
+                              : context.colors.textHint,
                         ),
                         label: Text(
                           'Me gusta',
                           style: TextStyle(
                             color: isLiked
                                 ? AppColors.error
-                                : AppColors.textPrimary,
+                                : context.colors.textPrimary,
                           ),
                         ),
                       ),

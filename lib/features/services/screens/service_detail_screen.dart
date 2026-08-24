@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 import 'package:vecindario_app/features/services/widgets/rating_stars.dart';
@@ -34,7 +35,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                     height: 250,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                      color: AppColors.background,
+                      color: context.colors.background,
                     ),
                     child: PageView.builder(
                       itemCount: service.imageURLs.length,
@@ -113,7 +114,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                       Text(
                         'Precio',
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: AppSizes.xs),
@@ -143,7 +144,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSizes.md),
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.colors.border),
                     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   ),
                   child: Row(

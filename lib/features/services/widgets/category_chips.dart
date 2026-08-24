@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 
@@ -27,7 +28,9 @@ class CategoryChips extends ConsumerWidget {
                   ref.read(selectedCategoryProvider.notifier).state = null,
               selectedColor: AppColors.primary,
               labelStyle: TextStyle(
-                color: selected == null ? Colors.white : AppColors.textPrimary,
+                color: selected == null
+                    ? Colors.white
+                    : context.colors.textPrimary,
                 fontSize: 13,
               ),
             ),
@@ -55,7 +58,7 @@ class CategoryChips extends ConsumerWidget {
                         isSelected ? null : cat,
                 selectedColor: cat.color,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppColors.textPrimary,
+                  color: isSelected ? Colors.white : context.colors.textPrimary,
                   fontSize: 13,
                 ),
               ),

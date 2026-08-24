@@ -73,27 +73,27 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 color: AppColors.primary.withValues(alpha: 0.2),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.shield, color: AppColors.primary, size: 32),
-                SizedBox(width: AppSizes.md),
+                const Icon(Icons.shield, color: AppColors.primary, size: 32),
+                const SizedBox(width: AppSizes.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Ley 1581 de 2012',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
                         'Tienes derecho a conocer, actualizar, rectificar y suprimir tus datos personales.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -212,11 +212,11 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSizes.sm),
-                const Text(
+                Text(
                   'Después de 15 días no podrás recuperar tu cuenta.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSizes.md),
@@ -289,9 +289,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 '¿Estás seguro? Después de 15 días esta acción no se puede deshacer.',
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
               ),
               const SizedBox(height: AppSizes.md),
               TextField(
@@ -399,7 +399,7 @@ class _SectionHeader extends StatelessWidget {
       style: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w700,
-        color: isDestructive ? AppColors.error : AppColors.textHint,
+        color: isDestructive ? AppColors.error : context.colors.textHint,
         letterSpacing: 1.2,
       ),
     );
@@ -425,7 +425,7 @@ class _PrivacyAction extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: Text(subtitle, style: AppTextStyles.caption),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+      trailing: Icon(Icons.chevron_right, color: context.colors.textHint),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
     );

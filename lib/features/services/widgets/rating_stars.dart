@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vecindario_app/core/constants/app_colors.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 
 class RatingStars extends StatelessWidget {
   final double rating;
@@ -24,13 +24,20 @@ class RatingStars extends StatelessWidget {
           } else if (i < rating) {
             return Icon(Icons.star_half, size: size, color: Colors.amber);
           }
-          return Icon(Icons.star_border, size: size, color: AppColors.border);
+          return Icon(
+            Icons.star_border,
+            size: size,
+            color: context.colors.border,
+          );
         }),
         if (showCount != null) ...[
           const SizedBox(width: 4),
           Text(
             '($showCount)',
-            style: TextStyle(fontSize: size * 0.75, color: AppColors.textHint),
+            style: TextStyle(
+              fontSize: size * 0.75,
+              color: context.colors.textHint,
+            ),
           ),
         ],
       ],

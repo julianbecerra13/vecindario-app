@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -85,7 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == i
                               ? AppColors.primary
-                              : AppColors.border,
+                              : context.colors.border,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -158,7 +159,7 @@ class _OnboardingPage extends StatelessWidget {
             description,
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],

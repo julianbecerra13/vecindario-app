@@ -79,12 +79,12 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSizes.md),
                   decoration: BoxDecoration(
-                    color: AppColors.textHint.withValues(alpha: 0.08),
+                    color: context.colors.textHint.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline, color: AppColors.textHint),
+                      Icon(Icons.lock_outline, color: context.colors.textHint),
                       const SizedBox(width: AppSizes.sm),
                       Expanded(
                         child: Text(
@@ -169,9 +169,9 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Ingresa el UID del usuario que será administrador. Puedes encontrarlo en Firebase Auth.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
             ),
             const SizedBox(height: AppSizes.md),
             TextField(
@@ -337,7 +337,9 @@ class _Header extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: isActive ? AppColors.success : AppColors.textHint,
+                    color: isActive
+                        ? AppColors.success
+                        : context.colors.textHint,
                     borderRadius: BorderRadius.circular(AppSizes.radiusFull),
                   ),
                   child: Text(
@@ -380,7 +382,7 @@ class _InfoRow extends StatelessWidget {
             child: Text(
               label,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.textHint,
+                color: context.colors.textHint,
                 fontWeight: FontWeight.w600,
               ),
             ),

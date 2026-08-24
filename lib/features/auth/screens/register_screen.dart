@@ -148,7 +148,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         'o continuar con',
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textHint,
+                          color: context.colors.textHint,
                         ),
                       ),
                     ),
@@ -184,15 +184,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSizes.md),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: context.colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.colors.border),
                   ),
                   child: RichText(
                     text: TextSpan(
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textHint,
+                        color: context.colors.textHint,
                         height: 1.5,
                       ),
                       children: const [

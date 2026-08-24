@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/features/services/widgets/rating_stars.dart';
@@ -33,8 +34,8 @@ class ServiceCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: service.imageURLs.first,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) =>
-                            Container(color: AppColors.surfaceVariant),
+                        placeholder: (ctx, __) =>
+                            Container(color: ctx.colors.surfaceVariant),
                         errorWidget: (_, __, ___) => _placeholder(),
                       )
                     : _placeholder(),

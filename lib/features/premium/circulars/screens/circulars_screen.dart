@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
@@ -75,7 +76,7 @@ class _CircularCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSizes.cardRadius),
         side: BorderSide(
           color: isRead
-              ? AppColors.border
+              ? context.colors.border
               : circular.priority.color.withValues(alpha: 0.3),
           width: isRead ? 1 : 2,
         ),
@@ -194,7 +195,7 @@ class _CircularCard extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(2),
                                 child: LinearProgressIndicator(
                                   value: pct,
-                                  backgroundColor: AppColors.border,
+                                  backgroundColor: context.colors.border,
                                   color: color,
                                   minHeight: 4,
                                 ),
@@ -264,7 +265,7 @@ class _MetaChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 12, color: AppColors.textHint),
+        Icon(icon, size: 12, color: context.colors.textHint),
         const SizedBox(width: 4),
         Text(text, style: AppTextStyles.caption),
       ],

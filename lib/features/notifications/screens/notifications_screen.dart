@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:vecindario_app/core/constants/app_colors.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/notifications/models/notification_model.dart';
 import 'package:vecindario_app/features/notifications/providers/notification_providers.dart';
@@ -93,7 +94,7 @@ class _NotificationTile extends StatelessWidget {
     }
   }
 
-  Color get _iconColor {
+  Color _iconColor(BuildContext context) {
     switch (notification.type) {
       case NotificationType.post:
         return AppColors.primary;
@@ -114,7 +115,7 @@ class _NotificationTile extends StatelessWidget {
       case NotificationType.approval:
         return AppColors.success;
       case NotificationType.system:
-        return AppColors.textSecondary;
+        return context.colors.textSecondary;
     }
   }
 
@@ -128,8 +129,8 @@ class _NotificationTile extends StatelessWidget {
           color: notification.read
               ? null
               : AppColors.primary.withValues(alpha: 0.04),
-          border: const Border(
-            bottom: BorderSide(color: AppColors.border, width: 0.5),
+          border: Border(
+            bottom: BorderSide(color: context.colors.border, width: 0.5),
           ),
         ),
         child: Row(
@@ -139,10 +140,10 @@ class _NotificationTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: _iconColor.withValues(alpha: 0.1),
+                color: _iconColor(context).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(_icon, color: _iconColor, size: 20),
+              child: Icon(_icon, color: _iconColor(context), size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -173,7 +174,7 @@ class _NotificationTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -183,7 +184,7 @@ class _NotificationTile extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: _iconColor.withValues(alpha: 0.08),
+                      color: _iconColor(context).withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -191,7 +192,7 @@ class _NotificationTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
-                        color: _iconColor,
+                        color: _iconColor(context),
                       ),
                     ),
                   ),

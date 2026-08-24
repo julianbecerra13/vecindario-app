@@ -316,14 +316,14 @@ class _ActionButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: color ?? AppColors.textSecondary),
+            Icon(icon, size: 20, color: color ?? context.colors.textSecondary),
             if (label.isNotEmpty) ...[
               const SizedBox(width: 4),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  color: color ?? AppColors.textSecondary,
+                  color: color ?? context.colors.textSecondary,
                 ),
               ),
             ],

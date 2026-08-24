@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/theme/theme_mode_provider.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
@@ -325,7 +326,9 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: AppSizes.xs),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+          style: AppTextStyles.caption.copyWith(
+            color: context.colors.textSecondary,
+          ),
         ),
       ],
     );
@@ -380,12 +383,12 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.textSecondary),
+      leading: Icon(icon, color: context.colors.textSecondary),
       title: Text(title, style: AppTextStyles.bodyMedium),
       subtitle: subtitle != null
           ? Text(subtitle!, style: AppTextStyles.caption)
           : null,
-      trailing: const Icon(Icons.chevron_right, color: AppColors.textHint),
+      trailing: Icon(Icons.chevron_right, color: context.colors.textHint),
       onTap: onTap,
     );
   }
@@ -459,7 +462,7 @@ class _QuickAccessTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surfaceVariant,
+      color: context.colors.surfaceVariant,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),

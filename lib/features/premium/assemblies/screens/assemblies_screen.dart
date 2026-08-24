@@ -106,10 +106,10 @@ class AssembliesScreen extends ConsumerWidget {
                         const SizedBox(height: AppSizes.sm),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.calendar_today,
                               size: 14,
-                              color: AppColors.textHint,
+                              color: context.colors.textHint,
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -122,10 +122,10 @@ class AssembliesScreen extends ConsumerWidget {
                           const SizedBox(height: AppSizes.xs),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on,
                                 size: 14,
-                                color: AppColors.textHint,
+                                color: context.colors.textHint,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -166,7 +166,7 @@ class AssembliesScreen extends ConsumerWidget {
                               ),
                               padding: const EdgeInsets.all(AppSizes.sm),
                               decoration: BoxDecoration(
-                                color: AppColors.surfaceVariant,
+                                color: context.colors.surfaceVariant,
                                 borderRadius: BorderRadius.circular(
                                   AppSizes.radiusMd,
                                 ),
@@ -220,8 +220,9 @@ class AssembliesScreen extends ConsumerWidget {
                                                       LinearProgressIndicator(
                                                         value: pct,
                                                         minHeight: 6,
-                                                        backgroundColor:
-                                                            AppColors.border,
+                                                        backgroundColor: context
+                                                            .colors
+                                                            .border,
                                                         color:
                                                             AppColors.success,
                                                       ),

@@ -66,7 +66,7 @@ class PollWidget extends ConsumerWidget {
                     child: LinearProgressIndicator(
                       value: percentage,
                       minHeight: 8,
-                      backgroundColor: AppColors.border,
+                      backgroundColor: context.colors.border,
                       color: voted ? AppColors.primary : AppColors.primaryLight,
                     ),
                   ),
@@ -95,7 +95,7 @@ class PollWidget extends ConsumerWidget {
         }),
         Text(
           '$_totalVotes voto${_totalVotes == 1 ? '' : 's'}',
-          style: const TextStyle(fontSize: 12, color: AppColors.textHint),
+          style: TextStyle(fontSize: 12, color: context.colors.textHint),
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 
@@ -249,7 +250,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: AppColors.surfaceVariant,
+                fillColor: context.colors.surfaceVariant,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,
@@ -316,8 +317,8 @@ class _ChapterTile extends StatelessWidget {
               color: hasLinkedFines && isExpanded
                   ? const Color(0xFF8B5CF6).withValues(alpha: 0.05)
                   : null,
-              border: const Border(
-                bottom: BorderSide(color: AppColors.border, width: 0.5),
+              border: Border(
+                bottom: BorderSide(color: context.colors.border, width: 0.5),
               ),
             ),
             child: Row(
@@ -332,7 +333,7 @@ class _ChapterTile extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: hasLinkedFines
                               ? const Color(0xFF8B5CF6)
-                              : AppColors.textPrimary,
+                              : context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -356,7 +357,7 @@ class _ChapterTile extends StatelessWidget {
                 ),
                 Icon(
                   isExpanded ? Icons.expand_less : Icons.chevron_right,
-                  color: AppColors.textHint,
+                  color: context.colors.textHint,
                 ),
               ],
             ),
@@ -378,9 +379,9 @@ class _ChapterTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: matchesSearch
                     ? AppColors.primary.withValues(alpha: 0.05)
-                    : AppColors.surfaceVariant.withValues(alpha: 0.5),
-                border: const Border(
-                  bottom: BorderSide(color: AppColors.border, width: 0.3),
+                    : context.colors.surfaceVariant.withValues(alpha: 0.5),
+                border: Border(
+                  bottom: BorderSide(color: context.colors.border, width: 0.3),
                 ),
               ),
               child: Column(
@@ -397,7 +398,7 @@ class _ChapterTile extends StatelessWidget {
                   Text(
                     article.content,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       height: 1.5,
                     ),
                   ),

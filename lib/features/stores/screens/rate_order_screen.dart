@@ -116,7 +116,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                           size: 44,
                           color: starIndex <= _rating
                               ? AppColors.warning
-                              : AppColors.textHint,
+                              : context.colors.textHint,
                         ),
                       ),
                     );

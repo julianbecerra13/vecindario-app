@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -101,7 +102,7 @@ class AccountStatementScreen extends ConsumerWidget {
                 if (statement.items.isEmpty)
                   Text(
                     'Sin movimientos registrados',
-                    style: TextStyle(color: AppColors.textHint),
+                    style: TextStyle(color: context.colors.textHint),
                   )
                 else
                   ...statement.items.map(
@@ -143,8 +144,8 @@ class _StatementItemTile extends StatelessWidget {
         horizontal: AppSizes.md,
         vertical: AppSizes.sm,
       ),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: context.colors.border)),
       ),
       child: Row(
         children: [
@@ -158,7 +159,7 @@ class _StatementItemTile extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: item.concept.toLowerCase().contains('multa')
                         ? AppColors.error
-                        : AppColors.textPrimary,
+                        : context.colors.textPrimary,
                   ),
                 ),
                 Text(

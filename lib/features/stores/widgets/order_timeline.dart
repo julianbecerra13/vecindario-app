@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 
@@ -39,10 +40,12 @@ class OrderTimeline extends StatelessWidget {
       ),
     ];
 
-    return Column(children: steps.map((step) => _buildStep(step)).toList());
+    return Column(
+      children: steps.map((step) => _buildStep(context, step)).toList(),
+    );
   }
 
-  Widget _buildStep(_TimelineStep step) {
+  Widget _buildStep(BuildContext context, _TimelineStep step) {
     final Color circleColor;
     final Widget circleChild;
 
@@ -60,7 +63,7 @@ class OrderTimeline extends StatelessWidget {
         ),
       );
     } else {
-      circleColor = AppColors.border;
+      circleColor = context.colors.border;
       circleChild = const SizedBox.shrink();
     }
 
@@ -83,7 +86,9 @@ class OrderTimeline extends StatelessWidget {
               Container(
                 width: 2,
                 height: 32,
-                color: step.isCompleted ? AppColors.success : AppColors.border,
+                color: step.isCompleted
+                    ? AppColors.success
+                    : context.colors.border,
               ),
           ],
         ),
@@ -103,15 +108,15 @@ class OrderTimeline extends StatelessWidget {
                         ? AppColors.success
                         : step.isCurrent
                         ? AppColors.primary
-                        : AppColors.textHint,
+                        : context.colors.textHint,
                   ),
                 ),
                 if (step.subtitle != null)
                   Text(
                     step.subtitle!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textHint,
+                      color: context.colors.textHint,
                     ),
                   ),
               ],

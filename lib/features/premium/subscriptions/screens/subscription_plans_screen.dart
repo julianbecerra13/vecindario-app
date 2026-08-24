@@ -37,7 +37,7 @@ class _SubscriptionPlansScreenState
                   'Digitaliza la gestión de tu conjunto',
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -174,7 +174,7 @@ class _PlanCard extends StatelessWidget {
       child: AppCard(
         borderColor: isPopular
             ? AppColors.success.withValues(alpha: 0.5)
-            : AppColors.border,
+            : context.colors.border,
         borderWidth: isPopular ? 2 : 1,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,7 +236,7 @@ class _PlanCard extends StatelessWidget {
                       size: 16,
                       color: f.included
                           ? AppColors.success
-                          : AppColors.textHint,
+                          : context.colors.textHint,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -244,8 +244,8 @@ class _PlanCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         color: f.included
-                            ? AppColors.textPrimary
-                            : AppColors.textHint,
+                            ? context.colors.textPrimary
+                            : context.colors.textHint,
                       ),
                     ),
                   ],

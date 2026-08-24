@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/widgets/post_card.dart';
@@ -272,13 +273,13 @@ class _AdBanner extends StatelessWidget {
                 Text(
                   'Espacio publicitario disponible',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.ads_click, color: AppColors.textHint, size: 20),
+          Icon(Icons.ads_click, color: context.colors.textHint, size: 20),
         ],
       ),
     );

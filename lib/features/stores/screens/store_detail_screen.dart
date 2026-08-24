@@ -241,7 +241,7 @@ class _PaymentMethodTile extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? AppColors.primary : context.colors.border,
             width: selected ? 2 : 1,
           ),
           color: selected
@@ -252,7 +252,7 @@ class _PaymentMethodTile extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: selected ? AppColors.primary : AppColors.textHint,
+              color: selected ? AppColors.primary : context.colors.textHint,
               size: 22,
             ),
             const SizedBox(width: AppSizes.sm),
@@ -267,14 +267,14 @@ class _PaymentMethodTile extends StatelessWidget {
                       fontSize: 13,
                       color: selected
                           ? AppColors.primary
-                          : AppColors.textPrimary,
+                          : context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textHint,
+                      color: context.colors.textHint,
                     ),
                   ),
                 ],

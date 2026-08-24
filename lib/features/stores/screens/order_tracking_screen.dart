@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
@@ -60,7 +61,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                   width: double.infinity,
                   padding: AppSizes.paddingCard,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: context.colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                   ),
                   child: Column(

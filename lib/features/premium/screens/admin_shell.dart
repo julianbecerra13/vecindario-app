@@ -49,7 +49,7 @@ class _AdminShellState extends ConsumerState<AdminShell> {
         onTap: (i) => setState(() => _currentIndex = i),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.success,
-        unselectedItemColor: AppColors.textHint,
+        unselectedItemColor: context.colors.textHint,
         selectedFontSize: 10,
         unselectedFontSize: 10,
         items: const [
@@ -317,7 +317,7 @@ class _AdminHomePage extends ConsumerWidget {
           ),
           _QuickAction(
             icon: Icons.settings,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             title: 'Configuración de comunidad',
             subtitle: 'Nombre, código de invitación, estrato',
             onTap: () => context.push('/premium/settings'),
@@ -422,7 +422,7 @@ class _AdminHomePage extends ConsumerWidget {
                                 const SizedBox(width: 4),
                                 _MiniButton(
                                   icon: Icons.close,
-                                  color: AppColors.textHint,
+                                  color: context.colors.textHint,
                                   onTap: () async {
                                     final communityId = ref.read(
                                       currentCommunityIdProvider,
@@ -479,7 +479,7 @@ class _StatCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 label,
-                style: const TextStyle(fontSize: 9, color: AppColors.textHint),
+                style: TextStyle(fontSize: 9, color: context.colors.textHint),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -523,9 +523,9 @@ class _QuickAction extends StatelessWidget {
           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
         ),
         subtitle: Text(subtitle, style: AppTextStyles.caption),
-        trailing: const Icon(
+        trailing: Icon(
           Icons.chevron_right,
-          color: AppColors.textHint,
+          color: context.colors.textHint,
           size: 18,
         ),
         onTap: onTap,

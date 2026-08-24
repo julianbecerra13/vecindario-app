@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 
 class CheckoutBar extends StatelessWidget {
@@ -28,8 +29,8 @@ class CheckoutBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSizes.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: context.colors.surface,
+        border: Border(top: BorderSide(color: context.colors.border)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -48,9 +49,9 @@ class CheckoutBar extends StatelessWidget {
               children: [
                 Text(
                   'Subtotal: ${formatCOP(subtotal)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 Text(

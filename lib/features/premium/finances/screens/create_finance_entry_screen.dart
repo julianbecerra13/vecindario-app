@@ -158,7 +158,7 @@ class _CreateFinanceEntryScreenState
               },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                side: const BorderSide(color: AppColors.border),
+                side: BorderSide(color: context.colors.border),
               ),
             ),
             const SizedBox(height: AppSizes.xl),

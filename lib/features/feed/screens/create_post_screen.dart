@@ -123,7 +123,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   onSelected: (_) => setState(() => _selectedType = type),
                   selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
-                    color: selected ? Colors.white : AppColors.textPrimary,
+                    color: selected ? Colors.white : context.colors.textPrimary,
                   ),
                 );
               }).toList(),

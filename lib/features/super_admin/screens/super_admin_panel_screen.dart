@@ -98,10 +98,10 @@ class SuperAdminPanelScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.apartment,
                     size: 64,
-                    color: AppColors.textHint,
+                    color: context.colors.textHint,
                   ),
                   const SizedBox(height: AppSizes.md),
                   const Text('No hay comunidades registradas'),
@@ -129,10 +129,10 @@ class SuperAdminPanelScreen extends ConsumerWidget {
 
               Text(
                 'COMUNIDADES (${communities.length})',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textHint,
+                  color: context.colors.textHint,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -221,7 +221,7 @@ class _StatCard extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+              style: TextStyle(fontSize: 11, color: context.colors.textHint),
             ),
           ],
         ),
@@ -280,7 +280,7 @@ class _CommunityCard extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: isActive
                             ? AppColors.success.withValues(alpha: 0.15)
-                            : AppColors.textHint.withValues(alpha: 0.15),
+                            : context.colors.textHint.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(
                           AppSizes.radiusFull,
                         ),
@@ -292,7 +292,7 @@ class _CommunityCard extends ConsumerWidget {
                           fontWeight: FontWeight.w700,
                           color: isActive
                               ? AppColors.success
-                              : AppColors.textHint,
+                              : context.colors.textHint,
                         ),
                       ),
                     ),
@@ -377,10 +377,10 @@ class _CommunityCard extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Ingresa el UID del usuario que será administrador del conjunto. '
               'Puedes encontrarlo en Firebase Auth.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
             ),
             const SizedBox(height: AppSizes.md),
             TextField(
@@ -485,11 +485,11 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 13, color: AppColors.textHint),
+        Icon(icon, size: 13, color: context.colors.textHint),
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(fontSize: 11, color: AppColors.textHint),
+          style: TextStyle(fontSize: 11, color: context.colors.textHint),
         ),
       ],
     );
