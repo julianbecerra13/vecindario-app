@@ -21,3 +21,15 @@ final storeItemsProvider = StreamProvider.family<List<StoreItemModel>, String>((
 ) {
   return ref.watch(storesRepositoryProvider).watchStoreItems(storeId);
 });
+
+/// La tienda del usuario actual, si tiene una. Null si no es dueño de
+/// ninguna tienda — esta es la capacidad "hasStore", derivada de datos
+/// reales (ownerUid) en vez de un rol exclusivo.
+final ownerStoreProvider = StreamProvider<StoreModel?>((ref) {
+  final user = ref.watch(currentUserProvider).value;
+  if (user == null) return Stream.value(null);
+  return ref
+      .watch(storesRepositoryProvider)
+      .getStoresForOwner(user.id)
+      .map((list) => list.isEmpty ? null : list.first);
+});

@@ -13,15 +13,6 @@ import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
-final ownerStoreProvider = StreamProvider<StoreModel?>((ref) {
-  final user = ref.watch(currentUserProvider).value;
-  if (user == null) return Stream.value(null);
-  return ref
-      .watch(storesRepositoryProvider)
-      .getStoresForOwner(user.id)
-      .map((list) => list.isEmpty ? null : list.first);
-});
-
 final storeOrdersProvider = StreamProvider<List<OrderModel>>((ref) {
   final store = ref.watch(ownerStoreProvider).value;
   final user = ref.watch(currentUserProvider).value;
