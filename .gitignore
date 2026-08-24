@@ -50,3 +50,7 @@ app.*.map.json
 # Node modules
 node_modules/
 image.png
+
+# Binarios compilados de Go (ej. functions/cmd/*)
+functions/*.exe
+functions/migrate_roles
