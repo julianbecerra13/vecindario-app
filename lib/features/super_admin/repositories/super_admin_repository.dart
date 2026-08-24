@@ -69,7 +69,7 @@ class SuperAdminRepository {
         .doc(communityId)
         .update({'adminUid': uid});
     await _firestore.collection(FirestorePaths.users).doc(uid).update({
-      'role': 'admin',
+      'communityRole': 'admin',
       'communityId': communityId,
       'verified': true,
     });

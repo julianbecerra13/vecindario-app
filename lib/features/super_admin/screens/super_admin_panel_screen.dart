@@ -20,7 +20,7 @@ class SuperAdminPanelScreen extends ConsumerWidget {
     final user = ref.watch(currentUserProvider).value;
 
     // Solo super_admin puede acceder
-    if (user == null || user.role.toValue() != 'super_admin') {
+    if (user == null || !user.isSuperAdmin) {
       return Scaffold(
         appBar: AppBar(title: const Text('Acceso denegado')),
         body: const Center(

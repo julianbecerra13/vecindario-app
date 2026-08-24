@@ -83,7 +83,7 @@ void main() {
       await firestore
           .collection(FirestorePaths.users)
           .doc(uid)
-          .set({'role': 'user', 'verified': false});
+          .set({'communityRole': 'resident', 'verified': false});
 
       await repository.assignAdmin(communityId: communityId, uid: uid);
 
@@ -92,7 +92,7 @@ void main() {
       final user =
           await firestore.collection(FirestorePaths.users).doc(uid).get();
       expect(community['adminUid'], uid);
-      expect(user['role'], 'admin');
+      expect(user['communityRole'], 'admin');
       expect(user['communityId'], communityId);
       expect(user['verified'], true);
     });

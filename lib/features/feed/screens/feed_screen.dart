@@ -6,7 +6,7 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/widgets/post_card.dart';
-import 'package:vecindario_app/shared/models/user_model.dart';
+import 'package:vecindario_app/shared/providers/capabilities_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
@@ -45,6 +45,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     final communityAsync = ref.watch(currentCommunityProvider);
     final userAsync = ref.watch(currentUserProvider);
     final isAdmin = ref.watch(isAdminProvider);
+    final hasStore = ref.watch(hasStoreProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -155,7 +156,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               tooltip: 'Panel de administración',
               onPressed: () => context.push('/premium'),
             ),
-          if (userAsync.value?.role == UserRole.storeOwner)
+          if (hasStore)
             IconButton(
               icon: const Icon(
                 Icons.storefront_outlined,

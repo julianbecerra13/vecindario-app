@@ -7,7 +7,7 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/features/profile/providers/profile_stats_provider.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
-import 'package:vecindario_app/shared/models/user_model.dart';
+import 'package:vecindario_app/shared/providers/capabilities_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
@@ -19,6 +19,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(currentUserProvider);
     final isAdmin = ref.watch(isAdminProvider);
+    final hasStore = ref.watch(hasStoreProvider);
     final postCountAsync = ref.watch(userPostCountProvider);
     final myOrdersAsync = ref.watch(myOrdersProvider);
 
@@ -63,7 +64,7 @@ class ProfileScreen extends ConsumerWidget {
                 onTap: () => context.push('/profile/edit'),
               ),
               // Super Admin (plataforma)
-              if (user.role == UserRole.superAdmin) ...[
+              if (user.isSuperAdmin) ...[
                 const Divider(),
                 _SectionTitle('Plataforma'),
                 _SettingsTile(
@@ -73,30 +74,21 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.push('/super-admin'),
                 ),
               ],
-              // Admin (conjunto)
+              // Administración del conjunto (fusiona lo que antes eran dos
+              // entradas separadas: panel admin y Vecindario Admin)
               if (isAdmin) ...[
                 const Divider(),
                 _SectionTitle('Administración'),
                 _SettingsTile(
-                  icon: Icons.admin_panel_settings,
-                  title: 'Panel de administrador',
-                  onTap: () => context.push('/admin'),
-                ),
-              ],
-              // Vecindario Admin (solo visible para admin)
-              if (isAdmin) ...[
-                const Divider(),
-                _SectionTitle('Vecindario Admin'),
-                _SettingsTile(
                   icon: Icons.business,
-                  title: 'Gestión del Conjunto',
-                  subtitle: 'Circulares, multas, zonas sociales, PQRS',
+                  title: 'Administración del conjunto',
+                  subtitle:
+                      'Aprobaciones, circulares, multas, finanzas, PQRS y más',
                   onTap: () => context.push('/premium'),
                 ),
               ],
               // Mi conjunto (residentes + admin, todos los vecinos)
-              if (user.role != UserRole.superAdmin &&
-                  user.communityId != null) ...[
+              if (!user.isSuperAdmin && user.communityId != null) ...[
                 const Divider(),
                 _SectionTitle('Mi conjunto'),
                 _SettingsTile(
@@ -140,8 +132,8 @@ class ProfileScreen extends ConsumerWidget {
                   onTap: () => context.push('/premium/manual'),
                 ),
               ],
-              // Store panel (solo para store_owner)
-              if (user.role == UserRole.storeOwner) ...[
+              // Store panel (solo para quien tiene una tienda)
+              if (hasStore) ...[
                 const Divider(),
                 _SectionTitle('Mi Tienda'),
                 _SettingsTile(
