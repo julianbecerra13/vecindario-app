@@ -152,5 +152,41 @@ void main() {
       expect(service, isNotNull);
       expect(service!.title, 'Mi Servicio');
     });
+
+    test('getServicesForOwner devuelve solo los servicios del dueño', () async {
+      await fakeFirestore.collection('services').doc('s1').set({
+        'communityId': 'comm1',
+        'title': 'Plomería Juan',
+        'category': 'hogar',
+        'active': true,
+        'ownerUid': 'owner1',
+        'ownerName': 'Juan',
+        'description': 'desc',
+        'imageURLs': [],
+        'rating': 0,
+        'ratingCount': 0,
+        'orderCount': 0,
+        'createdAt': DateTime(2026, 4, 1),
+      });
+
+      await fakeFirestore.collection('services').doc('s2').set({
+        'communityId': 'comm1',
+        'title': 'Belleza María',
+        'category': 'belleza',
+        'active': true,
+        'ownerUid': 'owner2',
+        'ownerName': 'María',
+        'description': 'desc',
+        'imageURLs': [],
+        'rating': 0,
+        'ratingCount': 0,
+        'orderCount': 0,
+        'createdAt': DateTime(2026, 4, 1),
+      });
+
+      final owned = await repo.getServicesForOwner('owner1').first;
+      expect(owned.length, 1);
+      expect(owned.first.ownerUid, 'owner1');
+    });
   });
 }

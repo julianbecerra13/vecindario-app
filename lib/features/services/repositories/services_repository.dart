@@ -45,6 +45,18 @@ class ServicesRepository {
     return ServiceModel.fromFirestore(doc.data()!, doc.id);
   }
 
+  Stream<List<ServiceModel>> getServicesForOwner(String ownerUid) {
+    return _firestore
+        .collection(FirestorePaths.services)
+        .where('ownerUid', isEqualTo: ownerUid)
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((doc) => ServiceModel.fromFirestore(doc.data(), doc.id))
+              .toList(),
+        );
+  }
+
   Future<String> createService(ServiceModel service) async {
     final doc = await _firestore
         .collection(FirestorePaths.services)

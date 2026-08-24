@@ -63,3 +63,15 @@ final serviceDetailProvider = FutureProvider.family<ServiceModel?, String>((
 ) async {
   return ref.read(servicesRepositoryProvider).getService(serviceId);
 });
+
+/// El primer servicio ofrecido por el usuario actual, si tiene alguno. Null
+/// si no ofrece ningún servicio — capacidad "offersService", derivada de
+/// datos reales (ownerUid) en vez de un rol exclusivo.
+final ownerServiceProvider = StreamProvider<ServiceModel?>((ref) {
+  final user = ref.watch(currentUserProvider).value;
+  if (user == null) return Stream.value(null);
+  return ref
+      .watch(servicesRepositoryProvider)
+      .getServicesForOwner(user.id)
+      .map((list) => list.isEmpty ? null : list.first);
+});
