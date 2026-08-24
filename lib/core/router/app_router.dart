@@ -1,63 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vecindario_app/features/admin/screens/admin_panel_screen.dart';
-import 'package:vecindario_app/features/admin/screens/community_settings_screen.dart';
-import 'package:vecindario_app/features/admin/screens/pending_approvals_screen.dart';
+import 'package:vecindario_app/core/router/community_admin_routes.dart';
+import 'package:vecindario_app/core/router/resident_routes.dart';
+import 'package:vecindario_app/core/router/super_admin_routes.dart';
 import 'package:vecindario_app/features/auth/screens/forgot_password_screen.dart';
 import 'package:vecindario_app/features/auth/screens/join_community_screen.dart';
 import 'package:vecindario_app/features/auth/screens/login_screen.dart';
 import 'package:vecindario_app/features/auth/screens/pending_approval_screen.dart';
 import 'package:vecindario_app/features/auth/screens/phone_verification_screen.dart';
 import 'package:vecindario_app/features/auth/screens/register_screen.dart';
-import 'package:vecindario_app/features/external_services/screens/external_services_screen.dart';
-import 'package:vecindario_app/features/external_services/screens/recommend_external_service_screen.dart';
-import 'package:vecindario_app/features/feed/screens/create_post_screen.dart';
-import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
-import 'package:vecindario_app/features/feed/screens/feed_detail_screen.dart';
-import 'package:vecindario_app/features/home/screens/home_shell.dart';
-import 'package:vecindario_app/features/notifications/screens/notifications_screen.dart';
 import 'package:vecindario_app/features/onboarding/screens/onboarding_screen.dart';
-import 'package:vecindario_app/features/profile/screens/privacy_screen.dart';
-import 'package:vecindario_app/features/profile/screens/profile_screen.dart';
-import 'package:vecindario_app/features/profile/screens/edit_profile_screen.dart';
-import 'package:vecindario_app/features/services/screens/services_screen.dart';
-import 'package:vecindario_app/features/services/screens/create_service_screen.dart';
-import 'package:vecindario_app/features/services/screens/service_detail_screen.dart';
-import 'package:vecindario_app/features/stores/screens/stores_screen.dart';
-import 'package:vecindario_app/features/stores/screens/store_detail_screen.dart';
-import 'package:vecindario_app/features/stores/screens/order_tracking_screen.dart';
-import 'package:vecindario_app/features/stores/screens/my_orders_screen.dart';
-import 'package:vecindario_app/features/premium/circulars/screens/circulars_screen.dart';
-import 'package:vecindario_app/features/premium/fines/screens/fines_screen.dart';
-import 'package:vecindario_app/features/premium/amenities/screens/amenities_screen.dart';
-import 'package:vecindario_app/features/premium/amenities/screens/create_amenity_screen.dart';
-import 'package:vecindario_app/features/premium/finances/screens/create_finance_entry_screen.dart';
-import 'package:vecindario_app/features/premium/finances/screens/finances_screen.dart';
-import 'package:vecindario_app/features/premium/finances/screens/account_statement_screen.dart';
-import 'package:vecindario_app/features/premium/pqrs/screens/pqrs_screen.dart';
-import 'package:vecindario_app/features/premium/assemblies/screens/assemblies_screen.dart';
-import 'package:vecindario_app/features/premium/assemblies/screens/assembly_detail_screen.dart';
-import 'package:vecindario_app/features/premium/assemblies/screens/create_assembly_screen.dart';
-import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dart';
-import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
-import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
-import 'package:vecindario_app/features/premium/circulars/screens/create_circular_screen.dart';
-import 'package:vecindario_app/features/premium/fines/screens/create_fine_screen.dart';
-import 'package:vecindario_app/features/premium/fines/screens/fine_detail_screen.dart';
-import 'package:vecindario_app/features/premium/pqrs/screens/create_pqrs_screen.dart';
-import 'package:vecindario_app/features/premium/subscriptions/screens/subscription_plans_screen.dart';
-import 'package:vecindario_app/features/profile/screens/terms_screen.dart';
-import 'package:vecindario_app/features/profile/screens/privacy_policy_screen.dart';
-import 'package:vecindario_app/features/stores/screens/store_panel_screen.dart';
-import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
-import 'package:vecindario_app/features/super_admin/screens/community_detail_admin_screen.dart';
-import 'package:vecindario_app/features/super_admin/screens/create_community_screen.dart';
-import 'package:vecindario_app/features/super_admin/screens/super_admin_panel_screen.dart';
+import 'package:vecindario_app/shared/providers/capabilities_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
+/// Ensambla las rutas de los 3 perfiles (resident_routes, community_admin_routes,
+/// super_admin_routes) y retiene solo el guard de alto nivel: login, unirse a
+/// comunidad, aprobación pendiente, y el enrutamiento forzado por perfil. El
+/// guard fino de cada sección (ej. "/premium requiere isAdmin") vive aquí
+/// porque depende del estado global de auth/usuario que ya está siendo
+/// observado por routerProvider.
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
   final currentUser = ref.watch(currentUserProvider);
+  final hasStore = ref.watch(hasStoreProvider);
 
   return GoRouter(
     initialLocation: '/feed',
@@ -74,20 +39,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && isAuthRoute) {
         final user = currentUser.valueOrNull;
         if (user == null) return null;
-        // Super admin no necesita comunidad
-        if (user.role.toValue() == 'super_admin') return '/super-admin';
+        if (user.isSuperAdmin) return '/super-admin';
         if (user.communityId == null) return '/join-community';
         if (!user.verified) return '/pending-approval';
         return '/feed';
       }
 
-      // Guard: rutas admin solo para admins
       if (isLoggedIn) {
         final user = currentUser.valueOrNull;
         final isLoading = currentUser.isLoading;
 
-        // Redirect forzado: super_admin siempre a /super-admin (excepto /profile)
-        if (user != null && user.role.toValue() == 'super_admin') {
+        // super_admin siempre vive en /super-admin (excepto /profile)
+        if (user != null && user.isSuperAdmin) {
           final isSuperAdminArea = state.matchedLocation.startsWith(
             '/super-admin',
           );
@@ -97,9 +60,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
-        // Redirect forzado: si el user no tiene comunidad, debe unirse primero.
-        // Si la tiene pero no está verified, debe esperar aprobación.
-        if (user != null && user.role.toValue() != 'super_admin') {
+        // Todo usuario de comunidad (resident o admin) debe unirse primero,
+        // y esperar aprobación si aún no está verificado.
+        if (user != null && !user.isSuperAdmin) {
           final onJoin = state.matchedLocation == '/join-community';
           final onPending = state.matchedLocation == '/pending-approval';
           if (user.communityId == null && !onJoin) {
@@ -110,17 +73,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
-        // Guard: /admin y /premium (shell admin) solo para admin o super_admin.
-        // Las subrutas de /premium (circulares, pqrs, amenities, etc.) son
-        // accesibles a residentes — cada pantalla controla qué ven por rol.
-        final isAdminShellRoute =
-            state.matchedLocation.startsWith('/admin') ||
-            state.matchedLocation == '/premium';
-        if (isAdminShellRoute && isLoading) return null;
-        if (isAdminShellRoute &&
-            user != null &&
-            user.role.toValue() != 'admin' &&
-            user.role.toValue() != 'super_admin') {
+        // Guard: /premium (Administración del conjunto) solo para
+        // communityRole == admin o super_admin de plataforma.
+        final isCommunityAdminRoute = state.matchedLocation.startsWith(
+          '/premium',
+        );
+        if (isCommunityAdminRoute && isLoading) return null;
+        if (isCommunityAdminRoute && user != null && !user.isAdmin) {
           return '/feed';
         }
 
@@ -129,18 +88,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           '/super-admin',
         );
         if (isSuperAdminRoute && isLoading) return '/feed';
-        if (isSuperAdminRoute &&
-            user != null &&
-            user.role.toValue() != 'super_admin') {
+        if (isSuperAdminRoute && user != null && !user.isSuperAdmin) {
           return '/feed';
         }
 
-        // Guard: store-panel solo para storeOwner
+        // Guard: /store-panel solo para quien tiene al menos una tienda
+        // propia (capacidad derivada de datos, ya no un rol exclusivo).
         final isStorePanel = state.matchedLocation.startsWith('/store-panel');
-        if (isStorePanel && isLoading) return '/feed';
-        if (isStorePanel &&
-            user != null &&
-            user.role.toValue() != 'store_owner') {
+        if (isStorePanel && !hasStore) {
           return '/feed';
         }
       }
@@ -173,229 +128,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/pending-approval',
         builder: (_, __) => const PendingApprovalScreen(),
       ),
-
-      // Shell con BottomNav (4 tabs: Noticias, Vecinos, Tiendas, Servicios)
-      StatefulShellRoute.indexedStack(
-        builder: (_, __, navigationShell) =>
-            HomeShell(navigationShell: navigationShell),
-        branches: [
-          // Tab 1: Noticias
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/feed',
-                builder: (_, __) => const FeedScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'create',
-                    builder: (_, __) => const CreatePostScreen(),
-                  ),
-                  GoRoute(
-                    path: ':postId',
-                    builder: (_, state) => FeedDetailScreen(
-                      postId: state.pathParameters['postId'] ?? '',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Tab 2: Vecinos (Servicios vecinales)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/services',
-                builder: (_, __) => const ServicesScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'create',
-                    builder: (_, __) => const CreateServiceScreen(),
-                  ),
-                  GoRoute(
-                    path: ':serviceId',
-                    builder: (_, state) => ServiceDetailScreen(
-                      serviceId: state.pathParameters['serviceId'] ?? '',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Tab 3: Tiendas
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/stores',
-                builder: (_, __) => const StoresScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'orders',
-                    builder: (_, __) => const MyOrdersScreen(),
-                  ),
-                  GoRoute(
-                    path: 'order/:orderId',
-                    builder: (_, state) => OrderTrackingScreen(
-                      orderId: state.pathParameters['orderId'] ?? '',
-                    ),
-                  ),
-                  GoRoute(
-                    path: 'rate/:orderId',
-                    builder: (_, state) => RateOrderScreen(
-                      orderId: state.pathParameters['orderId'] ?? '',
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':storeId',
-                    builder: (_, state) => StoreDetailScreen(
-                      storeId: state.pathParameters['storeId'] ?? '',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Tab 4: Servicios Externos
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/external-services',
-                builder: (_, __) => const ExternalServicesScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'recommend',
-                    builder: (_, __) => const RecommendExternalServiceScreen(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-
-      // Rutas globales (fuera del shell)
-      GoRoute(
-        path: '/profile',
-        builder: (_, __) => const ProfileScreen(),
-        routes: [
-          GoRoute(path: 'edit', builder: (_, __) => const EditProfileScreen()),
-          GoRoute(path: 'privacy', builder: (_, __) => const PrivacyScreen()),
-          GoRoute(path: 'terms', builder: (_, __) => const TermsScreen()),
-          GoRoute(
-            path: 'privacy-policy',
-            builder: (_, __) => const PrivacyPolicyScreen(),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/store-panel',
-        builder: (_, __) => const StorePanelScreen(),
-      ),
-      GoRoute(
-        path: '/notifications',
-        builder: (_, __) => const NotificationsScreen(),
-      ),
-      GoRoute(
-        path: '/admin',
-        builder: (_, __) => const AdminPanelScreen(),
-        routes: [
-          GoRoute(
-            path: 'pending',
-            builder: (_, __) => const PendingApprovalsScreen(),
-          ),
-          GoRoute(
-            path: 'settings',
-            builder: (_, __) => const CommunitySettingsScreen(),
-          ),
-        ],
-      ),
-
-      // Rutas Premium (Vecindario Admin)
-      GoRoute(path: '/premium', builder: (_, __) => const AdminShell()),
-      GoRoute(
-        path: '/premium/dashboard',
-        builder: (_, __) => const PremiumDashboardScreen(),
-      ),
-      GoRoute(
-        path: '/premium/circulars',
-        builder: (_, __) => const CircularsScreen(),
-      ),
-      GoRoute(
-        path: '/premium/circulars/create',
-        builder: (_, __) => const CreateCircularScreen(),
-      ),
-      GoRoute(path: '/premium/fines', builder: (_, __) => const FinesScreen()),
-      GoRoute(
-        path: '/premium/fines/create',
-        builder: (_, __) => const CreateFineScreen(),
-      ),
-      GoRoute(
-        path: '/premium/fines/:fineId',
-        builder: (_, state) =>
-            FineDetailScreen(fineId: state.pathParameters['fineId'] ?? ''),
-      ),
-      GoRoute(path: '/premium/pqrs', builder: (_, __) => const PqrsScreen()),
-      GoRoute(
-        path: '/premium/pqrs/create',
-        builder: (_, __) => const CreatePqrsScreen(),
-      ),
-      GoRoute(
-        path: '/premium/amenities',
-        builder: (_, __) => const AmenitiesScreen(),
-      ),
-      GoRoute(
-        path: '/premium/amenities/create',
-        builder: (_, __) => const CreateAmenityScreen(),
-      ),
-      GoRoute(
-        path: '/premium/finances',
-        builder: (_, __) => const FinancesScreen(),
-      ),
-      GoRoute(
-        path: '/premium/finances/create',
-        builder: (_, __) => const CreateFinanceEntryScreen(),
-      ),
-      GoRoute(
-        path: '/premium/account-statement',
-        builder: (_, __) => const AccountStatementScreen(),
-      ),
-      GoRoute(
-        path: '/premium/manual',
-        builder: (_, __) => const ManualScreen(),
-      ),
-      GoRoute(
-        path: '/premium/assemblies',
-        builder: (_, __) => const AssembliesScreen(),
-      ),
-      GoRoute(
-        path: '/premium/assemblies/create',
-        builder: (_, __) => const CreateAssemblyScreen(),
-      ),
-      GoRoute(
-        path: '/premium/assemblies/:assemblyId',
-        builder: (_, state) => AssemblyDetailScreen(
-          assemblyId: state.pathParameters['assemblyId'] ?? '',
-        ),
-      ),
-      GoRoute(
-        path: '/premium/plans',
-        builder: (_, __) => const SubscriptionPlansScreen(),
-      ),
-      GoRoute(
-        path: '/super-admin',
-        builder: (_, __) => const SuperAdminPanelScreen(),
-        routes: [
-          GoRoute(
-            path: 'create-community',
-            builder: (_, __) => const CreateCommunityScreen(),
-          ),
-          GoRoute(
-            path: 'community/:communityId',
-            builder: (_, state) => CommunityDetailAdminScreen(
-              communityId: state.pathParameters['communityId'] ?? '',
-            ),
-          ),
-        ],
-      ),
+      ...residentRoutes,
+      ...communityAdminRoutes,
+      ...superAdminRoutes,
     ],
   );
 });
