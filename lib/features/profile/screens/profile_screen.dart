@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/core/theme/theme_mode_provider.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/features/profile/providers/profile_stats_provider.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
@@ -170,6 +171,21 @@ class ProfileScreen extends ConsumerWidget {
                     subtitle: 'Datos, derechos y eliminación de cuenta',
                     onTap: () => context.push('/profile/privacy'),
                   ),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final themeMode = ref.watch(themeModeProvider);
+                      return _SettingsTile(
+                        icon: Icons.brightness_6_outlined,
+                        title: 'Apariencia',
+                        subtitle: switch (themeMode) {
+                          ThemeMode.light => 'Claro',
+                          ThemeMode.dark => 'Oscuro',
+                          ThemeMode.system => 'Automático (sistema)',
+                        },
+                        onTap: () => _showThemeModeDialog(context, ref),
+                      );
+                    },
+                  ),
                 ],
               ),
 
@@ -224,6 +240,38 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showThemeModeDialog(BuildContext context, WidgetRef ref) {
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      final current = ref.read(themeModeProvider);
+      return AlertDialog(
+        title: const Text('Apariencia'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ThemeMode.values.map((mode) {
+            final label = switch (mode) {
+              ThemeMode.light => 'Claro',
+              ThemeMode.dark => 'Oscuro',
+              ThemeMode.system => 'Automático (sistema)',
+            };
+            return RadioListTile<ThemeMode>(
+              title: Text(label),
+              value: mode,
+              groupValue: current,
+              onChanged: (value) {
+                if (value == null) return;
+                ref.read(themeModeProvider.notifier).setThemeMode(value);
+                Navigator.of(dialogContext).pop();
+              },
+            );
+          }).toList(),
+        ),
+      );
+    },
+  );
 }
 
 class _StatsRow extends StatelessWidget {

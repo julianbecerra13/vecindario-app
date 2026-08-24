@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/router/app_router.dart';
 import 'package:vecindario_app/core/theme/app_theme.dart';
+import 'package:vecindario_app/core/theme/theme_mode_provider.dart';
 import 'package:vecindario_app/l10n/app_localizations.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/features/notifications/providers/notification_providers.dart';
@@ -13,6 +14,7 @@ class VecindarioApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     // Inicializar FCM cuando el usuario se autentica
     ref.listen(currentUserProvider, (previous, next) {
@@ -25,9 +27,9 @@ class VecindarioApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Vecindario',
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: const [

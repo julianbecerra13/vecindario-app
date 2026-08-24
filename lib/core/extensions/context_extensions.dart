@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
+import 'package:vecindario_app/core/theme/app_semantic_colors.dart';
 
 extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
   TextTheme get textTheme => Theme.of(this).textTheme;
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
+
+  /// Tokens de color que cambian entre modo claro y oscuro (fondos,
+  /// superficies, texto, bordes). Úsalo en vez de las constantes dark-only
+  /// de `AppColors.background/surface/textPrimary/...`.
+  AppSemanticColors get colors =>
+      Theme.of(this).extension<AppSemanticColors>() ?? AppSemanticColors.dark;
   MediaQueryData get mediaQuery => MediaQuery.of(this);
   double get screenWidth => MediaQuery.of(this).size.width;
   double get screenHeight => MediaQuery.of(this).size.height;
