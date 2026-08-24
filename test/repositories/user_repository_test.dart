@@ -60,8 +60,7 @@ void main() {
     test('requestAccountDeletion crea solicitud', () async {
       await repo.requestAccountDeletion('uid3');
 
-      final snap =
-          await fakeFirestore.collection('deletion_requests').get();
+      final snap = await fakeFirestore.collection('deletion_requests').get();
       expect(snap.docs.length, 1);
       expect(snap.docs.first.data()['uid'], 'uid3');
       expect(snap.docs.first.data()['status'], 'pending');
@@ -70,8 +69,7 @@ void main() {
     test('requestDataExport crea solicitud', () async {
       await repo.requestDataExport('uid4');
 
-      final snap =
-          await fakeFirestore.collection('data_export_requests').get();
+      final snap = await fakeFirestore.collection('data_export_requests').get();
       expect(snap.docs.length, 1);
       expect(snap.docs.first.data()['uid'], 'uid4');
       expect(snap.docs.first.data()['status'], 'pending');
@@ -98,32 +96,33 @@ void main() {
       expect(consents['analytics'], false);
     });
 
-    test('watchPendingResidents filtra por comunidad y no verificados',
-        () async {
-      // Crear 2 usuarios: uno verificado y uno no
-      await fakeFirestore.collection('users').doc('u1').set({
-        'displayName': 'Verificado',
-        'email': 'v@t.com',
-        'phone': '',
-        'communityId': 'comm1',
-        'verified': true,
-        'role': 'resident',
-        'createdAt': DateTime.now(),
-      });
-      await fakeFirestore.collection('users').doc('u2').set({
-        'displayName': 'Pendiente',
-        'email': 'p@t.com',
-        'phone': '',
-        'communityId': 'comm1',
-        'verified': false,
-        'role': 'resident',
-        'createdAt': DateTime.now(),
-      });
+    test(
+      'watchPendingResidents filtra por comunidad y no verificados',
+      () async {
+        // Crear 2 usuarios: uno verificado y uno no
+        await fakeFirestore.collection('users').doc('u1').set({
+          'displayName': 'Verificado',
+          'email': 'v@t.com',
+          'phone': '',
+          'communityId': 'comm1',
+          'verified': true,
+          'role': 'resident',
+          'createdAt': DateTime.now(),
+        });
+        await fakeFirestore.collection('users').doc('u2').set({
+          'displayName': 'Pendiente',
+          'email': 'p@t.com',
+          'phone': '',
+          'communityId': 'comm1',
+          'verified': false,
+          'role': 'resident',
+          'createdAt': DateTime.now(),
+        });
 
-      final pending =
-          await repo.watchPendingResidents('comm1').first;
-      expect(pending.length, 1);
-      expect(pending.first.displayName, 'Pendiente');
-    });
+        final pending = await repo.watchPendingResidents('comm1').first;
+        expect(pending.length, 1);
+        expect(pending.first.displayName, 'Pendiente');
+      },
+    );
   });
 }

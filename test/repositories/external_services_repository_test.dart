@@ -83,7 +83,9 @@ void main() {
         });
 
         // Act
-        final stream = repository.watchExternalServices(category: ExternalCategory.electricista);
+        final stream = repository.watchExternalServices(
+          category: ExternalCategory.electricista,
+        );
         final result = await stream.first;
 
         // Assert
@@ -166,7 +168,9 @@ void main() {
         await repository.recommendService(service);
 
         // Assert
-        final docs = await firestore.collection(FirestorePaths.externalServices).get();
+        final docs = await firestore
+            .collection(FirestorePaths.externalServices)
+            .get();
         expect(docs.docs.length, 1);
         expect(docs.docs.first['name'], 'Nuevo Electricista');
         expect(docs.docs.first['recommendedByUid'], 'user-1');
@@ -221,7 +225,9 @@ void main() {
           'authorName': 'User 1',
           'rating': 5.0,
           'comment': 'Primera review',
-          'createdAt': Timestamp.fromDate(now.subtract(const Duration(days: 1))),
+          'createdAt': Timestamp.fromDate(
+            now.subtract(const Duration(days: 1)),
+          ),
         });
 
         await firestore.collection(FirestorePaths.reviews).add({

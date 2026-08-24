@@ -81,10 +81,9 @@ void main() {
         'createdAt': DateTime(2026, 4, 2),
       });
 
-      final services = await repo.watchServices(
-        'comm1',
-        category: ServiceCategory.comida,
-      ).first;
+      final services = await repo
+          .watchServices('comm1', category: ServiceCategory.comida)
+          .first;
 
       expect(services.length, 1);
       expect(services.first.title, 'Comidas');

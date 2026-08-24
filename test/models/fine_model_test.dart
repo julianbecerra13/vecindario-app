@@ -44,13 +44,13 @@ void main() {
 
     test('canDefend es true solo en estados notified o defense', () {
       FineModel makeFine(FineStatus status) => FineModel(
-            id: '1',
-            unitNumber: 'T1-101',
-            amount: 100000,
-            reason: 'Test',
-            status: status,
-            createdAt: DateTime.now(),
-          );
+        id: '1',
+        unitNumber: 'T1-101',
+        amount: 100000,
+        reason: 'Test',
+        status: status,
+        createdAt: DateTime.now(),
+      );
 
       expect(makeFine(FineStatus.notified).canDefend, true);
       expect(makeFine(FineStatus.defense).canDefend, true);
@@ -61,13 +61,13 @@ void main() {
 
     test('canPay es true solo cuando está confirmada', () {
       FineModel makeFine(FineStatus status) => FineModel(
-            id: '1',
-            unitNumber: 'T1-101',
-            amount: 100000,
-            reason: 'Test',
-            status: status,
-            createdAt: DateTime.now(),
-          );
+        id: '1',
+        unitNumber: 'T1-101',
+        amount: 100000,
+        reason: 'Test',
+        status: status,
+        createdAt: DateTime.now(),
+      );
 
       expect(makeFine(FineStatus.confirmed).canPay, true);
       expect(makeFine(FineStatus.notified).canPay, false);

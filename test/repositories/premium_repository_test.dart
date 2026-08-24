@@ -16,34 +16,43 @@ void main() {
 
   group('PremiumRepository', () {
     group('Circulars', () {
-      test('watchCirculars retorna lista ordenada por createdAt descendente', () async {
-        // Arrange
-        const communityId = 'comm-1';
-        final now = DateTime.now();
+      test(
+        'watchCirculars retorna lista ordenada por createdAt descendente',
+        () async {
+          // Arrange
+          const communityId = 'comm-1';
+          final now = DateTime.now();
 
-        await firestore.collection(FirestorePaths.circulars(communityId)).add({
-          'title': 'Circular 1',
-          'body': 'Body 1',
-          'priority': 'informative',
-          'createdAt': Timestamp.fromDate(now.subtract(const Duration(days: 1))),
-        });
+          await firestore
+              .collection(FirestorePaths.circulars(communityId))
+              .add({
+                'title': 'Circular 1',
+                'body': 'Body 1',
+                'priority': 'informative',
+                'createdAt': Timestamp.fromDate(
+                  now.subtract(const Duration(days: 1)),
+                ),
+              });
 
-        await firestore.collection(FirestorePaths.circulars(communityId)).add({
-          'title': 'Circular 2',
-          'body': 'Body 2',
-          'priority': 'urgent',
-          'createdAt': Timestamp.fromDate(now),
-        });
+          await firestore
+              .collection(FirestorePaths.circulars(communityId))
+              .add({
+                'title': 'Circular 2',
+                'body': 'Body 2',
+                'priority': 'urgent',
+                'createdAt': Timestamp.fromDate(now),
+              });
 
-        // Act
-        final stream = repository.watchCirculars(communityId);
-        final result = await stream.first;
+          // Act
+          final stream = repository.watchCirculars(communityId);
+          final result = await stream.first;
 
-        // Assert
-        expect(result.length, 2);
-        expect(result[0].title, 'Circular 2'); // Más reciente primero
-        expect(result[1].title, 'Circular 1');
-      });
+          // Assert
+          expect(result.length, 2);
+          expect(result[0].title, 'Circular 2'); // Más reciente primero
+          expect(result[1].title, 'Circular 1');
+        },
+      );
 
       test('createCircular agrega documento a circulars', () async {
         // Arrange
@@ -64,7 +73,9 @@ void main() {
         await repository.createCircular(communityId, circular);
 
         // Assert
-        final docs = await firestore.collection(FirestorePaths.circulars(communityId)).get();
+        final docs = await firestore
+            .collection(FirestorePaths.circulars(communityId))
+            .get();
         expect(docs.docs.length, 1);
         expect(docs.docs.first['title'], 'Test Circular');
       });
@@ -75,20 +86,26 @@ void main() {
         const circularId = 'circ-1';
         const uid = 'user-1';
 
-        await firestore.collection(FirestorePaths.circulars(communityId)).doc(circularId).set({
-          'title': 'Test',
-          'body': 'Body',
-          'priority': 'informative',
-          'readBy': [],
-          'ackBy': [],
-          'createdAt': Timestamp.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.circulars(communityId))
+            .doc(circularId)
+            .set({
+              'title': 'Test',
+              'body': 'Body',
+              'priority': 'informative',
+              'readBy': [],
+              'ackBy': [],
+              'createdAt': Timestamp.now(),
+            });
 
         // Act
         await repository.markCircularAsRead(communityId, circularId, uid);
 
         // Assert
-        final doc = await firestore.collection(FirestorePaths.circulars(communityId)).doc(circularId).get();
+        final doc = await firestore
+            .collection(FirestorePaths.circulars(communityId))
+            .doc(circularId)
+            .get();
         final readBy = doc['readBy'] as List;
         expect(readBy.length, 1);
         expect(readBy[0]['uid'], uid);
@@ -96,38 +113,43 @@ void main() {
     });
 
     group('Fines', () {
-      test('watchFines retorna lista ordenada por createdAt descendente', () async {
-        // Arrange
-        const communityId = 'comm-1';
-        final now = DateTime.now();
+      test(
+        'watchFines retorna lista ordenada por createdAt descendente',
+        () async {
+          // Arrange
+          const communityId = 'comm-1';
+          final now = DateTime.now();
 
-        await firestore.collection(FirestorePaths.fines(communityId)).add({
-          'unitNumber': '101',
-          'residentUid': 'user-1',
-          'amount': 150000,
-          'reason': 'Ruido',
-          'status': 'pending',
-          'createdAt': Timestamp.fromDate(now.subtract(const Duration(days: 1))),
-        });
+          await firestore.collection(FirestorePaths.fines(communityId)).add({
+            'unitNumber': '101',
+            'residentUid': 'user-1',
+            'amount': 150000,
+            'reason': 'Ruido',
+            'status': 'pending',
+            'createdAt': Timestamp.fromDate(
+              now.subtract(const Duration(days: 1)),
+            ),
+          });
 
-        await firestore.collection(FirestorePaths.fines(communityId)).add({
-          'unitNumber': '102',
-          'residentUid': 'user-2',
-          'amount': 200000,
-          'reason': 'Basura',
-          'status': 'pending',
-          'createdAt': Timestamp.fromDate(now),
-        });
+          await firestore.collection(FirestorePaths.fines(communityId)).add({
+            'unitNumber': '102',
+            'residentUid': 'user-2',
+            'amount': 200000,
+            'reason': 'Basura',
+            'status': 'pending',
+            'createdAt': Timestamp.fromDate(now),
+          });
 
-        // Act
-        final stream = repository.watchFines(communityId);
-        final result = await stream.first;
+          // Act
+          final stream = repository.watchFines(communityId);
+          final result = await stream.first;
 
-        // Assert
-        expect(result.length, 2);
-        expect(result[0].unitNumber, '102'); // Más reciente primero
-        expect(result[1].unitNumber, '101');
-      });
+          // Assert
+          expect(result.length, 2);
+          expect(result[0].unitNumber, '102'); // Más reciente primero
+          expect(result[1].unitNumber, '101');
+        },
+      );
 
       test('watchMyFines filtra solo multas del residente', () async {
         // Arrange
@@ -163,35 +185,38 @@ void main() {
     });
 
     group('PQRS', () {
-      test('watchAllPqrs retorna todas las PQRS ordenadas por createdAt', () async {
-        // Arrange
-        const communityId = 'comm-1';
+      test(
+        'watchAllPqrs retorna todas las PQRS ordenadas por createdAt',
+        () async {
+          // Arrange
+          const communityId = 'comm-1';
 
-        await firestore.collection(FirestorePaths.pqrs(communityId)).add({
-          'title': 'PQRS 1',
-          'description': 'Desc 1',
-          'category': 'mantenimiento',
-          'residentUid': 'user-1',
-          'status': 'received',
-          'createdAt': Timestamp.now(),
-        });
+          await firestore.collection(FirestorePaths.pqrs(communityId)).add({
+            'title': 'PQRS 1',
+            'description': 'Desc 1',
+            'category': 'mantenimiento',
+            'residentUid': 'user-1',
+            'status': 'received',
+            'createdAt': Timestamp.now(),
+          });
 
-        await firestore.collection(FirestorePaths.pqrs(communityId)).add({
-          'title': 'PQRS 2',
-          'description': 'Desc 2',
-          'category': 'seguridad',
-          'residentUid': 'user-2',
-          'status': 'inProgress',
-          'createdAt': Timestamp.now(),
-        });
+          await firestore.collection(FirestorePaths.pqrs(communityId)).add({
+            'title': 'PQRS 2',
+            'description': 'Desc 2',
+            'category': 'seguridad',
+            'residentUid': 'user-2',
+            'status': 'inProgress',
+            'createdAt': Timestamp.now(),
+          });
 
-        // Act
-        final stream = repository.watchAllPqrs(communityId);
-        final result = await stream.first;
+          // Act
+          final stream = repository.watchAllPqrs(communityId);
+          final result = await stream.first;
 
-        // Assert
-        expect(result.length, 2);
-      });
+          // Assert
+          expect(result.length, 2);
+        },
+      );
 
       test('watchMyPqrs filtra solo PQRS del residente', () async {
         // Arrange

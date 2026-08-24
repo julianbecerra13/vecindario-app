@@ -53,25 +53,32 @@ void main() {
       expect(docs.docs.first['inviteCode'], 'ABC123');
     });
 
-    test('countVerifiedUsers cuenta solo residentes verificados del conjunto', () async {
-      const communityId = 'comm-1';
-      await firestore.collection(FirestorePaths.users).add(
-        {'communityId': communityId, 'verified': true},
-      );
-      await firestore.collection(FirestorePaths.users).add(
-        {'communityId': communityId, 'verified': true},
-      );
-      await firestore.collection(FirestorePaths.users).add(
-        {'communityId': communityId, 'verified': false},
-      );
-      await firestore.collection(FirestorePaths.users).add(
-        {'communityId': 'otra', 'verified': true},
-      );
+    test(
+      'countVerifiedUsers cuenta solo residentes verificados del conjunto',
+      () async {
+        const communityId = 'comm-1';
+        await firestore.collection(FirestorePaths.users).add({
+          'communityId': communityId,
+          'verified': true,
+        });
+        await firestore.collection(FirestorePaths.users).add({
+          'communityId': communityId,
+          'verified': true,
+        });
+        await firestore.collection(FirestorePaths.users).add({
+          'communityId': communityId,
+          'verified': false,
+        });
+        await firestore.collection(FirestorePaths.users).add({
+          'communityId': 'otra',
+          'verified': true,
+        });
 
-      final count = await repository.countVerifiedUsers(communityId);
+        final count = await repository.countVerifiedUsers(communityId);
 
-      expect(count, 2);
-    });
+        expect(count, 2);
+      },
+    );
 
     test('assignAdmin actualiza el conjunto y el rol del usuario', () async {
       const communityId = 'comm-1';
@@ -79,18 +86,26 @@ void main() {
       await firestore
           .collection(FirestorePaths.communities)
           .doc(communityId)
-          .set({'name': 'Comunidad', 'adminUid': '', 'createdAt': Timestamp.now()});
-      await firestore
-          .collection(FirestorePaths.users)
-          .doc(uid)
-          .set({'communityRole': 'resident', 'verified': false});
+          .set({
+            'name': 'Comunidad',
+            'adminUid': '',
+            'createdAt': Timestamp.now(),
+          });
+      await firestore.collection(FirestorePaths.users).doc(uid).set({
+        'communityRole': 'resident',
+        'verified': false,
+      });
 
       await repository.assignAdmin(communityId: communityId, uid: uid);
 
-      final community =
-          await firestore.collection(FirestorePaths.communities).doc(communityId).get();
-      final user =
-          await firestore.collection(FirestorePaths.users).doc(uid).get();
+      final community = await firestore
+          .collection(FirestorePaths.communities)
+          .doc(communityId)
+          .get();
+      final user = await firestore
+          .collection(FirestorePaths.users)
+          .doc(uid)
+          .get();
       expect(community['adminUid'], uid);
       expect(user['communityRole'], 'admin');
       expect(user['communityId'], communityId);
@@ -130,8 +145,10 @@ void main() {
 
       await repository.deleteCommunity(communityId);
 
-      final community =
-          await firestore.collection(FirestorePaths.communities).doc(communityId).get();
+      final community = await firestore
+          .collection(FirestorePaths.communities)
+          .doc(communityId)
+          .get();
       final sub = await firestore
           .collection(FirestorePaths.subscriptions)
           .doc(communityId)

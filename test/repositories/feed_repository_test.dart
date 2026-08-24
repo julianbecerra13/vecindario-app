@@ -15,10 +15,7 @@ void main() {
 
   group('FeedRepository', () {
     test('watchPosts devuelve posts de la comunidad', () async {
-      await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .set({
+      await fakeFirestore.collection('communities/comm1/posts').doc('p1').set({
         'authorUid': 'u1',
         'authorName': 'Juan',
         'text': 'Post 1',
@@ -30,10 +27,7 @@ void main() {
         'type': 'news',
       });
 
-      await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p2')
-          .set({
+      await fakeFirestore.collection('communities/comm1/posts').doc('p2').set({
         'authorUid': 'u2',
         'authorName': 'María',
         'text': 'Post 2',
@@ -76,10 +70,7 @@ void main() {
     });
 
     test('toggleLike con isLiked=false incrementa likes y añade uid', () async {
-      await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .set({
+      await fakeFirestore.collection('communities/comm1/posts').doc('p1').set({
         'authorUid': 'u1',
         'authorName': 'Juan',
         'text': 'Post',
@@ -101,69 +92,73 @@ void main() {
       expect(doc['likedBy'], contains('u2'));
     });
 
-    test('toggleLike con isLiked=true decrementa likes y remueve uid', () async {
-      await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .set({
-        'authorUid': 'u1',
-        'authorName': 'Juan',
-        'text': 'Post',
-        'pinned': false,
-        'likes': 1,
-        'likedBy': ['u2'],
-        'commentCount': 0,
-        'createdAt': DateTime.now(),
-        'type': 'news',
-      });
+    test(
+      'toggleLike con isLiked=true decrementa likes y remueve uid',
+      () async {
+        await fakeFirestore.collection('communities/comm1/posts').doc('p1').set(
+          {
+            'authorUid': 'u1',
+            'authorName': 'Juan',
+            'text': 'Post',
+            'pinned': false,
+            'likes': 1,
+            'likedBy': ['u2'],
+            'commentCount': 0,
+            'createdAt': DateTime.now(),
+            'type': 'news',
+          },
+        );
 
-      await repo.toggleLike('comm1', 'p1', 'u2', true);
+        await repo.toggleLike('comm1', 'p1', 'u2', true);
 
-      final doc = await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .get();
-      expect(doc['likes'], 0);
-      expect(doc['likedBy'], isNot(contains('u2')));
-    });
+        final doc = await fakeFirestore
+            .collection('communities/comm1/posts')
+            .doc('p1')
+            .get();
+        expect(doc['likes'], 0);
+        expect(doc['likedBy'], isNot(contains('u2')));
+      },
+    );
 
-    test('addComment incrementa commentCount y crea doc en sub-colección',
-        () async {
-      await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .set({
-        'authorUid': 'u1',
-        'authorName': 'Juan',
-        'text': 'Post',
-        'pinned': false,
-        'likes': 0,
-        'likedBy': [],
-        'commentCount': 0,
-        'createdAt': DateTime.now(),
-        'type': 'news',
-      });
+    test(
+      'addComment incrementa commentCount y crea doc en sub-colección',
+      () async {
+        await fakeFirestore
+            .collection('communities/comm1/posts')
+            .doc('p1')
+            .set({
+              'authorUid': 'u1',
+              'authorName': 'Juan',
+              'text': 'Post',
+              'pinned': false,
+              'likes': 0,
+              'likedBy': [],
+              'commentCount': 0,
+              'createdAt': DateTime.now(),
+              'type': 'news',
+            });
 
-      final comment = CommentModel(
-        id: 'c1',
-        authorUid: 'u2',
-        authorName: 'María',
-        text: 'Comentario',
-        createdAt: DateTime.now(),
-      );
+        final comment = CommentModel(
+          id: 'c1',
+          authorUid: 'u2',
+          authorName: 'María',
+          text: 'Comentario',
+          createdAt: DateTime.now(),
+        );
 
-      await repo.addComment('comm1', 'p1', comment);
+        await repo.addComment('comm1', 'p1', comment);
 
-      final post = await fakeFirestore
-          .collection('communities/comm1/posts')
-          .doc('p1')
-          .get();
-      expect(post['commentCount'], 1);
+        final post = await fakeFirestore
+            .collection('communities/comm1/posts')
+            .doc('p1')
+            .get();
+        expect(post['commentCount'], 1);
 
-      final comments = await fakeFirestore
-          .collection('communities/comm1/posts/p1/comments')
-          .get();
-      expect(comments.docs.length, 1);
-    });
+        final comments = await fakeFirestore
+            .collection('communities/comm1/posts/p1/comments')
+            .get();
+        expect(comments.docs.length, 1);
+      },
+    );
   });
 }

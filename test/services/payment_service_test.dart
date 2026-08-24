@@ -19,11 +19,17 @@ void main() {
 
     test('usa el value del enum como prefijo', () {
       expect(
-        PaymentService.generateReference(PaymentType.fine, 'x').startsWith('fine_'),
+        PaymentService.generateReference(
+          PaymentType.fine,
+          'x',
+        ).startsWith('fine_'),
         isTrue,
       );
       expect(
-        PaymentService.generateReference(PaymentType.order, 'x').startsWith('order_'),
+        PaymentService.generateReference(
+          PaymentType.order,
+          'x',
+        ).startsWith('order_'),
         isTrue,
       );
     });

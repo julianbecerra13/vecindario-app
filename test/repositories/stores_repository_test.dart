@@ -56,10 +56,7 @@ void main() {
       final orderId = await repo.createOrder(order);
       expect(orderId, isNotEmpty);
 
-      final doc = await fakeFirestore
-          .collection('orders')
-          .doc(orderId)
-          .get();
+      final doc = await fakeFirestore.collection('orders').doc(orderId).get();
       expect(doc.exists, true);
       expect(doc['buyerUid'], 'u1');
     });
@@ -103,10 +100,7 @@ void main() {
 
       await repo.updateOrderStatus('o1', OrderStatus.confirmed);
 
-      final doc = await fakeFirestore
-          .collection('orders')
-          .doc('o1')
-          .get();
+      final doc = await fakeFirestore.collection('orders').doc('o1').get();
       expect(doc['status'], 'confirmed');
       expect(doc['confirmedAt'], isNotNull);
     });

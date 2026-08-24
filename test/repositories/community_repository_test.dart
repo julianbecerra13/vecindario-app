@@ -18,17 +18,20 @@ void main() {
       test('retorna CommunityModel correcto', () async {
         // Arrange
         const communityId = 'community-1';
-        await firestore.collection(FirestorePaths.communities).doc(communityId).set({
-          'name': 'Edificio Los Andes',
-          'address': 'Cra 5 #10-20',
-          'city': 'Bogotá',
-          'estrato': 4,
-          'adminUid': 'admin-1',
-          'inviteCode': 'ABC123',
-          'memberCount': 15,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .set({
+              'name': 'Edificio Los Andes',
+              'address': 'Cra 5 #10-20',
+              'city': 'Bogotá',
+              'estrato': 4,
+              'adminUid': 'admin-1',
+              'inviteCode': 'ABC123',
+              'memberCount': 15,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act
         final community = await repository.getCommunity(communityId);
@@ -53,17 +56,20 @@ void main() {
       test('emite cambios en stream', () async {
         // Arrange
         const communityId = 'community-1';
-        await firestore.collection(FirestorePaths.communities).doc(communityId).set({
-          'name': 'Inicial',
-          'address': 'Cra 5 #10-20',
-          'city': 'Bogotá',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': 'ABC123',
-          'memberCount': 15,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .set({
+              'name': 'Inicial',
+              'address': 'Cra 5 #10-20',
+              'city': 'Bogotá',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': 'ABC123',
+              'memberCount': 15,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act & Assert
         final stream = repository.watchCommunity(communityId);
@@ -78,9 +84,10 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 100));
 
         // Actualizar documento
-        await firestore.collection(FirestorePaths.communities).doc(communityId).update({
-          'name': 'Actualizado',
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .update({'name': 'Actualizado'});
 
         await Future.delayed(const Duration(milliseconds: 100));
 
@@ -98,17 +105,20 @@ void main() {
       test('encuentra comunidad por código invitación', () async {
         // Arrange
         const inviteCode = 'TEST99';
-        await firestore.collection(FirestorePaths.communities).doc('comm-1').set({
-          'name': 'Test Community',
-          'address': 'Test Address',
-          'city': 'Test City',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': inviteCode,
-          'memberCount': 5,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc('comm-1')
+            .set({
+              'name': 'Test Community',
+              'address': 'Test Address',
+              'city': 'Test City',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': inviteCode,
+              'memberCount': 5,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act
         final community = await repository.getCommunityByInviteCode(inviteCode);
@@ -129,17 +139,20 @@ void main() {
 
       test('insensible a mayúsculas/minúsculas en código', () async {
         // Arrange
-        await firestore.collection(FirestorePaths.communities).doc('comm-1').set({
-          'name': 'Test Community',
-          'address': 'Test Address',
-          'city': 'Test City',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': 'UPPER',
-          'memberCount': 5,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc('comm-1')
+            .set({
+              'name': 'Test Community',
+              'address': 'Test Address',
+              'city': 'Test City',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': 'UPPER',
+              'memberCount': 5,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act - buscar con minúsculas
         final community = await repository.getCommunityByInviteCode('upper');
@@ -151,80 +164,98 @@ void main() {
     });
 
     group('joinCommunity', () {
-      test('actualiza usuario con communityId, tower, apartment, verified=false', () async {
-        // Arrange
-        const uid = 'user-1';
-        const communityId = 'comm-1';
-        await firestore.collection(FirestorePaths.users).doc(uid).set({
-          'displayName': 'John Doe',
-          'email': 'john@example.com',
-          'role': 'resident',
-          'verified': true, // cambiar a false después
-        });
+      test(
+        'actualiza usuario con communityId, tower, apartment, verified=false',
+        () async {
+          // Arrange
+          const uid = 'user-1';
+          const communityId = 'comm-1';
+          await firestore.collection(FirestorePaths.users).doc(uid).set({
+            'displayName': 'John Doe',
+            'email': 'john@example.com',
+            'role': 'resident',
+            'verified': true, // cambiar a false después
+          });
 
-        // Act
-        await repository.joinCommunity(
-          communityId: communityId,
-          uid: uid,
-          tower: 'A',
-          apartment: '301',
-        );
+          // Act
+          await repository.joinCommunity(
+            communityId: communityId,
+            uid: uid,
+            tower: 'A',
+            apartment: '301',
+          );
 
-        // Assert
-        final user = await firestore.collection(FirestorePaths.users).doc(uid).get();
-        final data = user.data();
-        expect(data!['communityId'], communityId);
-        expect(data['tower'], 'A');
-        expect(data['apartment'], '301');
-        expect(data['verified'], false);
-      });
+          // Assert
+          final user = await firestore
+              .collection(FirestorePaths.users)
+              .doc(uid)
+              .get();
+          final data = user.data();
+          expect(data!['communityId'], communityId);
+          expect(data['tower'], 'A');
+          expect(data['apartment'], '301');
+          expect(data['verified'], false);
+        },
+      );
     });
 
     group('regenerateInviteCode', () {
       test('genera código de 6 caracteres alfanuméricos uppercase', () async {
         // Arrange
         const communityId = 'comm-1';
-        await firestore.collection(FirestorePaths.communities).doc(communityId).set({
-          'name': 'Test Community',
-          'address': 'Test Address',
-          'city': 'Test City',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': 'OLD999',
-          'memberCount': 5,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .set({
+              'name': 'Test Community',
+              'address': 'Test Address',
+              'city': 'Test City',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': 'OLD999',
+              'memberCount': 5,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act
         const newCode = 'NEW123';
         await repository.regenerateInviteCode(communityId, newCode);
 
         // Assert
-        final community = await firestore.collection(FirestorePaths.communities).doc(communityId).get();
+        final community = await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .get();
         expect(community.data()!['inviteCode'], 'NEW123');
       });
 
       test('convierte a uppercase si se pasa en minúsculas', () async {
         // Arrange
         const communityId = 'comm-1';
-        await firestore.collection(FirestorePaths.communities).doc(communityId).set({
-          'name': 'Test Community',
-          'address': 'Test Address',
-          'city': 'Test City',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': 'OLD999',
-          'memberCount': 5,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .set({
+              'name': 'Test Community',
+              'address': 'Test Address',
+              'city': 'Test City',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': 'OLD999',
+              'memberCount': 5,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act
         await repository.regenerateInviteCode(communityId, 'lowercase');
 
         // Assert
-        final community = await firestore.collection(FirestorePaths.communities).doc(communityId).get();
+        final community = await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .get();
         expect(community.data()!['inviteCode'], 'LOWERCASE');
       });
     });
@@ -233,17 +264,20 @@ void main() {
       test('actualiza campos específicos de comunidad', () async {
         // Arrange
         const communityId = 'comm-1';
-        await firestore.collection(FirestorePaths.communities).doc(communityId).set({
-          'name': 'Original Name',
-          'address': 'Test Address',
-          'city': 'Test City',
-          'estrato': 3,
-          'adminUid': 'admin-1',
-          'inviteCode': 'CODE123',
-          'memberCount': 5,
-          'unitType': 'apartment',
-          'createdAt': DateTime.now(),
-        });
+        await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .set({
+              'name': 'Original Name',
+              'address': 'Test Address',
+              'city': 'Test City',
+              'estrato': 3,
+              'adminUid': 'admin-1',
+              'inviteCode': 'CODE123',
+              'memberCount': 5,
+              'unitType': 'apartment',
+              'createdAt': DateTime.now(),
+            });
 
         // Act
         await repository.updateCommunity(communityId, {
@@ -252,7 +286,10 @@ void main() {
         });
 
         // Assert
-        final community = await firestore.collection(FirestorePaths.communities).doc(communityId).get();
+        final community = await firestore
+            .collection(FirestorePaths.communities)
+            .doc(communityId)
+            .get();
         final data = community.data();
         expect(data!['name'], 'Updated Name');
         expect(data['memberCount'], 10);

@@ -50,8 +50,16 @@ void main() {
         'commentCount': 0,
         'createdAt': Timestamp.fromDate(DateTime(2026, 4, 1)),
         'pollOptions': [
-          {'text': 'Sí', 'votes': 10, 'voterUids': ['a', 'b']},
-          {'text': 'No', 'votes': 3, 'voterUids': ['c']},
+          {
+            'text': 'Sí',
+            'votes': 10,
+            'voterUids': ['a', 'b'],
+          },
+          {
+            'text': 'No',
+            'votes': 3,
+            'voterUids': ['c'],
+          },
         ],
       };
 
