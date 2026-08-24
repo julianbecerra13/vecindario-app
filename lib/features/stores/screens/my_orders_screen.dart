@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
@@ -18,14 +19,14 @@ class MyOrdersScreen extends ConsumerWidget {
     final ordersAsync = ref.watch(myOrdersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Pedidos')),
+      appBar: AppBar(title: Text(context.l10n.storeMyOrdersTitle)),
       body: ordersAsync.when(
         data: (orders) {
           if (orders.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.receipt_long_outlined,
-              title: 'Sin pedidos',
-              subtitle: 'Tus pedidos a tiendas del barrio aparecerán aquí',
+              title: context.l10n.storeNoOrdersTitle,
+              subtitle: context.l10n.storeNoOrdersSubtitle,
             );
           }
           return ListView.builder(
@@ -77,7 +78,7 @@ class MyOrdersScreen extends ConsumerWidget {
         },
         loading: () => const LoadingIndicator(),
         error: (e, _) => ErrorDisplay(
-          message: 'Error al cargar pedidos',
+          message: context.l10n.storeLoadOrdersError,
           onRetry: () => ref.invalidate(myOrdersProvider),
         ),
       ),

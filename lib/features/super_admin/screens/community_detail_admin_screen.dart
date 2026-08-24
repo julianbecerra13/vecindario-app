@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
@@ -37,11 +38,11 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle de comunidad')),
+      appBar: AppBar(title: Text(context.l10n.superAdminCommunityDetailTitle)),
       body: communityAsync.when(
         data: (c) {
           if (c == null) {
-            return const Center(child: Text('Comunidad no encontrada'));
+            return Center(child: Text(context.l10n.adminCommunityNotFound));
           }
           final subscription = subscriptionAsync.valueOrNull;
           return ListView(
@@ -54,26 +55,50 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                 compact: true,
                 onCopy: () {
                   Clipboard.setData(ClipboardData(text: c.inviteCode));
-                  context.showSuccessSnackBar('Código copiado');
+                  context.showSuccessSnackBar(context.l10n.adminCodeCopied);
                 },
               ),
               const SizedBox(height: AppSizes.lg),
-              Text('Información', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.superAdminInfoTitle,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
-              _InfoRow(label: 'Dirección', value: c.address),
-              _InfoRow(label: 'Ciudad', value: c.city),
-              _InfoRow(label: 'Estrato', value: c.estratoLabel),
-              _InfoRow(label: 'Tipo unidad', value: c.unitType.label),
-              _InfoRow(label: 'Residentes', value: '${c.memberCount}'),
+              _InfoRow(label: context.l10n.adminAddressLabel, value: c.address),
+              _InfoRow(label: context.l10n.adminCityLabel, value: c.city),
               _InfoRow(
-                label: 'Admin UID',
-                value: c.adminUid.isEmpty ? 'Sin asignar' : c.adminUid,
+                label: context.l10n.adminEstratoLabel,
+                value: c.estratoLabel,
+              ),
+              _InfoRow(
+                label: context.l10n.superAdminUnitTypeLabel,
+                value: c.unitType.label,
+              ),
+              _InfoRow(
+                label: context.l10n.adminResidentsLabel,
+                value: '${c.memberCount}',
+              ),
+              _InfoRow(
+                label: context.l10n.superAdminAdminUidLabel,
+                value: c.adminUid.isEmpty
+                    ? context.l10n.superAdminUnassigned
+                    : c.adminUid,
                 mono: true,
               ),
-              _InfoRow(label: 'ID comunidad', value: c.id, mono: true),
-              _InfoRow(label: 'Creada', value: _formatDate(c.createdAt)),
+              _InfoRow(
+                label: context.l10n.superAdminCommunityIdLabel,
+                value: c.id,
+                mono: true,
+              ),
+              _InfoRow(
+                label: context.l10n.superAdminCreatedLabel,
+                value: _formatDate(c.createdAt),
+              ),
               const SizedBox(height: AppSizes.lg),
-              Text('Suscripción', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.superAdminSubscriptionTitle,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
               if (subscription == null)
                 Container(
@@ -88,7 +113,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                       const SizedBox(width: AppSizes.sm),
                       Expanded(
                         child: Text(
-                          'Sin Vecindario Admin activo. El admin puede activar el trial o tú puedes activar un plan aquí.',
+                          context.l10n.superAdminNoActivePlanMessage,
                           style: AppTextStyles.bodySmall,
                         ),
                       ),
@@ -97,34 +122,36 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                 )
               else ...[
                 _InfoRow(
-                  label: 'Plan',
+                  label: context.l10n.superAdminPlanLabel,
                   value: (subscription['plan'] as String? ?? '-').toUpperCase(),
                 ),
                 _InfoRow(
-                  label: 'Estado',
+                  label: context.l10n.superAdminStatusLabel,
                   value: subscription['status'] as String? ?? '-',
                 ),
               ],
               const SizedBox(height: AppSizes.lg),
-              Text('Acciones', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.superAdminActionsTitle,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
               _ActionTile(
                 icon: Icons.person_add,
-                title: 'Asignar administrador',
-                subtitle:
-                    'Ingresa el UID del usuario que gestionará la comunidad',
+                title: context.l10n.superAdminAssignAdminAction,
+                subtitle: context.l10n.superAdminAssignAdminSubtitle,
                 onTap: () => _showAssignAdminDialog(context, ref, c),
               ),
               _ActionTile(
                 icon: Icons.workspace_premium,
-                title: 'Activar plan',
-                subtitle: 'Starter, Profesional o Enterprise (trial o activo)',
+                title: context.l10n.superAdminActivatePlanAction,
+                subtitle: context.l10n.superAdminActivatePlanSubtitle,
                 onTap: () => _showActivatePlanDialog(context, ref, c),
               ),
               _ActionTile(
                 icon: Icons.delete_outline,
-                title: 'Eliminar comunidad',
-                subtitle: 'Acción irreversible. No borra usuarios.',
+                title: context.l10n.superAdminDeleteCommunityAction,
+                subtitle: context.l10n.superAdminDeleteCommunitySubtitle,
                 color: AppColors.error,
                 onTap: () => _confirmDelete(context, ref, c),
               ),
@@ -133,7 +160,8 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.adminGenericError('$e'))),
       ),
     );
   }
@@ -165,20 +193,20 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Asignar Admin — ${c.name}'),
+        title: Text(context.l10n.superAdminAssignAdminDialogTitle(c.name)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Ingresa el UID del usuario que será administrador. Puedes encontrarlo en Firebase Auth.',
+              context.l10n.superAdminAssignAdminDialogMessage,
               style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
             ),
             const SizedBox(height: AppSizes.md),
             TextField(
               controller: uidController,
-              decoration: const InputDecoration(
-                labelText: 'UID del usuario',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.superAdminUidLabel,
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -186,7 +214,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -198,15 +226,19 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                     .assignAdmin(communityId: c.id, uid: uid);
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
-                  context.showSuccessSnackBar('Admin asignado');
+                  context.showSuccessSnackBar(
+                    context.l10n.superAdminAdminAssigned,
+                  );
                 }
               } catch (e) {
                 if (ctx.mounted) {
-                  context.showErrorSnackBar('Error: $e');
+                  context.showErrorSnackBar(
+                    context.l10n.adminGenericError('$e'),
+                  );
                 }
               }
             },
-            child: const Text('Asignar'),
+            child: Text(context.l10n.superAdminAssignAction),
           ),
         ],
       ),
@@ -223,7 +255,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: Text('Activar Plan — ${c.name}'),
+          title: Text(context.l10n.superAdminActivatePlanDialogTitle(c.name)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -248,7 +280,7 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               onPressed: () async {
@@ -259,16 +291,18 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
                   if (ctx.mounted) {
                     Navigator.pop(ctx);
                     context.showSuccessSnackBar(
-                      'Plan $selectedPlan activado (trial 30 días gratis)',
+                      context.l10n.superAdminPlanActivatedMessage(selectedPlan),
                     );
                   }
                 } catch (e) {
                   if (ctx.mounted) {
-                    context.showErrorSnackBar('Error: $e');
+                    context.showErrorSnackBar(
+                      context.l10n.adminGenericError('$e'),
+                    );
                   }
                 }
               },
-              child: const Text('Activar Trial'),
+              child: Text(context.l10n.superAdminActivateTrialAction),
             ),
           ],
         ),
@@ -283,10 +317,9 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
   ) async {
     final confirm = await showConfirmDialog(
       context,
-      title: 'Eliminar comunidad',
-      message:
-          '¿Seguro? Se eliminará el documento de "${c.name}" y su suscripción. Los usuarios NO se eliminan (quedan sin comunidad).',
-      confirmText: 'Eliminar',
+      title: context.l10n.superAdminDeleteCommunityAction,
+      message: context.l10n.superAdminDeleteCommunityMessage(c.name),
+      confirmText: context.l10n.delete,
       isDestructive: true,
     );
     if (!confirm) return;
@@ -294,12 +327,12 @@ class CommunityDetailAdminScreen extends ConsumerWidget {
     try {
       await ref.read(superAdminRepositoryProvider).deleteCommunity(c.id);
       if (context.mounted) {
-        context.showSuccessSnackBar('Comunidad eliminada');
+        context.showSuccessSnackBar(context.l10n.superAdminCommunityDeleted);
         context.pop();
       }
     } catch (e) {
       if (context.mounted) {
-        context.showErrorSnackBar('Error: $e');
+        context.showErrorSnackBar(context.l10n.adminGenericError('$e'));
       }
     }
   }

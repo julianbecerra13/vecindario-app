@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 
@@ -48,7 +49,7 @@ class _PhoneVerificationScreenState
   Future<void> _verifyCode() async {
     final code = _codeControllers.map((c) => c.text).join();
     if (code.length < 6) {
-      context.showErrorSnackBar('Ingresa el código completo');
+      context.showErrorSnackBar(context.l10n.authEnterFullCode);
       return;
     }
 
@@ -85,7 +86,7 @@ class _PhoneVerificationScreenState
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Verificar teléfono')),
+      appBar: AppBar(title: Text(context.l10n.authVerifyPhoneTitle)),
       body: SafeArea(
         child: Padding(
           padding: AppSizes.paddingAll,
@@ -106,10 +107,13 @@ class _PhoneVerificationScreenState
                 ),
               ),
               const SizedBox(height: AppSizes.lg),
-              Text('Código de verificación', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.authVerificationCodeTitle,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
               Text(
-                'Enviamos un código SMS al\n+57 ${widget.phoneNumber}',
+                context.l10n.authSmsCodeSentTo(widget.phoneNumber),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: context.colors.textSecondary,
@@ -164,20 +168,20 @@ class _PhoneVerificationScreenState
               else
                 ElevatedButton(
                   onPressed: _verifyCode,
-                  child: const Text('Verificar'),
+                  child: Text(context.l10n.authVerify),
                 ),
 
               const SizedBox(height: AppSizes.md),
               TextButton(
                 onPressed: _codeSent ? _sendCode : null,
-                child: const Text('Reenviar código'),
+                child: Text(context.l10n.authResendCode),
               ),
 
               const Spacer(),
               TextButton(
                 onPressed: () => context.go('/join-community'),
                 child: Text(
-                  'Verificar después',
+                  context.l10n.authVerifyLater,
                   style: TextStyle(color: context.colors.textSecondary),
                 ),
               ),

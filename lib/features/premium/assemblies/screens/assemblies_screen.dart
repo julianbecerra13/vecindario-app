@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -23,22 +24,22 @@ class AssembliesScreen extends ConsumerWidget {
     final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Asambleas')),
+      appBar: AppBar(title: Text(context.l10n.assemblyScreenTitle)),
       floatingActionButton: isAdmin
           ? FloatingActionButton.extended(
               heroTag: 'assemblies_fab',
               onPressed: () => context.push('/premium/assemblies/create'),
               icon: const Icon(Icons.add),
-              label: const Text('Convocar'),
+              label: Text(context.l10n.assemblyConvene),
             )
           : null,
       body: assembliesAsync.when(
         data: (assemblies) {
           if (assemblies.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.how_to_vote_outlined,
-              title: 'Sin asambleas',
-              subtitle: 'Las convocatorias de asamblea aparecerán aquí',
+              title: context.l10n.assemblyEmptyTitle,
+              subtitle: context.l10n.assemblyEmptySubtitle,
             );
           }
           return ListView.builder(
@@ -71,18 +72,18 @@ class AssembliesScreen extends ConsumerWidget {
                                     AppSizes.radiusFull,
                                   ),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.circle,
                                       size: 8,
                                       color: Colors.white,
                                     ),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      'EN VIVO',
-                                      style: TextStyle(
+                                      context.l10n.assemblyLive,
+                                      style: const TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white,
@@ -138,14 +139,18 @@ class AssembliesScreen extends ConsumerWidget {
                         const SizedBox(height: AppSizes.sm),
                         // Agenda preview
                         Text(
-                          'Orden del día: ${assembly.agenda.length} puntos',
+                          context.l10n.assemblyAgendaCount(
+                            assembly.agenda.length,
+                          ),
                           style: AppTextStyles.caption,
                         ),
                         // Quórum
                         if (assembly.quorum > 0) ...[
                           const SizedBox(height: AppSizes.xs),
                           Text(
-                            '${assembly.quorum} asistentes registrados',
+                            context.l10n.assemblyAttendeesRegistered(
+                              assembly.quorum,
+                            ),
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.success,
                             ),
@@ -251,7 +256,9 @@ class AssembliesScreen extends ConsumerWidget {
                                                         user.id,
                                                       );
                                                   context.showSuccessSnackBar(
-                                                    'Voto registrado',
+                                                    context
+                                                        .l10n
+                                                        .assemblyVoteRegistered,
                                                   );
                                                 },
                                                 child: Text(option),
@@ -260,7 +267,9 @@ class AssembliesScreen extends ConsumerWidget {
                                     );
                                   }),
                                   Text(
-                                    '${vote.totalVotes()} votos',
+                                    context.l10n.assemblyTotalVotes(
+                                      vote.totalVotes(),
+                                    ),
                                     style: AppTextStyles.caption,
                                   ),
                                 ],
@@ -277,7 +286,7 @@ class AssembliesScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }

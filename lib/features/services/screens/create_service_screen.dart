@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
@@ -33,7 +34,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
 
   Future<void> _submit() async {
     if (_titleController.text.isEmpty || _descriptionController.text.isEmpty) {
-      context.showErrorSnackBar('Completa todos los campos');
+      context.showErrorSnackBar(context.l10n.serviceFillAllFields);
       return;
     }
 
@@ -41,7 +42,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
     final community = ref.read(currentCommunityProvider).value;
 
     if (user == null || community == null) {
-      context.showErrorSnackBar('No hay usuario o comunidad');
+      context.showErrorSnackBar(context.l10n.serviceNoUserOrCommunity);
       return;
     }
 
@@ -68,12 +69,12 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
       await ref.read(servicesRepositoryProvider).createService(service);
 
       if (mounted) {
-        context.showSuccessSnackBar('Servicio creado');
+        context.showSuccessSnackBar(context.l10n.serviceCreated);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al crear servicio');
+        context.showErrorSnackBar(context.l10n.serviceCreateError);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -83,14 +84,14 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ofrecer Servicio')),
+      appBar: AppBar(title: Text(context.l10n.serviceOfferTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSizes.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Categoría
-            const Text('Categoría'),
+            Text(context.l10n.serviceCategoryLabel),
             const SizedBox(height: AppSizes.sm),
             Wrap(
               spacing: AppSizes.xs,
@@ -112,7 +113,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'Título del servicio',
+                labelText: context.l10n.serviceTitleLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
@@ -125,7 +126,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
             TextField(
               controller: _descriptionController,
               decoration: InputDecoration(
-                labelText: 'Descripción',
+                labelText: context.l10n.serviceDescriptionLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
@@ -139,7 +140,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
             TextField(
               controller: _priceController,
               decoration: InputDecoration(
-                labelText: 'Precio (COP) - Opcional',
+                labelText: context.l10n.servicePriceLabel,
                 prefixText: '\$ ',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
@@ -160,7 +161,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Publicar Servicio'),
+                    : Text(context.l10n.servicePublishButton),
               ),
             ),
           ],

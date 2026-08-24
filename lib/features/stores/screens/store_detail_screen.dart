@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/providers/cart_provider.dart';
@@ -104,12 +105,12 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
       ref.read(cartProvider.notifier).clear();
 
       if (mounted) {
-        context.showSuccessSnackBar('Pedido creado');
+        context.showSuccessSnackBar(context.l10n.storeOrderCreated);
         context.push('/stores/order/$orderId');
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al crear el pedido');
+        context.showErrorSnackBar(context.l10n.storeOrderCreateError);
       }
     } finally {
       if (mounted) setState(() => _isOrdering = false);
@@ -125,13 +126,13 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     final fee = OrderModel.calculateServiceFee(estrato);
 
     return Scaffold(
-      appBar: AppBar(title: Text(cart?.storeName ?? 'Tienda')),
+      appBar: AppBar(
+        title: Text(cart?.storeName ?? context.l10n.storeDefaultTitle),
+      ),
       body: itemsAsync.when(
         data: (items) {
           if (items.isEmpty) {
-            return const Center(
-              child: Text('Esta tienda no tiene productos aún'),
-            );
+            return Center(child: Text(context.l10n.storeNoItemsMessage));
           }
           return ListView(
             padding: EdgeInsets.only(
@@ -163,9 +164,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Método de pago',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.storePaymentMethodLabel,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -173,8 +174,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                       const SizedBox(height: AppSizes.sm),
                       _PaymentMethodTile(
                         icon: Icons.money,
-                        title: 'Contra entrega',
-                        subtitle: 'Paga al recibir tu pedido',
+                        title: context.l10n.storeCashOnDeliveryTitle,
+                        subtitle: context.l10n.storeCashOnDeliverySubtitle,
                         selected:
                             _paymentMethod == PaymentMethod.cashOnDelivery,
                         onTap: () => setState(
@@ -184,8 +185,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                       const SizedBox(height: AppSizes.xs),
                       _PaymentMethodTile(
                         icon: Icons.credit_card,
-                        title: 'Pago en línea',
-                        subtitle: 'PSE, tarjeta o Nequi via Wompi',
+                        title: context.l10n.storeOnlinePaymentTitle,
+                        subtitle: context.l10n.storeOnlinePaymentSubtitle,
                         selected: _paymentMethod == PaymentMethod.online,
                         onTap: () => setState(
                           () => _paymentMethod = PaymentMethod.online,
@@ -199,7 +200,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
       bottomNavigationBar: cart != null && !cart.isEmpty
           ? CheckoutBar(
@@ -209,8 +211,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
               onCheckout: _handleCheckout,
               isLoading: _isOrdering,
               paymentLabel: _paymentMethod == PaymentMethod.online
-                  ? 'Pagar en línea'
-                  : 'Pedir (contra entrega)',
+                  ? context.l10n.storePayOnlineLabel
+                  : context.l10n.storeOrderCashLabel,
             )
           : null,
     );

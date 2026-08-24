@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -19,12 +20,12 @@ class AccountStatementScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Estado de Cuenta')),
+      appBar: AppBar(title: Text(context.l10n.financeStatementTitle)),
       body: statementAsync.when(
         data: (statement) {
           if (statement == null) {
-            return const Center(
-              child: Text('No hay estado de cuenta disponible'),
+            return Center(
+              child: Text(context.l10n.financeStatementUnavailable),
             );
           }
           return SingleChildScrollView(
@@ -49,7 +50,10 @@ class AccountStatementScreen extends ConsumerWidget {
                   ),
                   child: Column(
                     children: [
-                      Text('Saldo actual', style: AppTextStyles.caption),
+                      Text(
+                        context.l10n.financeCurrentBalance,
+                        style: AppTextStyles.caption,
+                      ),
                       const SizedBox(height: AppSizes.xs),
                       Text(
                         '\$${_formatNumber(statement.balance.abs())}',
@@ -64,8 +68,8 @@ class AccountStatementScreen extends ConsumerWidget {
                       const SizedBox(height: AppSizes.xs),
                       Text(
                         statement.balance <= 0
-                            ? 'Estás al día'
-                            : 'Tienes saldo pendiente',
+                            ? context.l10n.financeUpToDate
+                            : context.l10n.financePendingBalance,
                         style: TextStyle(
                           fontSize: 13,
                           color: statement.balance <= 0
@@ -83,7 +87,7 @@ class AccountStatementScreen extends ConsumerWidget {
                 // Botón de pagar cuota
                 if (statement.balance > 0)
                   PaymentButton(
-                    label: 'Pagar cuota',
+                    label: context.l10n.financePayFee,
                     amountCOP: statement.balance,
                     reference: PaymentService.generateReference(
                       PaymentType.cuota,
@@ -96,12 +100,15 @@ class AccountStatementScreen extends ConsumerWidget {
                 const SizedBox(height: AppSizes.xl),
 
                 // Historial
-                Text('Historial', style: AppTextStyles.heading3),
+                Text(
+                  context.l10n.financeHistory,
+                  style: AppTextStyles.heading3,
+                ),
                 const SizedBox(height: AppSizes.md),
 
                 if (statement.items.isEmpty)
                   Text(
-                    'Sin movimientos registrados',
+                    context.l10n.financeNoMovements,
                     style: TextStyle(color: context.colors.textHint),
                   )
                 else
@@ -115,7 +122,7 @@ class AccountStatementScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -189,7 +196,9 @@ class _StatementItemTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSizes.radiusFull),
                 ),
                 child: Text(
-                  isPaid ? 'Pagado' : 'Pendiente',
+                  isPaid
+                      ? context.l10n.financePaid
+                      : context.l10n.financePending,
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,

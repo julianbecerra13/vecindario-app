@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -32,11 +33,11 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
 
   Future<void> _publish() async {
     if (_titleController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Ingresa un título');
+      context.showErrorSnackBar(context.l10n.circularTitleRequired);
       return;
     }
     if (_bodyController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Ingresa el contenido');
+      context.showErrorSnackBar(context.l10n.circularBodyRequired);
       return;
     }
 
@@ -61,12 +62,12 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
           .read(premiumRepositoryProvider)
           .createCircular(communityId, circular);
       if (mounted) {
-        context.showSuccessSnackBar('Circular publicada');
+        context.showSuccessSnackBar(context.l10n.circularPublished);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error: $e');
+        context.showErrorSnackBar(context.l10n.errorGeneric(e));
         setState(() => _isLoading = false);
       }
     }
@@ -76,7 +77,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nueva Circular'),
+        title: Text(context.l10n.circularCreateTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
@@ -91,7 +92,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Publicar'),
+                  : Text(context.l10n.publish),
             ),
           ),
         ],
@@ -102,7 +103,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Prioridad
-            Text('Prioridad', style: AppTextStyles.heading3),
+            Text(context.l10n.circularPriority, style: AppTextStyles.heading3),
             const SizedBox(height: AppSizes.sm),
             Wrap(
               spacing: 8,
@@ -130,9 +131,9 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
             // Título
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título de la circular',
-                hintText: 'Ej: Corte de agua programado',
+              decoration: InputDecoration(
+                labelText: context.l10n.circularTitleLabel,
+                hintText: context.l10n.circularTitleHint,
               ),
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -142,9 +143,9 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
             TextField(
               controller: _bodyController,
               maxLines: 8,
-              decoration: const InputDecoration(
-                labelText: 'Contenido',
-                hintText: 'Escribe el comunicado completo...',
+              decoration: InputDecoration(
+                labelText: context.l10n.circularContentLabel,
+                hintText: context.l10n.circularContentHint,
                 alignLabelWithHint: true,
               ),
               textCapitalization: TextCapitalization.sentences,
@@ -153,12 +154,12 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
 
             // Opciones
             SwitchListTile(
-              title: const Text(
-                'Requiere firma de acuse',
-                style: TextStyle(fontSize: 14),
+              title: Text(
+                context.l10n.circularRequiresAck,
+                style: const TextStyle(fontSize: 14),
               ),
               subtitle: Text(
-                'Los residentes deberán firmar que lo leyeron',
+                context.l10n.circularRequiresAckHelper,
                 style: TextStyle(
                   fontSize: 12,
                   color: context.colors.textSecondary,

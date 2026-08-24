@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -44,7 +45,7 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
 
     final communityId = ref.read(currentCommunityIdProvider);
     if (communityId == null) {
-      context.showErrorSnackBar('Comunidad no disponible');
+      context.showErrorSnackBar(context.l10n.errorCommunityNotAvailable);
       return;
     }
 
@@ -67,10 +68,10 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
           .read(premiumRepositoryProvider)
           .createAmenity(communityId, amenity);
       if (!mounted) return;
-      context.showSuccessSnackBar('Zona creada');
+      context.showSuccessSnackBar(context.l10n.amenityCreated);
       context.pop();
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error: $e');
+      if (mounted) context.showErrorSnackBar(context.l10n.errorGeneric(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -79,22 +80,22 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva zona social')),
+      appBar: AppBar(title: Text(context.l10n.amenityCreateTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: AppSizes.paddingAll,
           children: [
-            Text('Información básica', style: AppTextStyles.heading3),
+            Text(context.l10n.formBasicInfo, style: AppTextStyles.heading3),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-                hintText: 'Ej: Salón social, BBQ, Piscina',
-                prefixIcon: Icon(Icons.meeting_room),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityNameLabel,
+                hintText: context.l10n.amenityNameHint,
+                prefixIcon: const Icon(Icons.meeting_room),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? 'El nombre es obligatorio'
@@ -104,10 +105,10 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
             TextFormField(
               controller: _descController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Descripción',
-                prefixIcon: Icon(Icons.description_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.formDescriptionLabel,
+                prefixIcon: const Icon(Icons.description_outlined),
+                border: const OutlineInputBorder(),
               ),
               maxLines: 2,
               validator: (v) => (v == null || v.trim().isEmpty)
@@ -115,15 +116,18 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
                   : null,
             ),
             const SizedBox(height: AppSizes.lg),
-            Text('Capacidad y tarifas', style: AppTextStyles.heading3),
+            Text(
+              context.l10n.amenityCapacityFeesSection,
+              style: AppTextStyles.heading3,
+            ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _capacityController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Capacidad (personas)',
-                prefixIcon: Icon(Icons.people_outline),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityCapacityFieldLabel,
+                prefixIcon: const Icon(Icons.people_outline),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
                 final n = int.tryParse(v ?? '');
@@ -135,11 +139,11 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
             TextFormField(
               controller: _rateController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Tarifa por hora (COP)',
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityHourlyRateLabel,
                 prefixText: '\$ ',
-                prefixIcon: Icon(Icons.attach_money),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.attach_money),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
                 final n = int.tryParse(v?.trim() ?? '');
@@ -151,12 +155,12 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
             TextFormField(
               controller: _depositController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Depósito reembolsable (opcional)',
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityDepositOptionalLabel,
                 prefixText: '\$ ',
-                prefixIcon: Icon(Icons.savings_outlined),
-                border: OutlineInputBorder(),
-                helperText: 'Se retiene y devuelve si no hay daños',
+                prefixIcon: const Icon(Icons.savings_outlined),
+                border: const OutlineInputBorder(),
+                helperText: context.l10n.amenityDepositHelper,
               ),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return null;
@@ -166,26 +170,29 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
               },
             ),
             const SizedBox(height: AppSizes.lg),
-            Text('Horario y reglas', style: AppTextStyles.heading3),
+            Text(
+              context.l10n.amenityScheduleRulesSection,
+              style: AppTextStyles.heading3,
+            ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _hoursController,
-              decoration: const InputDecoration(
-                labelText: 'Horario',
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityHoursLabel,
                 hintText: '8:00 - 22:00',
-                prefixIcon: Icon(Icons.access_time),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.access_time),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _rulesController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Reglas (opcional)',
-                hintText: 'Ej: Aforo máximo 15, no música después de 22h',
-                prefixIcon: Icon(Icons.rule),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.amenityRulesLabel,
+                hintText: context.l10n.amenityRulesHint,
+                prefixIcon: const Icon(Icons.rule),
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -205,7 +212,11 @@ class _CreateAmenityScreenState extends ConsumerState<CreateAmenityScreen> {
                         ),
                       )
                     : const Icon(Icons.check),
-                label: Text(_saving ? 'Guardando...' : 'Crear zona'),
+                label: Text(
+                  _saving
+                      ? context.l10n.savingEllipsis
+                      : context.l10n.amenityCreateSubmit,
+                ),
               ),
             ),
           ],

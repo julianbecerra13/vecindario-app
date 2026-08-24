@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,24 +18,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
 
-  final _pages = const [
+  List<_OnboardingPage> _pages(BuildContext context) => [
     _OnboardingPage(
       icon: Icons.groups_rounded,
-      title: 'Tu comunidad, conectada',
-      description:
-          'Noticias, alertas y comunicados de tu conjunto en un solo lugar. Sin perderse nada en el chat.',
+      title: context.l10n.onboardingPage1Title,
+      description: context.l10n.onboardingPage1Desc,
     ),
     _OnboardingPage(
       icon: Icons.storefront_rounded,
-      title: 'Compra a tus vecinos',
-      description:
-          'Descubre emprendimientos y servicios de tu comunidad. Apoya a quien vive al lado.',
+      title: context.l10n.onboardingPage2Title,
+      description: context.l10n.onboardingPage2Desc,
     ),
     _OnboardingPage(
       icon: Icons.verified_user_rounded,
-      title: 'Servicios de confianza',
-      description:
-          'Directorio de profesionales recomendados por tus vecinos. Electricistas, plomeros y más.',
+      title: context.l10n.onboardingPage3Title,
+      description: context.l10n.onboardingPage3Desc,
     ),
   ];
 
@@ -52,6 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = _pages(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -60,15 +59,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _complete,
-                child: const Text('Saltar'),
+                child: Text(context.l10n.onboardingSkip),
               ),
             ),
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (i) => setState(() => _currentPage = i),
-                itemBuilder: (_, i) => _pages[i],
+                itemBuilder: (_, i) => pages[i],
               ),
             ),
             Padding(
@@ -78,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (i) => Container(
                         width: _currentPage == i ? 24 : 8,
                         height: 8,
@@ -95,7 +94,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: AppSizes.lg),
                   ElevatedButton(
                     onPressed: () {
-                      if (_currentPage < _pages.length - 1) {
+                      if (_currentPage < pages.length - 1) {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
@@ -105,9 +104,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       }
                     },
                     child: Text(
-                      _currentPage < _pages.length - 1
-                          ? 'Siguiente'
-                          : 'Comenzar',
+                      _currentPage < pages.length - 1
+                          ? context.l10n.onboardingNext
+                          : context.l10n.onboardingStart,
                     ),
                   ),
                   const SizedBox(height: AppSizes.md),

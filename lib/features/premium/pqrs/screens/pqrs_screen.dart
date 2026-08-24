@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/pqrs_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -27,12 +28,12 @@ class PqrsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PQRS'),
+        title: Text(context.l10n.pqrsScreenTitle),
         actions: [
           TextButton.icon(
             onPressed: () => context.push('/premium/pqrs/create'),
             icon: const Icon(Icons.add),
-            label: const Text('Nuevo'),
+            label: Text(context.l10n.amenityNewButton),
           ),
         ],
       ),
@@ -51,10 +52,12 @@ class PqrsScreen extends ConsumerWidget {
                 if (pqrs.isEmpty) {
                   return EmptyState(
                     icon: Icons.assignment_outlined,
-                    title: isAdmin ? 'Sin PQRS' : 'Sin solicitudes',
+                    title: isAdmin
+                        ? context.l10n.pqrsEmptyAdminTitle
+                        : context.l10n.pqrsEmptyResidentTitle,
                     subtitle: isAdmin
-                        ? 'Las solicitudes de residentes aparecerán aquí'
-                        : 'Envía peticiones, quejas o sugerencias',
+                        ? context.l10n.pqrsEmptyAdminSubtitle
+                        : context.l10n.pqrsEmptyResidentSubtitle,
                   );
                 }
                 return ListView.builder(
@@ -65,7 +68,8 @@ class PqrsScreen extends ConsumerWidget {
                 );
               },
               loading: () => const LoadingIndicator(),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) =>
+                  Center(child: Text(context.l10n.errorGeneric(e))),
             ),
           ),
         ],
@@ -92,19 +96,19 @@ class _AdminStats extends StatelessWidget {
       child: Row(
         children: [
           _StatBadge(
-            label: 'Abiertos',
+            label: context.l10n.pqrsOpen,
             value: '$open',
             color: AppColors.warning,
           ),
           const SizedBox(width: AppSizes.sm),
           _StatBadge(
-            label: 'En gestión',
+            label: context.l10n.pqrsInProgress,
             value: '$inProgress',
             color: AppColors.info,
           ),
           const SizedBox(width: AppSizes.sm),
           _StatBadge(
-            label: 'Resueltos',
+            label: context.l10n.pqrsResolved,
             value: '$resolved',
             color: AppColors.success,
           ),
@@ -234,7 +238,10 @@ class _PqrsCard extends ConsumerWidget {
             if (isAdmin && pqrs.residentUnit != null) ...[
               const SizedBox(height: AppSizes.xs),
               Text(
-                '${pqrs.residentName} \u00b7 ${pqrs.residentUnit}',
+                context.l10n.pqrsResidentUnit(
+                  pqrs.residentName,
+                  pqrs.residentUnit!,
+                ),
                 style: AppTextStyles.caption,
               ),
             ],
@@ -250,9 +257,9 @@ class _PqrsCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Respuesta de la administración',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.pqrsAdminResponse,
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: AppColors.success,
@@ -270,9 +277,9 @@ class _PqrsCard extends ConsumerWidget {
                 Text(pqrs.createdAt.timeAgoText, style: AppTextStyles.caption),
                 if (pqrs.isOverdue) ...[
                   const SizedBox(width: AppSizes.sm),
-                  const Text(
-                    'SLA vencido',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.pqrsSlaOverdue,
+                    style: const TextStyle(
                       fontSize: 10,
                       color: AppColors.error,
                       fontWeight: FontWeight.w700,
@@ -290,7 +297,7 @@ class _PqrsCard extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => _showRespondDialog(context, ref),
-                  child: const Text('Responder'),
+                  child: Text(context.l10n.pqrsRespond),
                 ),
               ),
             ],
@@ -305,18 +312,16 @@ class _PqrsCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Responder PQRS'),
+        title: Text(ctx.l10n.pqrsRespondTitle),
         content: TextField(
           controller: controller,
           maxLines: 5,
-          decoration: const InputDecoration(
-            hintText: 'Escribe la respuesta...',
-          ),
+          decoration: InputDecoration(hintText: ctx.l10n.pqrsResponseHint),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(ctx.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -333,9 +338,9 @@ class _PqrsCard extends ConsumerWidget {
                     );
               }
               Navigator.pop(ctx);
-              context.showSuccessSnackBar('Respuesta enviada');
+              context.showSuccessSnackBar(context.l10n.pqrsResponseSent);
             },
-            child: const Text('Enviar'),
+            child: Text(ctx.l10n.fineSend),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
@@ -38,8 +39,8 @@ class StorePanelScreen extends ConsumerWidget {
     return storeAsync.when(
       loading: () => const Scaffold(body: LoadingIndicator()),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Mi Tienda')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(context.l10n.storePanelTitle)),
+        body: Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
       data: (store) {
         if (store == null) return const _NoStoreView();
@@ -77,7 +78,7 @@ class _NoStoreView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Tienda')),
+      appBar: AppBar(title: Text(context.l10n.storePanelTitle)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSizes.xl),
@@ -93,7 +94,7 @@ class _NoStoreView extends ConsumerWidget {
               ),
               const SizedBox(height: AppSizes.sm),
               Text(
-                'Crea tu tienda para empezar a vender productos a tu comunidad',
+                context.l10n.storeCreatePrompt,
                 style: AppTextStyles.bodySmall,
                 textAlign: TextAlign.center,
               ),
@@ -104,7 +105,7 @@ class _NoStoreView extends ConsumerWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _showCreateStoreDialog(context, ref),
                   icon: const Icon(Icons.add),
-                  label: const Text('Crear mi tienda'),
+                  label: Text(context.l10n.storeCreateMyStoreButton),
                 ),
               ),
             ],
@@ -126,32 +127,38 @@ class _NoStoreView extends ConsumerWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Crear tienda'),
+        title: Text(context.l10n.storeCreateDialogTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la tienda',
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeNameLabel,
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: descController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.serviceDescriptionLabel,
+                ),
                 maxLines: 2,
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: deliveryController,
-                decoration: const InputDecoration(labelText: 'Tiempo entrega'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeDeliveryTimeLabel,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: minOrderController,
-                decoration: const InputDecoration(labelText: 'Pedido mínimo'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeMinOrderLabel,
+                ),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -160,11 +167,11 @@ class _NoStoreView extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Crear'),
+            child: Text(context.l10n.create),
           ),
         ],
       ),
@@ -174,7 +181,7 @@ class _NoStoreView extends ConsumerWidget {
     final user = ref.read(currentUserProvider).value;
     final communityId = ref.read(currentCommunityIdProvider);
     if (user == null || communityId == null) {
-      context.showErrorSnackBar('No hay comunidad asignada');
+      context.showErrorSnackBar(context.l10n.storeNoCommunityAssigned);
       return;
     }
 
@@ -192,7 +199,9 @@ class _NoStoreView extends ConsumerWidget {
             createdAt: DateTime.now(),
           ),
         );
-    if (context.mounted) context.showSuccessSnackBar('Tienda creada');
+    if (context.mounted) {
+      context.showSuccessSnackBar(context.l10n.storeCreated);
+    }
   }
 }
 
@@ -204,13 +213,13 @@ class _OrdersTab extends ConsumerWidget {
 
     return ordersAsync.when(
       loading: () => const LoadingIndicator(),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => Center(child: Text(context.l10n.errorWithDetail('$e'))),
       data: (orders) {
         if (orders.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.inbox_outlined,
-            title: 'Sin pedidos',
-            subtitle: 'Los pedidos de tus clientes aparecerán aquí',
+            title: context.l10n.storePanelNoOrdersTitle,
+            subtitle: context.l10n.storePanelNoOrdersSubtitle,
           );
         }
 
@@ -238,19 +247,19 @@ class _OrdersTab extends ConsumerWidget {
             Row(
               children: [
                 _StatChip(
-                  label: 'Pendientes',
+                  label: context.l10n.storePendingLabel,
                   count: pending.length,
                   color: AppColors.warning,
                 ),
                 const SizedBox(width: AppSizes.sm),
                 _StatChip(
-                  label: 'Activos',
+                  label: context.l10n.storeActiveLabel,
                   count: active.length,
                   color: AppColors.primary,
                 ),
                 const SizedBox(width: AppSizes.sm),
                 _StatChip(
-                  label: 'Hoy',
+                  label: context.l10n.storeTodayLabel,
                   count: orders
                       .where(
                         (o) =>
@@ -264,17 +273,17 @@ class _OrdersTab extends ConsumerWidget {
             ),
             const SizedBox(height: AppSizes.lg),
             if (pending.isNotEmpty) ...[
-              _SectionLabel('Nuevos pedidos (${pending.length})'),
+              _SectionLabel(context.l10n.storeNewOrdersCount(pending.length)),
               ...pending.map((o) => _OrderManageCard(order: o)),
               const SizedBox(height: AppSizes.md),
             ],
             if (active.isNotEmpty) ...[
-              _SectionLabel('En proceso (${active.length})'),
+              _SectionLabel(context.l10n.storeInProgressCount(active.length)),
               ...active.map((o) => _OrderManageCard(order: o)),
               const SizedBox(height: AppSizes.md),
             ],
             if (completed.isNotEmpty) ...[
-              _SectionLabel('Completados'),
+              _SectionLabel(context.l10n.storeCompletedLabel),
               ...completed.take(10).map((o) => _OrderManageCard(order: o)),
             ],
           ],
@@ -298,17 +307,18 @@ class _ItemsTab extends ConsumerWidget {
         heroTag: 'store_item_fab',
         onPressed: () => _showItemDialog(context, ref, null),
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo'),
+        label: Text(context.l10n.storeNewItemFab),
       ),
       body: itemsAsync.when(
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
         data: (items) {
           if (items.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.restaurant_menu,
-              title: 'Sin productos',
-              subtitle: 'Agrega tu primer producto con el botón +',
+              title: context.l10n.storeNoItemsTitle,
+              subtitle: context.l10n.storeNoItemsSubtitle,
             );
           }
           return ListView.builder(
@@ -327,19 +337,21 @@ class _ItemsTab extends ConsumerWidget {
                 final ok = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Eliminar producto'),
-                    content: Text('¿Eliminar "${items[i].name}"?'),
+                    title: Text(context.l10n.storeDeleteProductTitle),
+                    content: Text(
+                      context.l10n.storeDeleteProductConfirm(items[i].name),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancelar'),
+                        child: Text(context.l10n.cancel),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, true),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.error,
                         ),
-                        child: const Text('Eliminar'),
+                        child: Text(context.l10n.delete),
                       ),
                     ],
                   ),
@@ -373,25 +385,35 @@ class _ItemsTab extends ConsumerWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(existing == null ? 'Nuevo producto' : 'Editar producto'),
+        title: Text(
+          existing == null
+              ? context.l10n.storeNewProductTitle
+              : context.l10n.storeEditProductTitle,
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeItemNameLabel,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: descController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.serviceDescriptionLabel,
+                ),
                 maxLines: 2,
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: priceController,
-                decoration: const InputDecoration(labelText: 'Precio (COP)'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeItemPriceLabel,
+                ),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -400,11 +422,13 @@ class _ItemsTab extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(existing == null ? 'Crear' : 'Guardar'),
+            child: Text(
+              existing == null ? context.l10n.create : context.l10n.save,
+            ),
           ),
         ],
       ),
@@ -431,10 +455,14 @@ class _ItemsTab extends ConsumerWidget {
           price: price,
         ),
       );
-      if (context.mounted) context.showSuccessSnackBar('Producto creado');
+      if (context.mounted) {
+        context.showSuccessSnackBar(context.l10n.storeProductCreated);
+      }
     } else {
       await repo.updateStoreItem(store.id, existing.id, data);
-      if (context.mounted) context.showSuccessSnackBar('Producto actualizado');
+      if (context.mounted) {
+        context.showSuccessSnackBar(context.l10n.storeProductUpdated);
+      }
     }
   }
 }
@@ -516,16 +544,20 @@ class _ItemManageCard extends StatelessWidget {
                 if (v == 'delete') onDelete();
               },
               itemBuilder: (_) => [
-                const PopupMenuItem(value: 'edit', child: Text('Editar')),
+                PopupMenuItem(value: 'edit', child: Text(context.l10n.edit)),
                 PopupMenuItem(
                   value: 'toggle',
-                  child: Text(item.available ? 'Ocultar' : 'Activar'),
+                  child: Text(
+                    item.available
+                        ? context.l10n.storeHideLabel
+                        : context.l10n.storeActivateLabel,
+                  ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Text(
-                    'Eliminar',
-                    style: TextStyle(color: AppColors.error),
+                    context.l10n.delete,
+                    style: const TextStyle(color: AppColors.error),
                   ),
                 ),
               ],
@@ -547,20 +579,34 @@ class _InfoTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSizes.md),
       children: [
-        _InfoRow(label: 'Nombre', value: store.name),
-        _InfoRow(label: 'Descripción', value: store.description),
-        _InfoRow(label: 'Tiempo de entrega', value: store.deliveryTime),
-        _InfoRow(label: 'Pedido mínimo', value: store.formattedMinOrder),
+        _InfoRow(label: context.l10n.storeItemNameLabel, value: store.name),
         _InfoRow(
-          label: 'Estado',
-          value: store.active ? 'Activa' : 'Inactiva',
+          label: context.l10n.serviceDescriptionLabel,
+          value: store.description,
+        ),
+        _InfoRow(
+          label: context.l10n.storeDeliveryTimeLabel,
+          value: store.deliveryTime,
+        ),
+        _InfoRow(
+          label: context.l10n.storeMinOrderLabel,
+          value: store.formattedMinOrder,
+        ),
+        _InfoRow(
+          label: context.l10n.storeStatusLabel,
+          value: store.active
+              ? context.l10n.storeActiveStatus
+              : context.l10n.storeInactiveStatus,
           valueColor: store.active ? AppColors.success : AppColors.error,
         ),
         _InfoRow(
-          label: 'Calificación',
+          label: context.l10n.storeRatingLabel,
           value: '${store.rating.toStringAsFixed(1)} ⭐',
         ),
-        _InfoRow(label: 'Pedidos completados', value: '${store.orderCount}'),
+        _InfoRow(
+          label: context.l10n.storeCompletedOrdersLabel,
+          value: '${store.orderCount}',
+        ),
         const SizedBox(height: AppSizes.xl),
         SizedBox(
           width: double.infinity,
@@ -568,7 +614,7 @@ class _InfoTab extends ConsumerWidget {
           child: ElevatedButton.icon(
             onPressed: () => _showEditDialog(context, ref),
             icon: const Icon(Icons.edit),
-            label: const Text('Editar información'),
+            label: Text(context.l10n.storeEditInfoButton),
           ),
         ),
         const SizedBox(height: AppSizes.sm),
@@ -581,7 +627,11 @@ class _InfoTab extends ConsumerWidget {
               {'active': !store.active},
             ),
             icon: Icon(store.active ? Icons.pause : Icons.play_arrow),
-            label: Text(store.active ? 'Pausar tienda' : 'Reactivar tienda'),
+            label: Text(
+              store.active
+                  ? context.l10n.storePauseStoreButton
+                  : context.l10n.storeReactivateStoreButton,
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: store.active
                   ? AppColors.warning
@@ -604,30 +654,38 @@ class _InfoTab extends ConsumerWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Editar tienda'),
+        title: Text(context.l10n.storeEditDialogTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeItemNameLabel,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: descController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.serviceDescriptionLabel,
+                ),
                 maxLines: 2,
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: deliveryController,
-                decoration: const InputDecoration(labelText: 'Tiempo entrega'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeDeliveryTimeLabel,
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: minOrderController,
-                decoration: const InputDecoration(labelText: 'Pedido mínimo'),
+                decoration: InputDecoration(
+                  labelText: context.l10n.storeMinOrderLabel,
+                ),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -636,11 +694,11 @@ class _InfoTab extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Guardar'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -654,7 +712,9 @@ class _InfoTab extends ConsumerWidget {
       'minOrder':
           int.tryParse(minOrderController.text.trim()) ?? store.minOrder,
     });
-    if (context.mounted) context.showSuccessSnackBar('Actualizado');
+    if (context.mounted) {
+      context.showSuccessSnackBar(context.l10n.storeUpdated);
+    }
   }
 }
 
@@ -844,7 +904,7 @@ class _OrderManageCard extends ConsumerWidget {
                         foregroundColor: AppColors.error,
                         side: const BorderSide(color: AppColors.error),
                       ),
-                      child: const Text('Rechazar'),
+                      child: Text(context.l10n.storeRejectButton),
                     ),
                   ),
                   const SizedBox(width: AppSizes.sm),
@@ -853,7 +913,7 @@ class _OrderManageCard extends ConsumerWidget {
                       onPressed: () => ref
                           .read(storesRepositoryProvider)
                           .updateOrderStatus(order.id, OrderStatus.confirmed),
-                      child: const Text('Confirmar'),
+                      child: Text(context.l10n.confirm),
                     ),
                   ),
                 ],
@@ -866,7 +926,7 @@ class _OrderManageCard extends ConsumerWidget {
                       .read(storesRepositoryProvider)
                       .updateOrderStatus(order.id, OrderStatus.inTransit),
                   icon: const Icon(Icons.delivery_dining, size: 18),
-                  label: const Text('Marcar en camino'),
+                  label: Text(context.l10n.storeMarkOnWayButton),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                   ),
@@ -880,7 +940,7 @@ class _OrderManageCard extends ConsumerWidget {
                       .read(storesRepositoryProvider)
                       .updateOrderStatus(order.id, OrderStatus.delivered),
                   icon: const Icon(Icons.check_circle, size: 18),
-                  label: const Text('Marcar entregado'),
+                  label: Text(context.l10n.storeMarkDeliveredButton),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.success,
                   ),

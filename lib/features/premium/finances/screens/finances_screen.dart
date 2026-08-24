@@ -6,6 +6,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -50,13 +51,13 @@ class _AdminFinancesView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard Financiero'),
+        title: Text(context.l10n.financeDashboardTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'Exportar PDF',
+            tooltip: context.l10n.financeExportPdf,
             onPressed: () {
-              context.showSuccessSnackBar('Generando reporte PDF...');
+              context.showSuccessSnackBar(context.l10n.financeGeneratingReport);
             },
           ),
         ],
@@ -65,7 +66,7 @@ class _AdminFinancesView extends ConsumerWidget {
         heroTag: 'finances_fab',
         onPressed: () => context.push('/premium/finances/create'),
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo'),
+        label: Text(context.l10n.amenityNewButton),
       ),
       body: financesAsync.when(
         data: (entries) {
@@ -92,14 +93,14 @@ class _AdminFinancesView extends ConsumerWidget {
               Row(
                 children: [
                   _FinanceStatCard(
-                    label: 'Ingresos',
+                    label: context.l10n.financeIncome,
                     amount: incomes,
                     color: AppColors.success,
                     icon: Icons.arrow_downward,
                   ),
                   const SizedBox(width: AppSizes.sm),
                   _FinanceStatCard(
-                    label: 'Egresos',
+                    label: context.l10n.financeExpense,
                     amount: expenses,
                     color: AppColors.error,
                     icon: Icons.arrow_upward,
@@ -119,9 +120,9 @@ class _AdminFinancesView extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Saldo',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.financeBalance,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
                       ),
@@ -140,7 +141,9 @@ class _AdminFinancesView extends ConsumerWidget {
               if (expenseByCategory.isNotEmpty) ...[
                 const SizedBox(height: AppSizes.lg),
                 Text(
-                  hasBudget ? 'Presupuesto vs. Ejecución' : 'Ejecución',
+                  hasBudget
+                      ? context.l10n.financeBudgetVsExecution
+                      : context.l10n.financeExecution,
                   style: AppTextStyles.heading3,
                 ),
                 const SizedBox(height: AppSizes.sm),
@@ -165,18 +168,18 @@ class _AdminFinancesView extends ConsumerWidget {
                     children: [
                       _ChartLegend(
                         color: AppColors.primary,
-                        label: 'Presupuesto',
+                        label: context.l10n.financeBudget,
                       ),
                       const SizedBox(width: AppSizes.md),
                       _ChartLegend(
                         color: AppColors.success,
-                        label: 'Ejecutado',
+                        label: context.l10n.financeExecuted,
                       ),
                     ],
                   )
                 else
                   Text(
-                    'Configura presupuestos para comparar con la ejecución',
+                    context.l10n.financeConfigureBudgets,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.caption,
                   ),
@@ -184,7 +187,10 @@ class _AdminFinancesView extends ConsumerWidget {
 
               // Cartera
               const SizedBox(height: AppSizes.lg),
-              Text('Cartera', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.financePortfolio,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
               Container(
                 padding: AppSizes.paddingCard,
@@ -199,7 +205,7 @@ class _AdminFinancesView extends ConsumerWidget {
                           vertical: AppSizes.sm,
                         ),
                         child: Text(
-                          'Sin estados de cuenta cargados',
+                          context.l10n.financeNoStatements,
                           style: TextStyle(color: context.colors.textSecondary),
                         ),
                       )
@@ -212,7 +218,7 @@ class _AdminFinancesView extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Tasa de recaudo',
+                                    context.l10n.financeCollectionRate,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: context.colors.textSecondary,
@@ -232,7 +238,7 @@ class _AdminFinancesView extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'Cartera morosa',
+                                    context.l10n.financeOverdueBalance,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: context.colors.textSecondary,
@@ -265,14 +271,17 @@ class _AdminFinancesView extends ConsumerWidget {
               ),
 
               const SizedBox(height: AppSizes.lg),
-              Text('Movimientos', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.financeMovements,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.md),
               ...entries.map((e) => _FinanceEntryTile(entry: e)),
             ],
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -297,7 +306,7 @@ class _BudgetVsExecutionChart extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSizes.lg),
           child: Text(
-            'Registra egresos por categoría para ver el gráfico',
+            context.l10n.financeRegisterExpensesForChart,
             textAlign: TextAlign.center,
             style: AppTextStyles.caption,
           ),
@@ -420,7 +429,7 @@ class _ResidentFinancesView extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Estado de Cuenta')),
+      appBar: AppBar(title: Text(context.l10n.financeStatementTitle)),
       body: statementAsync.when(
         data: (statement) {
           if (statement == null) {
@@ -437,7 +446,7 @@ class _ResidentFinancesView extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSizes.md),
                     Text(
-                      'Estado de cuenta no disponible',
+                      context.l10n.financeStatementUnavailable,
                       style: TextStyle(color: context.colors.textSecondary),
                     ),
                   ],
@@ -461,7 +470,7 @@ class _ResidentFinancesView extends ConsumerWidget {
                 child: Column(
                   children: [
                     Text(
-                      'Saldo actual',
+                      context.l10n.financeCurrentBalance,
                       style: TextStyle(color: context.colors.textSecondary),
                     ),
                     const SizedBox(height: AppSizes.sm),
@@ -476,18 +485,18 @@ class _ResidentFinancesView extends ConsumerWidget {
                       ),
                     ),
                     if (statement.isUpToDate)
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             color: AppColors.success,
                             size: 16,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'Estás al día',
-                            style: TextStyle(color: AppColors.success),
+                            context.l10n.financeUpToDate,
+                            style: const TextStyle(color: AppColors.success),
                           ),
                         ],
                       ),
@@ -497,7 +506,7 @@ class _ResidentFinancesView extends ConsumerWidget {
               if (!statement.isUpToDate) ...[
                 const SizedBox(height: AppSizes.md),
                 PaymentButton(
-                  label: 'Pagar cuota pendiente',
+                  label: context.l10n.financePayPendingFee,
                   amountCOP: statement.balance,
                   reference: PaymentService.generateReference(
                     PaymentType.cuota,
@@ -508,14 +517,14 @@ class _ResidentFinancesView extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: AppSizes.lg),
-              Text('Historial', style: AppTextStyles.heading3),
+              Text(context.l10n.financeHistory, style: AppTextStyles.heading3),
               const SizedBox(height: AppSizes.md),
               ...statement.items.map((item) => _StatementItemTile(item: item)),
             ],
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -652,7 +661,7 @@ class _StatementItemTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppSizes.radiusFull),
               ),
               child: Text(
-                isPaid ? 'Pagado' : 'Pendiente',
+                isPaid ? context.l10n.financePaid : context.l10n.financePending,
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w600,

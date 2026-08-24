@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/notifications/models/notification_model.dart';
 import 'package:vecindario_app/features/notifications/providers/notification_providers.dart';
@@ -20,22 +21,22 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notificaciones'),
+        title: Text(context.l10n.notifTitle),
         actions: [
           if (unreadCount > 0)
             TextButton(
               onPressed: () => ref.read(markAllReadProvider)(),
-              child: const Text('Marcar todas'),
+              child: Text(context.l10n.notifMarkAll),
             ),
         ],
       ),
       body: notificationsAsync.when(
         data: (notifications) {
           if (notifications.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.notifications_none,
-              title: 'Sin notificaciones',
-              subtitle: 'Aquí aparecerán las novedades de tu comunidad',
+              title: context.l10n.notifEmpty,
+              subtitle: context.l10n.notifEmptySubtitle,
             );
           }
           return ListView.builder(
@@ -57,7 +58,8 @@ class NotificationsScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
     );
   }

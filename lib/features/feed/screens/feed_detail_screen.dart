@@ -4,6 +4,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
@@ -21,11 +22,11 @@ class FeedDetailScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Post')),
+      appBar: AppBar(title: Text(context.l10n.feedPostTitle)),
       body: postAsync.when(
         data: (post) {
           if (post == null) {
-            return const Center(child: Text('Post no encontrado'));
+            return Center(child: Text(context.l10n.feedPostNotFound));
           }
           final isLiked = post.likedBy.contains(currentUser?.id);
           return SingleChildScrollView(
@@ -83,7 +84,7 @@ class FeedDetailScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              'Fijado',
+                              context.l10n.feedPinned,
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -150,7 +151,7 @@ class FeedDetailScreen extends ConsumerWidget {
                 if (post.pollOptions != null &&
                     post.pollOptions!.isNotEmpty) ...[
                   Text(
-                    'Encuesta',
+                    context.l10n.feedPollTitle,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -216,11 +217,11 @@ class FeedDetailScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${post.likes} Me gusta',
+                        context.l10n.feedLikesCount(post.likes),
                         style: AppTextStyles.caption,
                       ),
                       Text(
-                        '${post.commentCount} comentarios',
+                        context.l10n.feedCommentsCount(post.commentCount),
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -245,7 +246,7 @@ class FeedDetailScreen extends ConsumerWidget {
                                     );
                                 if (!ok && context.mounted) {
                                   context.showErrorSnackBar(
-                                    'No se pudo registrar tu like',
+                                    context.l10n.feedCouldNotLike,
                                   );
                                 }
                               },
@@ -256,7 +257,7 @@ class FeedDetailScreen extends ConsumerWidget {
                               : context.colors.textHint,
                         ),
                         label: Text(
-                          'Me gusta',
+                          context.l10n.feedLikeAction,
                           style: TextStyle(
                             color: isLiked
                                 ? AppColors.error
@@ -269,7 +270,7 @@ class FeedDetailScreen extends ConsumerWidget {
                       child: TextButton.icon(
                         onPressed: () {},
                         icon: const Icon(Icons.comment_outlined),
-                        label: const Text('Comentar'),
+                        label: Text(context.l10n.feedCommentAction),
                       ),
                     ),
                   ],
@@ -279,7 +280,8 @@ class FeedDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
     );
   }

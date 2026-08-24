@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
@@ -20,11 +21,11 @@ class OrderTrackingScreen extends ConsumerWidget {
     final orderAsync = ref.watch(orderDetailProvider(orderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Estado del Pedido')),
+      appBar: AppBar(title: Text(context.l10n.storeOrderTrackingTitle)),
       body: orderAsync.when(
         data: (order) {
           if (order == null) {
-            return const Center(child: Text('Pedido no encontrado'));
+            return Center(child: Text(context.l10n.storeOrderNotFound));
           }
           return SingleChildScrollView(
             padding: AppSizes.paddingAll,
@@ -34,7 +35,9 @@ class OrderTrackingScreen extends ConsumerWidget {
                 Icon(order.status.icon, size: 56, color: order.status.color),
                 const SizedBox(height: AppSizes.md),
                 Text(
-                  'Pedido #${order.id.substring(0, 4).toUpperCase()}',
+                  context.l10n.storeOrderNumber(
+                    order.id.substring(0, 4).toUpperCase(),
+                  ),
                   style: AppTextStyles.heading3,
                 ),
                 Text(order.storeName, style: AppTextStyles.bodySmall),
@@ -46,9 +49,9 @@ class OrderTrackingScreen extends ConsumerWidget {
                       color: AppColors.errorLight,
                       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                     ),
-                    child: const Text(
-                      'Este pedido fue cancelado',
-                      style: TextStyle(color: AppColors.error),
+                    child: Text(
+                      context.l10n.storeOrderCancelledMessage,
+                      style: const TextStyle(color: AppColors.error),
                     ),
                   ),
                 const SizedBox(height: AppSizes.xl),
@@ -68,7 +71,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Resumen',
+                        context.l10n.storeOrderSummaryLabel,
                         style: AppTextStyles.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -96,9 +99,9 @@ class OrderTrackingScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Servicio',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.storeServiceFeeLabel,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.warning,
                             ),
@@ -117,7 +120,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total',
+                            context.l10n.storeTotalLabel,
                             style: AppTextStyles.bodyMedium.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
@@ -143,7 +146,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () => context.push('/stores/rate/${order.id}'),
                       icon: const Icon(Icons.star, color: Colors.white),
-                      label: const Text('Calificar pedido'),
+                      label: Text(context.l10n.storeRateOrderButton),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.warning,
                       ),
@@ -155,7 +158,8 @@ class OrderTrackingScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
     );
   }

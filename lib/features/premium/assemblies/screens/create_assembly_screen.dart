@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -77,13 +78,13 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
         .where((t) => t.isNotEmpty)
         .toList();
     if (agenda.isEmpty) {
-      context.showErrorSnackBar('Agrega al menos un punto al orden del día');
+      context.showErrorSnackBar(context.l10n.assemblyAgendaRequired);
       return;
     }
 
     final communityId = ref.read(currentCommunityIdProvider);
     if (communityId == null) {
-      context.showErrorSnackBar('Comunidad no disponible');
+      context.showErrorSnackBar(context.l10n.errorCommunityNotAvailable);
       return;
     }
 
@@ -112,11 +113,11 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
           .read(premiumRepositoryProvider)
           .createAssembly(communityId, assembly);
       if (!mounted) return;
-      context.showSuccessSnackBar('Asamblea convocada');
+      context.showSuccessSnackBar(context.l10n.assemblyConvened);
       context.pop();
     } catch (e) {
       if (!mounted) return;
-      context.showErrorSnackBar('Error: $e');
+      context.showErrorSnackBar(context.l10n.errorGeneric(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -128,7 +129,7 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
     final timeLabel = _time.format(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Convocar asamblea')),
+      appBar: AppBar(title: Text(context.l10n.assemblyConveneTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -136,10 +137,10 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Título',
-                hintText: 'Ej: Asamblea ordinaria 2026',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.assemblyTitleLabel,
+                hintText: context.l10n.assemblyTitleHint,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Requerido' : null,
@@ -167,19 +168,19 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _locationController,
-              decoration: const InputDecoration(
-                labelText: 'Lugar (opcional)',
-                hintText: 'Ej: Salón Social',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.assemblyLocationLabel,
+                hintText: context.l10n.assemblyLocationHint,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _virtualLinkController,
-              decoration: const InputDecoration(
-                labelText: 'Link virtual (opcional)',
+              decoration: InputDecoration(
+                labelText: context.l10n.assemblyVirtualLinkLabel,
                 hintText: 'Ej: https://meet.google.com/...',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.url,
             ),
@@ -188,7 +189,7 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Orden del día',
+                  context.l10n.assemblyAgendaTitle,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -196,7 +197,7 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
                 TextButton.icon(
                   onPressed: _addAgendaItem,
                   icon: const Icon(Icons.add),
-                  label: const Text('Agregar'),
+                  label: Text(context.l10n.assemblyAddAgendaItem),
                 ),
               ],
             ),
@@ -224,10 +225,10 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: controller,
-                        decoration: const InputDecoration(
-                          hintText: 'Punto del orden del día',
+                        decoration: InputDecoration(
+                          hintText: context.l10n.assemblyAgendaItemHint,
                           isDense: true,
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -252,12 +253,12 @@ class _CreateAssemblyScreenState extends ConsumerState<CreateAssemblyScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Convocar asamblea'),
+                    : Text(context.l10n.assemblyConveneTitle),
               ),
             ),
             const SizedBox(height: AppSizes.sm),
             Text(
-              'Al convocar, los residentes serán notificados y podrán confirmar asistencia. Las votaciones se pueden iniciar el día de la asamblea.',
+              context.l10n.assemblyConveneHelper,
               style: AppTextStyles.caption,
               textAlign: TextAlign.center,
             ),

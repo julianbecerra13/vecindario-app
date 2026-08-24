@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/fine_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -37,11 +38,11 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
     final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle de Multa')),
+      appBar: AppBar(title: Text(context.l10n.fineDetailTitle)),
       body: fineAsync.when(
         data: (fine) {
           if (fine == null) {
-            return const Center(child: Text('Multa no encontrada'));
+            return Center(child: Text(context.l10n.fineNotFound));
           }
           return SingleChildScrollView(
             padding: AppSizes.paddingAll,
@@ -96,7 +97,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                             ),
                           ),
                           Text(
-                            'Multa #${fine.id.substring(0, 6)}',
+                            context.l10n.fineNumber(fine.id.substring(0, 6)),
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -119,7 +120,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 const SizedBox(height: AppSizes.lg),
 
                 // Motivo
-                Text('Motivo', style: AppTextStyles.heading3),
+                Text(
+                  context.l10n.fineReasonTitle,
+                  style: AppTextStyles.heading3,
+                ),
                 const SizedBox(height: AppSizes.sm),
                 Text(fine.reason, style: AppTextStyles.bodyLarge),
 
@@ -127,7 +131,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 if (fine.manualArticle != null &&
                     fine.manualArticle!.isNotEmpty) ...[
                   const SizedBox(height: AppSizes.lg),
-                  Text('Artículo del manual', style: AppTextStyles.heading3),
+                  Text(
+                    context.l10n.fineManualArticleTitle,
+                    style: AppTextStyles.heading3,
+                  ),
                   const SizedBox(height: AppSizes.sm),
                   Container(
                     width: double.infinity,
@@ -153,7 +160,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 // Evidencia
                 if (fine.evidenceURLs.isNotEmpty) ...[
                   const SizedBox(height: AppSizes.lg),
-                  Text('Evidencia', style: AppTextStyles.heading3),
+                  Text(
+                    context.l10n.fineEvidence,
+                    style: AppTextStyles.heading3,
+                  ),
                   const SizedBox(height: AppSizes.sm),
                   SizedBox(
                     height: 80,
@@ -190,7 +200,10 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Descargo', style: AppTextStyles.heading3),
+                      Text(
+                        context.l10n.fineDefense,
+                        style: AppTextStyles.heading3,
+                      ),
                       if (fine.daysLeftForDefense != null)
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -206,7 +219,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                             ),
                           ),
                           child: Text(
-                            '${fine.daysLeftForDefense} días restantes',
+                            context.l10n.fineDaysRemaining(
+                              fine.daysLeftForDefense!,
+                            ),
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -240,9 +255,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                     TextField(
                       controller: _defenseController,
                       maxLines: 4,
-                      decoration: const InputDecoration(
-                        hintText: 'Escribe tu descargo aquí...',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: context.l10n.fineDefenseFieldHint,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: AppSizes.sm),
@@ -250,7 +265,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () => _submitDefense(fine),
-                        child: const Text('Enviar descargo'),
+                        child: Text(context.l10n.fineSendDefense),
                       ),
                     ),
                   ],
@@ -269,7 +284,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.error,
                           ),
-                          child: const Text('Confirmar Multa'),
+                          child: Text(context.l10n.fineConfirm),
                         ),
                       ),
                       const SizedBox(width: AppSizes.sm),
@@ -280,7 +295,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                             foregroundColor: AppColors.success,
                             side: const BorderSide(color: AppColors.success),
                           ),
-                          child: const Text('Anular'),
+                          child: Text(context.l10n.fineVoid),
                         ),
                       ),
                     ],
@@ -291,7 +306,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 if (fine.canPay && !isAdmin) ...[
                   const SizedBox(height: AppSizes.xl),
                   PaymentButton(
-                    label: 'Pagar multa',
+                    label: context.l10n.finePayFine,
                     amountCOP: fine.amount,
                     reference: PaymentService.generateReference(
                       PaymentType.fine,
@@ -308,7 +323,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -316,7 +331,7 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
   Future<void> _submitDefense(FineModel fine) async {
     final text = _defenseController.text.trim();
     if (text.isEmpty) {
-      context.showErrorSnackBar('Escribe tu descargo');
+      context.showErrorSnackBar(context.l10n.fineWriteDefense);
       return;
     }
     await ref.read(premiumRepositoryProvider).updateFine(fine.id, {
@@ -324,16 +339,16 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
       'status': 'defense',
     });
     if (mounted) {
-      context.showSuccessSnackBar('Descargo enviado');
+      context.showSuccessSnackBar(context.l10n.fineDefenseSent);
     }
   }
 
   Future<void> _confirmFine(FineModel fine) async {
     final confirm = await showConfirmDialog(
       context,
-      title: 'Confirmar multa',
-      message: '¿Confirmar la multa de \$${fine.amount}?',
-      confirmText: 'Confirmar',
+      title: context.l10n.fineConfirm,
+      message: context.l10n.fineConfirmMessage(fine.amount),
+      confirmText: context.l10n.confirm,
       isDestructive: true,
     );
     if (confirm) {
@@ -346,9 +361,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
   Future<void> _voidFine(FineModel fine) async {
     final confirm = await showConfirmDialog(
       context,
-      title: 'Anular multa',
-      message: '¿Estás seguro de anular esta multa?',
-      confirmText: 'Anular',
+      title: context.l10n.fineVoidTitle,
+      message: context.l10n.fineVoidMessage,
+      confirmText: context.l10n.fineVoid,
     );
     if (confirm) {
       await ref.read(premiumRepositoryProvider).updateFine(fine.id, {

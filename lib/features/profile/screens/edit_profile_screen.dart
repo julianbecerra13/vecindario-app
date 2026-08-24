@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/utils/validators.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
@@ -70,25 +71,27 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       });
 
       if (mounted) {
-        context.showSuccessSnackBar('Perfil actualizado');
+        context.showSuccessSnackBar(context.l10n.profileUpdated);
         context.pop();
       }
     } on FirebaseException catch (e) {
       if (mounted) {
         final msg = switch (e.code) {
-          'storage/unauthorized' => 'No tienes permisos para subir fotos',
-          'storage/quota-exceeded' => 'La foto es demasiado grande (máx 5 MB)',
-          'storage/retry-limit-exceeded' => 'Red inestable, intenta de nuevo',
-          'storage/canceled' => 'Subida cancelada',
-          'permission-denied' => 'No tienes permisos. ¿Sesión expirada?',
-          'unavailable' =>
-            'Sin conexión. Verifica tu internet e intenta de nuevo',
-          _ => 'Error al guardar: ${e.message ?? e.code}',
+          'storage/unauthorized' => context.l10n.profileStorageUnauthorized,
+          'storage/quota-exceeded' => context.l10n.profileStorageQuotaExceeded,
+          'storage/retry-limit-exceeded' =>
+            context.l10n.profileStorageRetryLimit,
+          'storage/canceled' => context.l10n.profileUploadCanceled,
+          'permission-denied' => context.l10n.profilePermissionDenied,
+          'unavailable' => context.l10n.profileNoConnection,
+          _ => context.l10n.profileSaveErrorDetail(e.message ?? e.code),
         };
         context.showErrorSnackBar(msg);
       }
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error inesperado: $e');
+      if (mounted) {
+        context.showErrorSnackBar(context.l10n.profileUnexpectedError('$e'));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -100,7 +103,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (user == null) return const SizedBox.shrink();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar perfil')),
+      appBar: AppBar(title: Text(context.l10n.profileEditTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -148,9 +151,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             TextFormField(
               controller: _nameController,
               validator: Validators.validateName,
-              decoration: const InputDecoration(
-                labelText: 'Nombre completo',
-                prefixIcon: Icon(Icons.person_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.name,
+                prefixIcon: const Icon(Icons.person_outlined),
               ),
               textCapitalization: TextCapitalization.words,
             ),
@@ -159,9 +162,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               controller: _phoneController,
               validator: Validators.validatePhone,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: 'Teléfono',
-                prefixIcon: Icon(Icons.phone_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.phone,
+                prefixIcon: const Icon(Icons.phone_outlined),
                 prefixText: '+57 ',
               ),
             ),
@@ -169,28 +172,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             TextFormField(
               initialValue: user.email,
               enabled: false,
-              decoration: const InputDecoration(
-                labelText: 'Correo electrónico',
-                prefixIcon: Icon(Icons.email_outlined),
-                helperText: 'No se puede modificar',
+              decoration: InputDecoration(
+                labelText: context.l10n.email,
+                prefixIcon: const Icon(Icons.email_outlined),
+                helperText: context.l10n.profileEmailHelperText,
               ),
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               initialValue: user.tower ?? '',
               enabled: false,
-              decoration: const InputDecoration(
-                labelText: 'Torre / Bloque',
-                prefixIcon: Icon(Icons.domain),
+              decoration: InputDecoration(
+                labelText: context.l10n.tower,
+                prefixIcon: const Icon(Icons.domain),
               ),
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               initialValue: user.apartment ?? '',
               enabled: false,
-              decoration: const InputDecoration(
-                labelText: 'Apartamento',
-                prefixIcon: Icon(Icons.door_front_door_outlined),
+              decoration: InputDecoration(
+                labelText: context.l10n.apartment,
+                prefixIcon: const Icon(Icons.door_front_door_outlined),
               ),
             ),
             const SizedBox(height: AppSizes.xl),
@@ -205,7 +208,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Guardar cambios'),
+                  : Text(context.l10n.adminSaveChanges),
             ),
           ],
         ),

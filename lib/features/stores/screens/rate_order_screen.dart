@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
 import 'package:vecindario_app/features/stores/providers/stores_provider.dart';
@@ -33,7 +34,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
 
   Future<void> _submit() async {
     if (_rating == 0) {
-      context.showErrorSnackBar('Selecciona una calificación');
+      context.showErrorSnackBar(context.l10n.storeSelectRatingError);
       return;
     }
 
@@ -61,12 +62,12 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
           .submitOrderReview(orderId: widget.orderId, review: review);
 
       if (mounted) {
-        context.showSuccessSnackBar('Calificación enviada');
+        context.showSuccessSnackBar(context.l10n.storeRatingSubmitted);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al enviar calificación');
+        context.showErrorSnackBar(context.l10n.storeRatingSubmitError);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -78,11 +79,11 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
     final orderAsync = ref.watch(orderDetailProvider(widget.orderId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Calificar pedido')),
+      appBar: AppBar(title: Text(context.l10n.storeRateOrderButton)),
       body: orderAsync.when(
         data: (order) {
           if (order == null) {
-            return const Center(child: Text('Pedido no encontrado'));
+            return Center(child: Text(context.l10n.storeOrderNotFound));
           }
           return SingleChildScrollView(
             padding: AppSizes.paddingAll,
@@ -96,7 +97,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                 ),
                 const SizedBox(height: AppSizes.md),
                 Text(
-                  '¿Cómo fue tu pedido en ${order.storeName}?',
+                  context.l10n.storeRateOrderQuestion(order.storeName),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.heading3,
                 ),
@@ -125,7 +126,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                 if (_rating > 0) ...[
                   const SizedBox(height: AppSizes.sm),
                   Text(
-                    _ratingLabel(_rating),
+                    _ratingLabel(context, _rating),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -138,9 +139,9 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                 TextField(
                   controller: _commentController,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: 'Comentario opcional...',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.storeCommentHint,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
 
@@ -159,7 +160,7 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Enviar calificación'),
+                        : Text(context.l10n.storeSubmitRatingButton),
                   ),
                 ),
               ],
@@ -167,23 +168,24 @@ class _RateOrderScreenState extends ConsumerState<RateOrderScreen> {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
     );
   }
 
-  String _ratingLabel(int r) {
+  String _ratingLabel(BuildContext context, int r) {
     switch (r) {
       case 1:
-        return 'Muy malo';
+        return context.l10n.storeRatingVeryBad;
       case 2:
-        return 'Malo';
+        return context.l10n.storeRatingBad;
       case 3:
-        return 'Regular';
+        return context.l10n.storeRatingRegular;
       case 4:
-        return 'Bueno';
+        return context.l10n.storeRatingGood;
       case 5:
-        return 'Excelente';
+        return context.l10n.storeRatingExcellent;
       default:
         return '';
     }

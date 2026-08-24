@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:vecindario_app/shared/models/user_model.dart';
@@ -21,14 +22,14 @@ class PendingApprovalsScreen extends ConsumerWidget {
     final communityId = ref.watch(currentCommunityIdProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Solicitudes pendientes')),
+      appBar: AppBar(title: Text(context.l10n.adminPendingApprovalsTitle)),
       body: pendingAsync.when(
         data: (residents) {
           if (residents.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.check_circle_outline,
-              title: 'Todo al día',
-              subtitle: 'No hay solicitudes pendientes',
+              title: context.l10n.adminAllCaughtUp,
+              subtitle: context.l10n.adminNoPendingRequests,
             );
           }
           return ListView.builder(
@@ -44,12 +45,14 @@ class PendingApprovalsScreen extends ConsumerWidget {
                       .approveResident(residents[i].id, communityId);
                   if (context.mounted) {
                     context.showSuccessSnackBar(
-                      '${residents[i].displayName} aprobado',
+                      context.l10n.adminUserApproved(residents[i].displayName),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    context.showErrorSnackBar('Error al aprobar: $e');
+                    context.showErrorSnackBar(
+                      context.l10n.adminApproveError('$e'),
+                    );
                   }
                 }
               },
@@ -60,11 +63,13 @@ class PendingApprovalsScreen extends ConsumerWidget {
                       .read(cloudFunctionsProvider)
                       .rejectResident(residents[i].id, communityId);
                   if (context.mounted) {
-                    context.showSnackBar('Solicitud rechazada');
+                    context.showSnackBar(context.l10n.adminRequestRejected);
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    context.showErrorSnackBar('Error al rechazar: $e');
+                    context.showErrorSnackBar(
+                      context.l10n.adminRejectError('$e'),
+                    );
                   }
                 }
               },
@@ -72,7 +77,8 @@ class PendingApprovalsScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.adminGenericError('$e'))),
       ),
     );
   }

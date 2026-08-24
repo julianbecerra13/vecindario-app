@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -26,22 +27,22 @@ class AmenitiesScreen extends ConsumerWidget {
     final isAdmin = ref.watch(isAdminProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Zonas Sociales')),
+      appBar: AppBar(title: Text(context.l10n.amenityScreenTitle)),
       floatingActionButton: isAdmin
           ? FloatingActionButton.extended(
               heroTag: 'amenities_fab',
               onPressed: () => context.push('/premium/amenities/create'),
               icon: const Icon(Icons.add),
-              label: const Text('Nueva'),
+              label: Text(context.l10n.amenityNewButton),
             )
           : null,
       body: amenitiesAsync.when(
         data: (amenities) {
           if (amenities.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.pool,
-              title: 'Sin zonas configuradas',
-              subtitle: 'Las zonas sociales de tu conjunto aparecerán aquí',
+              title: context.l10n.amenityEmptyTitle,
+              subtitle: context.l10n.amenityEmptySubtitle,
             );
           }
           return ListView.builder(
@@ -51,7 +52,7 @@ class AmenitiesScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -140,7 +141,7 @@ class _AmenityCard extends StatelessWidget {
                   children: [
                     _InfoChip(
                       icon: Icons.people,
-                      text: '${amenity.capacity} personas',
+                      text: context.l10n.amenityCapacityLabel(amenity.capacity),
                     ),
                     const SizedBox(width: AppSizes.md),
                     _InfoChip(icon: Icons.access_time, text: amenity.hours),
@@ -159,7 +160,9 @@ class _AmenityCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: AppSizes.xs),
                   child: Text(
-                    'Depósito reembolsable: ${formatCOP(amenity.deposit!)}',
+                    context.l10n.amenityDepositLabel(
+                      formatCOP(amenity.deposit!),
+                    ),
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.warning,
                     ),
@@ -250,11 +253,15 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Capacidad: ${widget.amenity.capacity} personas',
+                        context.l10n.amenityCapacityColon(
+                          widget.amenity.capacity,
+                        ),
                         style: AppTextStyles.caption,
                       ),
                       Text(
-                        'Tarifa: ${formatCOP(widget.amenity.hourlyRate)}',
+                        context.l10n.amenityRateColon(
+                          formatCOP(widget.amenity.hourlyRate),
+                        ),
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.success,
                           fontWeight: FontWeight.w700,
@@ -265,7 +272,9 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                   if (widget.amenity.deposit != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Depósito: ${formatCOP(widget.amenity.deposit!)} (reembolsable)',
+                      context.l10n.amenityDepositColon(
+                        formatCOP(widget.amenity.deposit!),
+                      ),
                       style: AppTextStyles.caption.copyWith(
                         color: AppColors.warning,
                       ),
@@ -386,15 +395,18 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
             children: [
               _Legend(
                 color: AppColors.success.withValues(alpha: 0.15),
-                label: 'Disponible',
+                label: context.l10n.amenityAvailable,
               ),
               const SizedBox(width: 16),
               _Legend(
                 color: AppColors.error.withValues(alpha: 0.15),
-                label: 'Reservado',
+                label: context.l10n.amenityReserved,
               ),
               const SizedBox(width: 16),
-              _Legend(color: AppColors.success, label: 'Seleccionado'),
+              _Legend(
+                color: AppColors.success,
+                label: context.l10n.amenitySelected,
+              ),
             ],
           ),
           const SizedBox(height: AppSizes.md),
@@ -422,7 +434,7 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Horario: ${widget.amenity.hours}',
+                      context.l10n.amenityScheduleColon(widget.amenity.hours),
                       style: AppTextStyles.caption,
                     ),
                     const SizedBox(height: 8),
@@ -430,7 +442,7 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Alquiler + depósito',
+                          context.l10n.amenityRentalPlusDeposit,
                           style: AppTextStyles.caption,
                         ),
                         Text(
@@ -492,14 +504,19 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                         if (context.mounted) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Reserva creada')),
+                            SnackBar(
+                              content: Text(context.l10n.amenityBookingCreated),
+                            ),
                           );
                         }
                       },
                 icon: const Icon(Icons.credit_card),
-                label: const Text(
-                  'Pagar y Reservar',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                label: Text(
+                  context.l10n.amenityPayAndBook,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.success,

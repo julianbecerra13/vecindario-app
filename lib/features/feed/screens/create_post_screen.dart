@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
@@ -36,7 +37,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Future<void> _publish() async {
     final text = _textController.text.trim();
     if (text.isEmpty) {
-      context.showErrorSnackBar('Escribe algo para publicar');
+      context.showErrorSnackBar(context.l10n.feedWriteSomething);
       return;
     }
 
@@ -50,7 +51,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           .where((t) => t.isNotEmpty)
           .toList();
       if (options.length < 2) {
-        context.showErrorSnackBar('Agrega al menos 2 opciones');
+        context.showErrorSnackBar(context.l10n.feedAddAtLeast2Options);
         return;
       }
       pollOptions = options.map((t) => PollOption(text: t)).toList();
@@ -71,7 +72,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         .read(postNotifierProvider.notifier)
         .createPost(post);
     if (success && mounted) {
-      context.showSuccessSnackBar('Publicado');
+      context.showSuccessSnackBar(context.l10n.feedPublished);
       context.pop();
     }
   }
@@ -82,7 +83,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Publicar'),
+        title: Text(context.l10n.publish),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.pop(),
@@ -102,7 +103,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Publicar'),
+                  : Text(context.l10n.publish),
             ),
           ),
         ],
@@ -137,8 +138,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               style: AppTextStyles.bodyLarge,
               decoration: InputDecoration(
                 hintText: _selectedType == PostType.alert
-                    ? '¿Qué quieres alertar a tu comunidad?'
-                    : '¿Qué quieres compartir con tu comunidad?',
+                    ? context.l10n.feedAlertHint
+                    : context.l10n.feedShareHint,
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -147,7 +148,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             // Opciones de encuesta
             if (_selectedType == PostType.poll) ...[
               const SizedBox(height: AppSizes.md),
-              Text('Opciones de la encuesta', style: AppTextStyles.heading3),
+              Text(
+                context.l10n.feedPollOptionsTitle,
+                style: AppTextStyles.heading3,
+              ),
               const SizedBox(height: AppSizes.sm),
               ..._pollControllers.asMap().entries.map((entry) {
                 return Padding(
@@ -155,7 +159,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   child: TextField(
                     controller: entry.value,
                     decoration: InputDecoration(
-                      hintText: 'Opción ${entry.key + 1}',
+                      hintText: context.l10n.feedPollOptionHint(entry.key + 1),
                       suffixIcon: _pollControllers.length > 2
                           ? IconButton(
                               icon: const Icon(Icons.close, size: 18),
@@ -179,7 +183,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     });
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Agregar opción'),
+                  label: Text(context.l10n.feedAddOption),
                 ),
             ],
           ],

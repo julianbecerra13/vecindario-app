@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 import 'package:vecindario_app/features/services/widgets/rating_stars.dart';
@@ -18,11 +19,11 @@ class ServiceDetailScreen extends ConsumerWidget {
     final serviceAsync = ref.watch(serviceDetailProvider(serviceId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle del Servicio')),
+      appBar: AppBar(title: Text(context.l10n.serviceDetailTitle)),
       body: serviceAsync.when(
         data: (service) {
           if (service == null) {
-            return const Center(child: Text('Servicio no encontrado'));
+            return Center(child: Text(context.l10n.serviceNotFound));
           }
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSizes.md),
@@ -94,7 +95,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '${service.orderCount} órdenes',
+                      context.l10n.serviceOrdersCount(service.orderCount),
                       style: AppTextStyles.caption,
                     ),
                   ],
@@ -112,7 +113,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Precio',
+                        context.l10n.servicePriceHeading,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: context.colors.textSecondary,
                         ),
@@ -131,7 +132,7 @@ class ServiceDetailScreen extends ConsumerWidget {
 
                 // Descripción
                 Text(
-                  'Descripción',
+                  context.l10n.serviceDescriptionLabel,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -172,7 +173,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Prestador de servicio',
+                              context.l10n.serviceProviderLabel,
                               style: AppTextStyles.caption,
                             ),
                           ],
@@ -187,7 +188,8 @@ class ServiceDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.errorWithDetail('$e'))),
       ),
     );
   }

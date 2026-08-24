@@ -4,6 +4,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/fine_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -26,16 +27,22 @@ class FinesScreen extends ConsumerWidget {
         : ref.watch(myFinesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(isAdmin ? 'Gestión de Multas' : 'Mis Multas')),
+      appBar: AppBar(
+        title: Text(
+          isAdmin ? context.l10n.fineManagementTitle : context.l10n.fineMyTitle,
+        ),
+      ),
       body: finesAsync.when(
         data: (fines) {
           if (fines.isEmpty) {
             return EmptyState(
               icon: Icons.check_circle_outline,
-              title: isAdmin ? 'Sin multas registradas' : 'Sin multas',
+              title: isAdmin
+                  ? context.l10n.fineEmptyAdminTitle
+                  : context.l10n.fineEmptyResidentTitle,
               subtitle: isAdmin
-                  ? 'Las multas que registres aparecerán aquí'
-                  : 'No tienes multas pendientes',
+                  ? context.l10n.fineEmptyAdminSubtitle
+                  : context.l10n.fineEmptyResidentSubtitle,
             );
           }
           return ListView.builder(
@@ -45,7 +52,7 @@ class FinesScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -104,7 +111,10 @@ class _FineCard extends ConsumerWidget {
             ),
             const SizedBox(height: AppSizes.sm),
             // Apto
-            Text('Apto ${fine.unitNumber}', style: AppTextStyles.caption),
+            Text(
+              context.l10n.fineUnitLabel(fine.unitNumber),
+              style: AppTextStyles.caption,
+            ),
             const SizedBox(height: AppSizes.xs),
             // Motivo
             Text(
@@ -156,9 +166,9 @@ class _FineCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Descargo del residente',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.fineResidentDefense,
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: AppColors.warning,
@@ -178,7 +188,7 @@ class _FineCard extends ConsumerWidget {
                 !isAdmin) ...[
               const SizedBox(height: AppSizes.sm),
               Text(
-                '⏱ ${fine.daysLeftForDefense} días para presentar descargo',
+                context.l10n.fineDaysLeftForDefense(fine.daysLeftForDefense!),
                 style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.warning,
@@ -193,7 +203,7 @@ class _FineCard extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => _showDefenseDialog(context, ref),
-                  child: const Text('Presentar descargo'),
+                  child: Text(context.l10n.fineSubmitDefense),
                 ),
               ),
             if (isAdmin && fine.status == FineStatus.defense)
@@ -218,7 +228,7 @@ class _FineCard extends ConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.error,
                       ),
-                      child: const Text('Confirmar multa'),
+                      child: Text(context.l10n.fineConfirm),
                     ),
                   ),
                   const SizedBox(width: AppSizes.sm),
@@ -238,7 +248,7 @@ class _FineCard extends ConsumerWidget {
                               );
                         }
                       },
-                      child: const Text('Anular'),
+                      child: Text(context.l10n.fineVoid),
                     ),
                   ),
                 ],
@@ -254,18 +264,16 @@ class _FineCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Presentar descargo'),
+        title: Text(ctx.l10n.fineSubmitDefense),
         content: TextField(
           controller: controller,
           maxLines: 5,
-          decoration: const InputDecoration(
-            hintText: 'Escribe tu versión de los hechos...',
-          ),
+          decoration: InputDecoration(hintText: ctx.l10n.fineDefenseHint),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(ctx.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -281,9 +289,9 @@ class _FineCard extends ConsumerWidget {
                     );
               }
               Navigator.pop(ctx);
-              context.showSuccessSnackBar('Descargo enviado');
+              context.showSuccessSnackBar(context.l10n.fineDefenseSent);
             },
-            child: const Text('Enviar'),
+            child: Text(ctx.l10n.fineSend),
           ),
         ],
       ),

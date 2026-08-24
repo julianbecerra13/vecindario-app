@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/fine_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -35,18 +36,18 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
 
   Future<void> _create() async {
     if (_unitController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Ingresa la unidad (ej: T2-801)');
+      context.showErrorSnackBar(context.l10n.fineUnitRequired);
       return;
     }
     if (_reasonController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Describe el motivo');
+      context.showErrorSnackBar(context.l10n.fineReasonRequired);
       return;
     }
     final amount = int.tryParse(
       _amountController.text.replaceAll('.', '').replaceAll(',', ''),
     );
     if (amount == null || amount <= 0) {
-      context.showErrorSnackBar('Ingresa un monto válido');
+      context.showErrorSnackBar(context.l10n.fineAmountRequired);
       return;
     }
 
@@ -70,12 +71,12 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
     try {
       await ref.read(premiumRepositoryProvider).createFine(communityId, fine);
       if (mounted) {
-        context.showSuccessSnackBar('Multa registrada');
+        context.showSuccessSnackBar(context.l10n.fineRegistered);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error: $e');
+        context.showErrorSnackBar(context.l10n.errorGeneric(e));
         setState(() => _isLoading = false);
       }
     }
@@ -85,7 +86,7 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar Multa'),
+        title: Text(context.l10n.fineCreateTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
@@ -101,7 +102,7 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Registrar'),
+                  : Text(context.l10n.financeRegister),
             ),
           ),
         ],
@@ -114,10 +115,10 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
             // Unidad
             TextField(
               controller: _unitController,
-              decoration: const InputDecoration(
-                labelText: 'Unidad / Apartamento',
+              decoration: InputDecoration(
+                labelText: context.l10n.fineUnitFieldLabel,
                 hintText: 'Ej: T2-801',
-                prefixIcon: Icon(Icons.home),
+                prefixIcon: const Icon(Icons.home),
               ),
               textCapitalization: TextCapitalization.characters,
             ),
@@ -126,10 +127,10 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
             // Monto
             TextField(
               controller: _amountController,
-              decoration: const InputDecoration(
-                labelText: 'Monto (COP)',
+              decoration: InputDecoration(
+                labelText: context.l10n.financeAmountLabel,
                 hintText: 'Ej: 200000',
-                prefixIcon: Icon(Icons.attach_money),
+                prefixIcon: const Icon(Icons.attach_money),
               ),
               keyboardType: TextInputType.number,
             ),
@@ -139,9 +140,9 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
             TextField(
               controller: _reasonController,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Motivo de la multa',
-                hintText: 'Describe la infracción...',
+              decoration: InputDecoration(
+                labelText: context.l10n.fineReasonLabel,
+                hintText: context.l10n.fineReasonHint,
                 alignLabelWithHint: true,
               ),
               textCapitalization: TextCapitalization.sentences,
@@ -151,16 +152,19 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
             // Artículo del manual
             TextField(
               controller: _articleController,
-              decoration: const InputDecoration(
-                labelText: 'Artículo del manual (opcional)',
+              decoration: InputDecoration(
+                labelText: context.l10n.fineManualArticleLabel,
                 hintText: 'Ej: Art. 23 — Horarios de silencio',
-                prefixIcon: Icon(Icons.menu_book),
+                prefixIcon: const Icon(Icons.menu_book),
               ),
             ),
             const SizedBox(height: AppSizes.lg),
 
             // Plazo de descargos
-            Text('Plazo para descargos', style: AppTextStyles.heading3),
+            Text(
+              context.l10n.fineDefenseDeadline,
+              style: AppTextStyles.heading3,
+            ),
             const SizedBox(height: AppSizes.sm),
             Wrap(
               spacing: 8,
@@ -168,7 +172,7 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                 final selected = _defenseDays == days;
                 return ChoiceChip(
                   label: Text(
-                    '$days días',
+                    context.l10n.fineDaysCount(days),
                     style: TextStyle(
                       color: selected
                           ? Colors.white
@@ -206,7 +210,7 @@ class _CreateFineScreenState extends ConsumerState<CreateFineScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'El residente será notificado y tendrá el plazo indicado para presentar descargos.',
+                      context.l10n.fineNotifyInfo,
                       style: TextStyle(
                         fontSize: 12,
                         color: context.colors.textSecondary,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/utils/logger.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -59,7 +60,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Privacidad')),
+      appBar: AppBar(title: Text(context.l10n.privacyTitle)),
       body: ListView(
         padding: AppSizes.paddingAll,
         children: [
@@ -81,16 +82,16 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Ley 1581 de 2012',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.profileLaw1581Title,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Tienes derecho a conocer, actualizar, rectificar y suprimir tus datos personales.',
+                        context.l10n.profileLaw1581Description,
                         style: TextStyle(
                           fontSize: 12,
                           color: context.colors.textSecondary,
@@ -105,18 +106,18 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           const SizedBox(height: AppSizes.lg),
 
           // === MIS DATOS ===
-          _SectionHeader(title: 'Mis Datos'),
+          _SectionHeader(title: context.l10n.profileMyDataSection),
           const SizedBox(height: AppSizes.sm),
           _PrivacyAction(
             icon: Icons.download,
-            title: 'Descargar mis datos',
-            subtitle: 'Recibe un archivo con toda tu información',
+            title: context.l10n.downloadData,
+            subtitle: context.l10n.profileDownloadDataSubtitle,
             onTap: () {
               final user = ref.read(currentUserProvider).value;
               if (user != null) {
                 ref.read(userRepositoryProvider).requestDataExport(user.id);
                 context.showSuccessSnackBar(
-                  'Solicitud enviada. Recibirás un email en máximo 48 horas.',
+                  context.l10n.profileDataExportRequested,
                 );
               }
             },
@@ -124,19 +125,19 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           const Divider(height: 1),
           _PrivacyAction(
             icon: Icons.edit,
-            title: 'Editar información personal',
-            subtitle: 'Nombre, teléfono, foto de perfil',
+            title: context.l10n.profileEditPersonalInfoTitle,
+            subtitle: context.l10n.profileEditPersonalInfoSubtitle,
             onTap: () => context.push('/profile/edit'),
           ),
 
           const SizedBox(height: AppSizes.lg),
 
           // === CONSENTIMIENTOS ===
-          _SectionHeader(title: 'Consentimientos'),
+          _SectionHeader(title: context.l10n.profileConsentsSection),
           const SizedBox(height: AppSizes.sm),
           _ConsentToggle(
             icon: Icons.notifications,
-            title: 'Notificaciones push',
+            title: context.l10n.profilePushNotificationsTitle,
             value: _pushEnabled,
             onChanged: (v) {
               setState(() => _pushEnabled = v);
@@ -146,7 +147,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           const Divider(height: 1),
           _ConsentToggle(
             icon: Icons.email,
-            title: 'Email de novedades',
+            title: context.l10n.profileEmailNewsTitle,
             value: _emailEnabled,
             onChanged: (v) {
               setState(() => _emailEnabled = v);
@@ -156,7 +157,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           const Divider(height: 1),
           _ConsentToggle(
             icon: Icons.bar_chart,
-            title: 'Datos de uso (analytics)',
+            title: context.l10n.profileAnalyticsTitle,
             value: _analyticsEnabled,
             onChanged: (v) {
               setState(() => _analyticsEnabled = v);
@@ -167,26 +168,29 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           const SizedBox(height: AppSizes.lg),
 
           // === LEGAL ===
-          _SectionHeader(title: 'Legal'),
+          _SectionHeader(title: context.l10n.profileLegalSection),
           const SizedBox(height: AppSizes.sm),
           _PrivacyAction(
             icon: Icons.description,
-            title: 'Política de privacidad',
-            subtitle: 'Tratamiento de datos personales',
+            title: context.l10n.privacyPolicy,
+            subtitle: context.l10n.profilePrivacyPolicySubtitle,
             onTap: () => context.push('/profile/privacy-policy'),
           ),
           const Divider(height: 1),
           _PrivacyAction(
             icon: Icons.assignment,
-            title: 'Términos de uso',
-            subtitle: 'Condiciones del servicio',
+            title: context.l10n.termsOfUse,
+            subtitle: context.l10n.profileTermsSubtitle,
             onTap: () => context.push('/profile/terms'),
           ),
 
           const SizedBox(height: AppSizes.lg),
 
           // === ZONA DE PELIGRO ===
-          _SectionHeader(title: 'Zona de peligro', isDestructive: true),
+          _SectionHeader(
+            title: context.l10n.profileDangerZoneTitle,
+            isDestructive: true,
+          ),
           const SizedBox(height: AppSizes.sm),
           Container(
             padding: AppSizes.paddingAll,
@@ -197,13 +201,17 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.warning_amber, color: AppColors.error, size: 20),
-                    SizedBox(width: AppSizes.sm),
+                    const Icon(
+                      Icons.warning_amber,
+                      color: AppColors.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSizes.sm),
                     Text(
-                      'Esta acción es irreversible',
-                      style: TextStyle(
+                      context.l10n.profileIrreversibleAction,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: AppColors.error,
                         fontSize: 14,
@@ -213,36 +221,54 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 ),
                 const SizedBox(height: AppSizes.sm),
                 Text(
-                  'Después de 15 días no podrás recuperar tu cuenta.',
+                  context.l10n.profileCannotRecoverAfter15Days,
                   style: TextStyle(
                     fontSize: 12,
                     color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSizes.md),
-                const Text(
-                  'Se eliminará:',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                Text(
+                  context.l10n.profileWillBeDeletedLabel,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                _DeleteItem(text: 'Tu perfil y foto', isDelete: true),
-                _DeleteItem(text: 'Documentos de verificación', isDelete: true),
-                _DeleteItem(text: 'Tokens y sesiones', isDelete: true),
+                _DeleteItem(
+                  text: context.l10n.profileProfileAndPhotoItem,
+                  isDelete: true,
+                ),
+                _DeleteItem(
+                  text: context.l10n.profileVerificationDocsItem,
+                  isDelete: true,
+                ),
+                _DeleteItem(
+                  text: context.l10n.profileTokensSessionsItem,
+                  isDelete: true,
+                ),
                 const SizedBox(height: AppSizes.sm),
-                const Text(
-                  'Se anonimizará:',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                Text(
+                  context.l10n.profileWillBeAnonymizedLabel,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 _DeleteItem(
-                  text: 'Posts → "Usuario eliminado"',
+                  text: context.l10n.profilePostsAnonymizedItem,
                   isDelete: false,
                 ),
                 _DeleteItem(
-                  text: 'Reseñas → "Usuario eliminado"',
+                  text: context.l10n.profileReviewsAnonymizedItem,
                   isDelete: false,
                 ),
-                _DeleteItem(text: 'Pedidos → uid → null', isDelete: false),
+                _DeleteItem(
+                  text: context.l10n.profileOrdersAnonymizedItem,
+                  isDelete: false,
+                ),
                 const SizedBox(height: AppSizes.md),
                 SizedBox(
                   width: double.infinity,
@@ -252,9 +278,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                       Icons.delete_forever,
                       color: AppColors.error,
                     ),
-                    label: const Text(
-                      'Eliminar mi cuenta (15 días de gracia)',
-                      style: TextStyle(color: AppColors.error),
+                    label: Text(
+                      context.l10n.profileDeleteAccountButtonLabel,
+                      style: const TextStyle(color: AppColors.error),
                     ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.error),
@@ -279,9 +305,9 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text(
-            'Eliminar Cuenta',
-            style: TextStyle(
+          title: Text(
+            context.l10n.profileDeleteAccountDialogTitle,
+            style: const TextStyle(
               color: AppColors.error,
               fontWeight: FontWeight.w700,
             ),
@@ -290,7 +316,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '¿Estás seguro? Después de 15 días esta acción no se puede deshacer.',
+                context.l10n.profileDeleteConfirmMessage,
                 style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
               ),
               const SizedBox(height: AppSizes.md),
@@ -298,7 +324,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                 controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: 'Confirma tu contraseña',
+                  labelText: context.l10n.profileConfirmPasswordLabel,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.lock),
                   errorText: errorText,
@@ -309,7 +335,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
           actions: [
             TextButton(
               onPressed: isLoading ? null : () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               onPressed: isLoading
@@ -318,7 +344,8 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                       final password = passwordController.text;
                       if (password.isEmpty) {
                         setDialogState(
-                          () => errorText = 'Ingresa tu contraseña',
+                          () => errorText =
+                              context.l10n.profileEnterPasswordError,
                         );
                         return;
                       }
@@ -349,7 +376,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                               .requestAccountDeletion(user.id);
                           if (context.mounted) {
                             context.showSnackBar(
-                              'Tu cuenta será eliminada en 15 días. Puedes reactivarla iniciando sesión.',
+                              context.l10n.profileAccountDeletionScheduled,
                             );
                           }
                         }
@@ -357,13 +384,13 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                         setDialogState(() {
                           isLoading = false;
                           errorText = e.code == 'wrong-password'
-                              ? 'Contraseña incorrecta'
-                              : 'Error de autenticación';
+                              ? context.l10n.profileWrongPassword
+                              : context.l10n.profileAuthError;
                         });
                       } catch (e) {
                         setDialogState(() {
                           isLoading = false;
-                          errorText = 'Error inesperado';
+                          errorText = context.l10n.profileUnexpectedErrorShort;
                         });
                       }
                     },
@@ -377,7 +404,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Eliminar mi cuenta'),
+                  : Text(context.l10n.deleteAccount),
             ),
           ],
         ),

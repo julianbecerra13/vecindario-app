@@ -4,6 +4,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
@@ -51,13 +52,17 @@ class PostCard extends ConsumerWidget {
                     top: Radius.circular(AppSizes.cardRadius),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.warning_amber, color: Colors.white, size: 18),
-                    SizedBox(width: AppSizes.sm),
+                    const Icon(
+                      Icons.warning_amber,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    const SizedBox(width: AppSizes.sm),
                     Text(
-                      'ALERTA',
-                      style: TextStyle(
+                      context.l10n.feedAlertBadge,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
@@ -109,18 +114,18 @@ class PostCard extends ConsumerWidget {
                               AppSizes.radiusFull,
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.push_pin,
                                 size: 12,
                                 color: AppColors.primary,
                               ),
-                              SizedBox(width: 2),
+                              const SizedBox(width: 2),
                               Text(
-                                'Fijado',
-                                style: TextStyle(
+                                context.l10n.feedPinned,
+                                style: const TextStyle(
                                   fontSize: 11,
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w600,
@@ -141,7 +146,7 @@ class PostCard extends ConsumerWidget {
                                 .pinPost(post.id, !post.pinned);
                             if (!ok && context.mounted) {
                               context.showErrorSnackBar(
-                                'No se pudo fijar la publicación',
+                                context.l10n.feedCouldNotPin,
                               );
                             }
                           } else if (value == 'report') {
@@ -158,21 +163,23 @@ class PostCard extends ConsumerWidget {
                             PopupMenuItem(
                               value: 'pin',
                               child: Text(
-                                post.pinned ? 'Desfijar' : 'Fijar arriba',
+                                post.pinned
+                                    ? context.l10n.feedUnpin
+                                    : context.l10n.feedPinToTop,
                               ),
                             ),
                           if (isAuthor || isAdmin)
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'delete',
                               child: Text(
-                                'Eliminar',
-                                style: TextStyle(color: AppColors.error),
+                                context.l10n.delete,
+                                style: const TextStyle(color: AppColors.error),
                               ),
                             ),
                           if (!isAuthor)
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'report',
-                              child: Text('Reportar'),
+                              child: Text(context.l10n.feedReport),
                             ),
                         ],
                       ),
@@ -213,7 +220,7 @@ class PostCard extends ConsumerWidget {
                               .toggleLike(post.id, currentUser.id, isLiked);
                           if (!ok && context.mounted) {
                             context.showErrorSnackBar(
-                              'No se pudo registrar tu like',
+                              context.l10n.feedCouldNotLike,
                             );
                           }
                         },
@@ -251,11 +258,11 @@ void _showReportDialog(
   String uid,
 ) {
   final reasons = [
-    'Contenido inapropiado',
-    'Spam o publicidad',
-    'Información falsa',
-    'Acoso o intimidación',
-    'Otro',
+    context.l10n.feedReportReasonInappropriate,
+    context.l10n.feedReportReasonSpam,
+    context.l10n.feedReportReasonFalseInfo,
+    context.l10n.feedReportReasonHarassment,
+    context.l10n.feedReportReasonOther,
   ];
   showModalBottomSheet(
     context: context,
@@ -265,7 +272,10 @@ void _showReportDialog(
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSizes.md),
-            child: Text('Reportar publicación', style: AppTextStyles.heading3),
+            child: Text(
+              context.l10n.feedReportDialogTitle,
+              style: AppTextStyles.heading3,
+            ),
           ),
           ...reasons.map(
             (reason) => ListTile(
@@ -277,9 +287,11 @@ void _showReportDialog(
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (!context.mounted) return;
                 if (ok) {
-                  context.showSnackBar('Reporte enviado');
+                  context.showSnackBar(context.l10n.feedReportSent);
                 } else {
-                  context.showErrorSnackBar('No se pudo enviar el reporte');
+                  context.showErrorSnackBar(
+                    context.l10n.feedCouldNotSendReport,
+                  );
                 }
               },
             ),

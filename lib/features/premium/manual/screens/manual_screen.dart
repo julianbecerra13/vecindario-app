@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 
@@ -222,7 +223,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manual de Convivencia'),
+        title: Text(context.l10n.manualScreenTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -238,7 +239,7 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Buscar en el manual...',
+                hintText: context.l10n.manualSearchHint,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -266,9 +267,9 @@ class _ManualScreenState extends ConsumerState<ManualScreen> {
           // Lista de capítulos
           Expanded(
             child: chapters.isEmpty
-                ? const EmptyState(
+                ? EmptyState(
                     icon: Icons.search_off,
-                    title: 'No se encontraron resultados',
+                    title: context.l10n.noResults,
                   )
                 : ListView.builder(
                     itemCount: chapters.length,
@@ -343,7 +344,9 @@ class _ChapterTile extends StatelessWidget {
                           if (hasLinkedFines) ...[
                             const SizedBox(width: 8),
                             Text(
-                              '${chapter.linkedFines} multas vinculadas',
+                              context.l10n.manualLinkedFines(
+                                chapter.linkedFines,
+                              ),
                               style: AppTextStyles.caption.copyWith(
                                 color: AppColors.warning,
                                 fontWeight: FontWeight.w600,

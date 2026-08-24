@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/pqrs_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -30,7 +31,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
 
   Future<void> _submit() async {
     if (_descriptionController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Describe tu solicitud');
+      context.showErrorSnackBar(context.l10n.pqrsDescribeRequest);
       return;
     }
 
@@ -53,12 +54,12 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
     try {
       await ref.read(premiumRepositoryProvider).createPqrs(communityId, pqrs);
       if (mounted) {
-        context.showSuccessSnackBar('PQRS enviado');
+        context.showSuccessSnackBar(context.l10n.pqrsSent);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error: $e');
+        context.showErrorSnackBar(context.l10n.errorGeneric(e));
         setState(() => _isLoading = false);
       }
     }
@@ -68,7 +69,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nuevo PQRS'),
+        title: Text(context.l10n.pqrsCreateTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
@@ -83,7 +84,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Enviar'),
+                  : Text(context.l10n.fineSend),
             ),
           ),
         ],
@@ -94,7 +95,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Tipo
-            Text('Tipo de solicitud', style: AppTextStyles.heading3),
+            Text(context.l10n.pqrsRequestType, style: AppTextStyles.heading3),
             const SizedBox(height: AppSizes.sm),
             Wrap(
               spacing: 8,
@@ -120,7 +121,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
             const SizedBox(height: AppSizes.lg),
 
             // Categoría
-            Text('Categoría', style: AppTextStyles.heading3),
+            Text(context.l10n.pqrsCategory, style: AppTextStyles.heading3),
             const SizedBox(height: AppSizes.sm),
             Wrap(
               spacing: 8,
@@ -146,10 +147,9 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
             TextField(
               controller: _descriptionController,
               maxLines: 6,
-              decoration: const InputDecoration(
-                labelText: 'Descripción',
-                hintText:
-                    'Describe tu petición, queja, reclamo o sugerencia...',
+              decoration: InputDecoration(
+                labelText: context.l10n.formDescriptionLabel,
+                hintText: context.l10n.pqrsDescriptionHint,
                 alignLabelWithHint: true,
               ),
               textCapitalization: TextCapitalization.sentences,
@@ -176,7 +176,7 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Tu solicitud será enviada al administrador del conjunto. Recibirás notificación cuando sea atendida.',
+                      context.l10n.pqrsNotifyInfo,
                       style: TextStyle(
                         fontSize: 12,
                         color: context.colors.textSecondary,

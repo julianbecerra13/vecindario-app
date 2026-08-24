@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 
 class TermsScreen extends StatelessWidget {
@@ -8,7 +9,7 @@ class TermsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Términos de Uso')),
+      appBar: AppBar(title: Text(context.l10n.termsOfUse)),
       body: SingleChildScrollView(
         padding: AppSizes.paddingAll,
         child: Column(

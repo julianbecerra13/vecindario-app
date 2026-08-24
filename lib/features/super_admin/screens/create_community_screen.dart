@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
@@ -64,12 +65,12 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
 
       if (!mounted) return;
       context.showSuccessSnackBar(
-        'Comunidad "${community.name}" creada. Código: $code',
+        context.l10n.superAdminCommunityCreatedMessage(community.name, code),
       );
       context.pop();
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al crear: $e');
+        context.showErrorSnackBar(context.l10n.superAdminCreateError('$e'));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -79,7 +80,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva comunidad')),
+      appBar: AppBar(title: Text(context.l10n.superAdminNewCommunityTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -100,7 +101,7 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                   const SizedBox(width: AppSizes.sm),
                   Expanded(
                     child: Text(
-                      'Después de crear la comunidad, se generará un código de invitación único para compartir con el administrador.',
+                      context.l10n.superAdminCreateCommunityHint,
                       style: AppTextStyles.bodySmall,
                     ),
                   ),
@@ -108,58 +109,64 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
               ),
             ),
             const SizedBox(height: AppSizes.lg),
-            Text('Información básica', style: AppTextStyles.heading3),
+            Text(
+              context.l10n.superAdminBasicInfoTitle,
+              style: AppTextStyles.heading3,
+            ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Nombre del conjunto',
-                hintText: 'Ej: Pinares de Granada',
-                prefixIcon: Icon(Icons.apartment),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.superAdminCommunityNameLabel,
+                hintText: context.l10n.superAdminCommunityNameHint,
+                prefixIcon: const Icon(Icons.apartment),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'El nombre es obligatorio'
+                  ? context.l10n.adminNameRequired
                   : null,
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _addressController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Dirección',
-                hintText: 'Ej: Carrera 15 # 80-45',
-                prefixIcon: Icon(Icons.location_on_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.adminAddressLabel,
+                hintText: context.l10n.superAdminAddressHint,
+                prefixIcon: const Icon(Icons.location_on_outlined),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'La dirección es obligatoria'
+                  ? context.l10n.superAdminAddressRequired
                   : null,
             ),
             const SizedBox(height: AppSizes.md),
             TextFormField(
               controller: _cityController,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Ciudad',
-                hintText: 'Ej: Bogotá',
-                prefixIcon: Icon(Icons.location_city_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.adminCityLabel,
+                hintText: context.l10n.superAdminCityHint,
+                prefixIcon: const Icon(Icons.location_city_outlined),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'La ciudad es obligatoria'
+                  ? context.l10n.superAdminCityRequired
                   : null,
             ),
             const SizedBox(height: AppSizes.lg),
-            Text('Características', style: AppTextStyles.heading3),
+            Text(
+              context.l10n.superAdminCharacteristicsTitle,
+              style: AppTextStyles.heading3,
+            ),
             const SizedBox(height: AppSizes.md),
             DropdownButtonFormField<int>(
               value: _estrato,
-              decoration: const InputDecoration(
-                labelText: 'Estrato socioeconómico',
-                prefixIcon: Icon(Icons.stars_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.superAdminEstratoSocioLabel,
+                prefixIcon: const Icon(Icons.stars_outlined),
+                border: const OutlineInputBorder(),
               ),
               items: List.generate(6, (i) => i + 1).map((e) {
                 const labels = [
@@ -182,10 +189,10 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
             const SizedBox(height: AppSizes.md),
             DropdownButtonFormField<UnitType>(
               value: _unitType,
-              decoration: const InputDecoration(
-                labelText: 'Tipo de unidad',
-                prefixIcon: Icon(Icons.home_work_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.superAdminUnitTypeFieldLabel,
+                prefixIcon: const Icon(Icons.home_work_outlined),
+                border: const OutlineInputBorder(),
               ),
               items: UnitType.values.map((t) {
                 return DropdownMenuItem(value: t, child: Text(t.label));
@@ -210,7 +217,11 @@ class _CreateCommunityScreenState extends ConsumerState<CreateCommunityScreen> {
                         ),
                       )
                     : const Icon(Icons.check),
-                label: Text(_saving ? 'Creando...' : 'Crear comunidad'),
+                label: Text(
+                  _saving
+                      ? context.l10n.superAdminCreatingAction
+                      : context.l10n.superAdminCreateCommunityAction,
+                ),
               ),
             ),
             const SizedBox(height: AppSizes.md),

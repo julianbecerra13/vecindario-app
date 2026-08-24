@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 import 'package:vecindario_app/features/services/widgets/category_chips.dart';
 import 'package:vecindario_app/features/services/widgets/service_card.dart';
@@ -38,15 +39,15 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Buscar servicio...',
+                decoration: InputDecoration(
+                  hintText: context.l10n.serviceSearchHint,
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
                   ref.read(serviceSearchProvider.notifier).state = value;
                 },
               )
-            : const Text('Servicios Vecinales'),
+            : Text(context.l10n.serviceScreenTitle),
         actions: [
           IconButton(
             icon: Icon(_showSearch ? Icons.close : Icons.search),
@@ -60,7 +61,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
           ),
           PopupMenuButton<ServiceSortBy>(
             icon: const Icon(Icons.sort),
-            tooltip: 'Ordenar',
+            tooltip: context.l10n.sortTooltip,
             onSelected: (sort) {
               ref.read(serviceSortProvider.notifier).state = sort;
             },
@@ -77,7 +78,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                       ),
                     if (currentSort == ServiceSortBy.recent)
                       const SizedBox(width: 8),
-                    const Text('Más recientes'),
+                    Text(context.l10n.serviceSortRecent),
                   ],
                 ),
               ),
@@ -93,7 +94,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                       ),
                     if (currentSort == ServiceSortBy.rating)
                       const SizedBox(width: 8),
-                    const Text('Mejor calificación'),
+                    Text(context.l10n.serviceSortRating),
                   ],
                 ),
               ),
@@ -109,7 +110,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
                       ),
                     if (currentSort == ServiceSortBy.popular)
                       const SizedBox(width: 8),
-                    const Text('Más populares'),
+                    Text(context.l10n.serviceSortPopular),
                   ],
                 ),
               ),
@@ -126,10 +127,10 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
             child: servicesAsync.when(
               data: (services) {
                 if (services.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.storefront_outlined,
-                    title: 'Sin servicios aún',
-                    subtitle: 'Ofrece tus productos o servicios a tu comunidad',
+                    title: context.l10n.serviceEmptyTitle,
+                    subtitle: context.l10n.serviceEmptySubtitle,
                   );
                 }
                 return RefreshIndicator(
@@ -149,7 +150,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
               },
               loading: () => const LoadingIndicator(),
               error: (e, _) => ErrorDisplay(
-                message: 'Error al cargar servicios',
+                message: context.l10n.serviceLoadError,
                 onRetry: () => ref.invalidate(servicesListProvider),
               ),
             ),
@@ -160,7 +161,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen> {
         heroTag: 'services_fab',
         onPressed: () => context.push('/services/create'),
         icon: const Icon(Icons.add),
-        label: const Text('Ofrecer'),
+        label: Text(context.l10n.serviceOfferFab),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/subscriptions/models/subscription_model.dart';
 import 'package:vecindario_app/features/premium/subscriptions/repositories/subscription_repository.dart';
@@ -26,7 +27,7 @@ class _SubscriptionPlansScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Planes Vecindario Admin')),
+      appBar: AppBar(title: Text(context.l10n.subscriptionPlansTitle)),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -34,7 +35,7 @@ class _SubscriptionPlansScreenState
             child: Column(
               children: [
                 Text(
-                  'Digitaliza la gestión de tu conjunto',
+                  context.l10n.subscriptionTagline,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: context.colors.textSecondary,
@@ -42,7 +43,7 @@ class _SubscriptionPlansScreenState
                 ),
                 const SizedBox(height: AppSizes.sm),
                 Text(
-                  'Primer mes gratis',
+                  context.l10n.subscriptionFirstMonthFree,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.primary,
@@ -52,48 +53,78 @@ class _SubscriptionPlansScreenState
                 const SizedBox(height: AppSizes.lg),
                 _PlanCard(
                   plan: SubscriptionPlan.starter,
-                  units: '1 - 50 unidades',
-                  features: const [
-                    _Feature('Circulares con tracking', true),
-                    _Feature('PQRS con SLA', true),
-                    _Feature('Manual de convivencia', true),
-                    _Feature('Gestión de multas', true),
-                    _Feature('Zonas sociales', false),
-                    _Feature('Finanzas', false),
+                  units: context.l10n.subscriptionUnitsStarter,
+                  features: [
+                    _Feature(
+                      context.l10n.subscriptionFeatureCircularsTracking,
+                      true,
+                    ),
+                    _Feature(context.l10n.subscriptionFeaturePqrsSla, true),
+                    _Feature(context.l10n.subscriptionFeatureManual, true),
+                    _Feature(
+                      context.l10n.subscriptionFeatureFineManagement,
+                      true,
+                    ),
+                    _Feature(context.l10n.subscriptionFeatureAmenities, false),
+                    _Feature(context.l10n.subscriptionFeatureFinances, false),
                   ],
                   onSubscribe: () => _startTrial(SubscriptionPlan.starter),
                 ),
                 const SizedBox(height: AppSizes.md),
                 _PlanCard(
                   plan: SubscriptionPlan.professional,
-                  units: '51 - 150 unidades',
+                  units: context.l10n.subscriptionUnitsProfessional,
                   isPopular: true,
-                  features: const [
-                    _Feature('Todo de Starter', true),
-                    _Feature('Reserva zonas sociales', true),
-                    _Feature('Pagos en línea', true),
-                    _Feature('Dashboard financiero', true),
-                    _Feature('Estado de cuenta individual', true),
-                    _Feature('Asambleas/votaciones', false),
+                  features: [
+                    _Feature(context.l10n.subscriptionFeatureAllStarter, true),
+                    _Feature(
+                      context.l10n.subscriptionFeatureAmenitiesBooking,
+                      true,
+                    ),
+                    _Feature(
+                      context.l10n.subscriptionFeatureOnlinePayments,
+                      true,
+                    ),
+                    _Feature(
+                      context.l10n.subscriptionFeatureFinanceDashboard,
+                      true,
+                    ),
+                    _Feature(
+                      context.l10n.subscriptionFeatureIndividualStatement,
+                      true,
+                    ),
+                    _Feature(context.l10n.subscriptionFeatureAssemblies, false),
                   ],
                   onSubscribe: () => _startTrial(SubscriptionPlan.professional),
                 ),
                 const SizedBox(height: AppSizes.md),
                 _PlanCard(
                   plan: SubscriptionPlan.enterprise,
-                  units: '151+ unidades',
-                  features: const [
-                    _Feature('Todo de Profesional', true),
-                    _Feature('Asambleas + votaciones', true),
-                    _Feature('Reportes PDF automáticos', true),
-                    _Feature('API contable (Siigo)', true),
-                    _Feature('Soporte prioritario', true),
+                  units: context.l10n.subscriptionUnitsEnterprise,
+                  features: [
+                    _Feature(
+                      context.l10n.subscriptionFeatureAllProfessional,
+                      true,
+                    ),
+                    _Feature(
+                      context.l10n.subscriptionFeatureAssembliesVoting,
+                      true,
+                    ),
+                    _Feature(context.l10n.subscriptionFeaturePdfReports, true),
+                    _Feature(
+                      context.l10n.subscriptionFeatureAccountingApi,
+                      true,
+                    ),
+                    _Feature(
+                      context.l10n.subscriptionFeaturePrioritySupport,
+                      true,
+                    ),
                   ],
                   onSubscribe: () => _startTrial(SubscriptionPlan.enterprise),
                 ),
                 const SizedBox(height: AppSizes.lg),
                 Text(
-                  '20% descuento pago anual (2 meses gratis)',
+                  context.l10n.subscriptionAnnualDiscount,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.caption,
                 ),
@@ -117,7 +148,7 @@ class _SubscriptionPlansScreenState
     final user = ref.read(currentUserProvider).value;
     final communityId = ref.read(currentCommunityIdProvider);
     if (user == null || communityId == null) {
-      context.showErrorSnackBar('Usuario o comunidad no disponibles');
+      context.showErrorSnackBar(context.l10n.errorUserOrCommunityUnavailable);
       return;
     }
 
@@ -127,19 +158,21 @@ class _SubscriptionPlansScreenState
           .read(subscriptionRepositoryProvider)
           .startTrial(communityId: communityId, plan: plan, adminUid: user.id);
       if (!mounted) return;
-      context.showSuccessSnackBar('Trial de 30 días activado: ${plan.label}');
+      context.showSuccessSnackBar(
+        context.l10n.subscriptionTrialActivated(plan.label),
+      );
       context.go('/premium/dashboard');
     } on StateError catch (e) {
       if (mounted) context.showErrorSnackBar(e.message);
     } on FirebaseException catch (e) {
       if (mounted) {
         final msg = e.code == 'permission-denied'
-            ? 'Solo administradores pueden activar el trial'
-            : 'Error al activar trial: ${e.message}';
+            ? context.l10n.subscriptionOnlyAdminsCanActivate
+            : context.l10n.subscriptionActivationError(e.message ?? '');
         context.showErrorSnackBar(msg);
       }
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error inesperado: $e');
+      if (mounted) context.showErrorSnackBar(context.l10n.errorUnexpected(e));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -193,9 +226,9 @@ class _PlanCard extends StatelessWidget {
                       color: AppColors.success,
                       borderRadius: BorderRadius.circular(AppSizes.radiusFull),
                     ),
-                    child: const Text(
-                      'POPULAR',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.subscriptionPopular,
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -221,7 +254,10 @@ class _PlanCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4),
-                  child: Text('/mes', style: AppTextStyles.caption),
+                  child: Text(
+                    context.l10n.subscriptionPerMonth,
+                    style: AppTextStyles.caption,
+                  ),
                 ),
               ],
             ),
@@ -262,7 +298,7 @@ class _PlanCard extends StatelessWidget {
                       ? AppColors.success
                       : AppColors.primary,
                 ),
-                child: const Text('Probar gratis 30 días'),
+                child: Text(context.l10n.subscriptionTry30DaysFree),
               ),
             ),
           ],

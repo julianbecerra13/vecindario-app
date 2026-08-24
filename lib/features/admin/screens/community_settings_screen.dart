@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
@@ -54,11 +55,11 @@ class _CommunitySettingsScreenState
     final communityAsync = ref.watch(currentCommunityProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configuración de comunidad')),
+      appBar: AppBar(title: Text(context.l10n.adminSettingsTitle)),
       body: communityAsync.when(
         data: (community) {
           if (community == null) {
-            return const Center(child: Text('Comunidad no encontrada'));
+            return Center(child: Text(context.l10n.adminCommunityNotFound));
           }
           _hydrate(community);
           return Stack(
@@ -77,46 +78,49 @@ class _CommunitySettingsScreenState
                         rotating: _rotating,
                       ),
                       const SizedBox(height: AppSizes.lg),
-                      Text('Datos generales', style: AppTextStyles.heading3),
+                      Text(
+                        context.l10n.adminGeneralData,
+                        style: AppTextStyles.heading3,
+                      ),
                       const SizedBox(height: AppSizes.md),
                       TextFormField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nombre',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.adminNameLabel,
+                          border: const OutlineInputBorder(),
                         ),
                         validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'El nombre es obligatorio'
+                            ? context.l10n.adminNameRequired
                             : null,
                       ),
                       const SizedBox(height: AppSizes.md),
                       TextFormField(
                         controller: _addressController,
-                        decoration: const InputDecoration(
-                          labelText: 'Dirección',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.adminAddressLabel,
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: AppSizes.md),
                       TextFormField(
                         controller: _cityController,
-                        decoration: const InputDecoration(
-                          labelText: 'Ciudad',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.adminCityLabel,
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: AppSizes.md),
                       DropdownButtonFormField<int>(
                         value: _estrato,
-                        decoration: const InputDecoration(
-                          labelText: 'Estrato',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.adminEstratoLabel,
+                          border: const OutlineInputBorder(),
                         ),
                         items: List.generate(6, (i) => i + 1)
                             .map(
                               (e) => DropdownMenuItem(
                                 value: e,
-                                child: Text('Estrato $e'),
+                                child: Text(context.l10n.adminEstratoOption(e)),
                               ),
                             )
                             .toList(),
@@ -139,7 +143,7 @@ class _CommunitySettingsScreenState
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Text('Guardar cambios'),
+                              : Text(context.l10n.adminSaveChanges),
                         ),
                       ),
                     ],
@@ -150,14 +154,15 @@ class _CommunitySettingsScreenState
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.adminGenericError('$e'))),
       ),
     );
   }
 
   void _copyCode(String code) {
     Clipboard.setData(ClipboardData(text: code));
-    context.showSuccessSnackBar('Código copiado');
+    context.showSuccessSnackBar(context.l10n.adminCodeCopied);
   }
 
   Future<void> _rotateCode() async {
@@ -166,10 +171,9 @@ class _CommunitySettingsScreenState
 
     final confirm = await showConfirmDialog(
       context,
-      title: 'Rotar código',
-      message:
-          'El código actual dejará de funcionar y se generará uno nuevo. Los residentes que aún no se hayan unido deberán pedirlo de nuevo.',
-      confirmText: 'Rotar',
+      title: context.l10n.adminRotateCodeTitle,
+      message: context.l10n.adminRotateCodeMessage,
+      confirmText: context.l10n.adminRotateAction,
       isDestructive: true,
     );
     if (!confirm) return;
@@ -182,14 +186,19 @@ class _CommunitySettingsScreenState
       if (!mounted) return;
       final newCode = result['newCode'] as String?;
       context.showSuccessSnackBar(
-        newCode != null ? 'Nuevo código: $newCode' : 'Código rotado',
+        newCode != null
+            ? context.l10n.adminNewCodeMessage(newCode)
+            : context.l10n.adminCodeRotated,
       );
     } on CloudFunctionException catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('No se pudo rotar: ${e.statusCode}');
+        context.showErrorSnackBar(
+          context.l10n.adminRotateError('${e.statusCode}'),
+        );
       }
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error: $e');
+      if (mounted)
+        context.showErrorSnackBar(context.l10n.adminGenericError('$e'));
     } finally {
       if (mounted) setState(() => _rotating = false);
     }
@@ -206,10 +215,10 @@ class _CommunitySettingsScreenState
         'city': _cityController.text.trim(),
         'estrato': _estrato,
       });
-      if (mounted) context.showSuccessSnackBar('Cambios guardados');
+      if (mounted) context.showSuccessSnackBar(context.l10n.adminChangesSaved);
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al guardar: $e');
+        context.showErrorSnackBar(context.l10n.adminSaveError('$e'));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -231,11 +240,20 @@ class _StatsRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _StatItem(label: 'Residentes', value: '${community.memberCount}'),
+          _StatItem(
+            label: context.l10n.adminResidentsLabel,
+            value: '${community.memberCount}',
+          ),
           const SizedBox(width: AppSizes.lg),
-          _StatItem(label: 'Servicio', value: '\$${community.serviceFee}'),
+          _StatItem(
+            label: context.l10n.adminServiceLabel,
+            value: '\$${community.serviceFee}',
+          ),
           const SizedBox(width: AppSizes.lg),
-          _StatItem(label: 'Unidades', value: community.unitType.label),
+          _StatItem(
+            label: context.l10n.adminUnitsLabel,
+            value: community.unitType.label,
+          ),
         ],
       ),
     );

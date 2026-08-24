@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
@@ -36,7 +37,7 @@ class _RecommendExternalServiceScreenState
 
   Future<void> _submit() async {
     if (_nameController.text.isEmpty || _descriptionController.text.isEmpty) {
-      context.showErrorSnackBar('Completa nombre y descripción');
+      context.showErrorSnackBar(context.l10n.externalCompleteNameDesc);
       return;
     }
 
@@ -44,7 +45,7 @@ class _RecommendExternalServiceScreenState
     final community = ref.read(currentCommunityProvider).value;
 
     if (user == null || community == null) {
-      context.showErrorSnackBar('No hay usuario o comunidad');
+      context.showErrorSnackBar(context.l10n.externalNoUserOrCommunity);
       return;
     }
 
@@ -65,12 +66,12 @@ class _RecommendExternalServiceScreenState
       });
 
       if (mounted) {
-        context.showSuccessSnackBar('Servicio recomendado');
+        context.showSuccessSnackBar(context.l10n.externalServiceRecommended);
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al recomendar servicio');
+        context.showErrorSnackBar(context.l10n.externalErrorRecommending);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -80,14 +81,14 @@ class _RecommendExternalServiceScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recomendar Servicio')),
+      appBar: AppBar(title: Text(context.l10n.externalRecommendTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSizes.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Recomienda un servicio externo a tu comunidad',
+              context.l10n.externalRecommendDesc,
               style: TextStyle(color: context.colors.textSecondary),
             ),
             const SizedBox(height: AppSizes.lg),
@@ -96,7 +97,7 @@ class _RecommendExternalServiceScreenState
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Nombre del servicio *',
+                labelText: context.l10n.externalServiceNameLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
@@ -109,11 +110,11 @@ class _RecommendExternalServiceScreenState
             TextField(
               controller: _descriptionController,
               decoration: InputDecoration(
-                labelText: 'Descripción *',
+                labelText: context.l10n.externalDescriptionLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
-                hintText: 'Qué ofrece este servicio',
+                hintText: context.l10n.externalDescriptionHint,
               ),
               maxLines: 3,
               maxLength: 300,
@@ -124,7 +125,7 @@ class _RecommendExternalServiceScreenState
             TextField(
               controller: _phoneController,
               decoration: InputDecoration(
-                labelText: 'Teléfono',
+                labelText: context.l10n.phone,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
@@ -137,7 +138,7 @@ class _RecommendExternalServiceScreenState
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
-                labelText: 'Email',
+                labelText: context.l10n.email,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
@@ -150,11 +151,11 @@ class _RecommendExternalServiceScreenState
             TextField(
               controller: _websiteController,
               decoration: InputDecoration(
-                labelText: 'Sitio web',
+                labelText: context.l10n.externalWebsiteLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
-                hintText: 'https://ejemplo.com',
+                hintText: context.l10n.externalWebsiteHint,
               ),
               keyboardType: TextInputType.url,
             ),
@@ -171,7 +172,7 @@ class _RecommendExternalServiceScreenState
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Enviar Recomendación'),
+                    : Text(context.l10n.externalSendRecommendation),
               ),
             ),
           ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/utils/validators.dart';
 import 'package:vecindario_app/features/external_services/models/external_service_model.dart';
 import 'package:vecindario_app/features/external_services/providers/external_services_provider.dart';
@@ -58,11 +59,12 @@ class _RecommendServiceScreenState
           .recommendService(service);
 
       if (mounted) {
-        context.showSuccessSnackBar('Servicio recomendado');
+        context.showSuccessSnackBar(context.l10n.externalServiceRecommended);
         context.pop();
       }
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error al recomendar');
+      if (mounted)
+        context.showErrorSnackBar(context.l10n.externalErrorRecommendingShort);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -71,7 +73,7 @@ class _RecommendServiceScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recomendar servicio')),
+      appBar: AppBar(title: Text(context.l10n.externalRecommendTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -80,18 +82,18 @@ class _RecommendServiceScreenState
             TextFormField(
               controller: _nameController,
               validator: (v) => Validators.validateRequired(v, 'El nombre'),
-              decoration: const InputDecoration(
-                labelText: 'Nombre del profesional o empresa',
-                prefixIcon: Icon(Icons.person_outline),
+              decoration: InputDecoration(
+                labelText: context.l10n.externalProfessionalNameLabel,
+                prefixIcon: const Icon(Icons.person_outline),
               ),
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: AppSizes.md),
             DropdownButtonFormField<ExternalCategory>(
               value: _category,
-              decoration: const InputDecoration(
-                labelText: 'Categoría',
-                prefixIcon: Icon(Icons.category),
+              decoration: InputDecoration(
+                labelText: context.l10n.externalCategoryLabel,
+                prefixIcon: const Icon(Icons.category),
               ),
               items: ExternalCategory.values
                   .map(
@@ -114,9 +116,9 @@ class _RecommendServiceScreenState
               controller: _phoneController,
               validator: Validators.validatePhone,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: 'Teléfono',
-                prefixIcon: Icon(Icons.phone),
+              decoration: InputDecoration(
+                labelText: context.l10n.phone,
+                prefixIcon: const Icon(Icons.phone),
                 prefixText: '+57 ',
               ),
             ),
@@ -125,8 +127,8 @@ class _RecommendServiceScreenState
               controller: _descController,
               validator: (v) =>
                   Validators.validateRequired(v, 'La descripción'),
-              decoration: const InputDecoration(
-                labelText: 'Describe tu experiencia con este servicio',
+              decoration: InputDecoration(
+                labelText: context.l10n.externalDescribeExperienceLabel,
                 alignLabelWithHint: true,
                 prefixIcon: Padding(
                   padding: EdgeInsets.only(bottom: 48),
@@ -149,7 +151,7 @@ class _RecommendServiceScreenState
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Recomendar'),
+                  : Text(context.l10n.externalRecommendCta),
             ),
           ],
         ),

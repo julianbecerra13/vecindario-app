@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/core/theme/theme_mode_provider.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
@@ -26,7 +27,7 @@ class ProfileScreen extends ConsumerWidget {
     final myOrdersAsync = ref.watch(myOrdersProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Perfil')),
+      appBar: AppBar(title: Text(context.l10n.profile)),
       body: userAsync.when(
         data: (user) {
           if (user == null) return const SizedBox.shrink();
@@ -60,11 +61,11 @@ class ProfileScreen extends ConsumerWidget {
 
               // Cuenta
               _SectionCard(
-                title: 'Cuenta',
+                title: context.l10n.profileAccountSection,
                 children: [
                   _SettingsTile(
                     icon: Icons.edit,
-                    title: 'Editar perfil',
+                    title: context.l10n.profileEditProfile,
                     onTap: () => context.push('/profile/edit'),
                   ),
                 ],
@@ -73,12 +74,12 @@ class ProfileScreen extends ConsumerWidget {
               // Super Admin (plataforma)
               if (user.isSuperAdmin)
                 _SectionCard(
-                  title: 'Plataforma',
+                  title: context.l10n.profilePlatformSection,
                   children: [
                     _SettingsTile(
                       icon: Icons.shield,
-                      title: 'Super Admin Panel',
-                      subtitle: 'Gestionar comunidades y clientes',
+                      title: context.l10n.profileSuperAdminPanelTitle,
+                      subtitle: context.l10n.profileManageCommunitiesSubtitle,
                       onTap: () => context.push('/super-admin'),
                     ),
                   ],
@@ -88,13 +89,12 @@ class ProfileScreen extends ConsumerWidget {
               // entradas separadas: panel admin y Vecindario Admin)
               if (isAdmin)
                 _SectionCard(
-                  title: 'Administración',
+                  title: context.l10n.profileAdminSection,
                   children: [
                     _SettingsTile(
                       icon: Icons.business,
-                      title: 'Administración del conjunto',
-                      subtitle:
-                          'Aprobaciones, circulares, multas, finanzas, PQRS y más',
+                      title: context.l10n.profileCommunityAdminTitle,
+                      subtitle: context.l10n.profileCommunityAdminSubtitle,
                       onTap: () => context.push('/premium'),
                     ),
                   ],
@@ -104,41 +104,41 @@ class ProfileScreen extends ConsumerWidget {
               // de accesos rápidos en vez de una lista larga de 7 filas.
               if (!user.isSuperAdmin && user.communityId != null)
                 _QuickAccessSection(
-                  title: 'Mi conjunto',
+                  title: context.l10n.profileMyCommunitySection,
                   items: [
                     _QuickAccessItem(
                       icon: Icons.campaign_outlined,
-                      title: 'Circulares',
+                      title: context.l10n.profileCircularsTitle,
                       onTap: () => context.push('/premium/circulars'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.pool_outlined,
-                      title: 'Reservar zona',
+                      title: context.l10n.profileReserveZoneTitle,
                       onTap: () => context.push('/premium/amenities'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.assignment_outlined,
-                      title: 'PQRS',
+                      title: context.l10n.profilePqrsTitle,
                       onTap: () => context.push('/premium/pqrs'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.receipt_long_outlined,
-                      title: 'Mis multas',
+                      title: context.l10n.profileMyFinesTitle,
                       onTap: () => context.push('/premium/fines'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.account_balance_wallet_outlined,
-                      title: 'Estado de cuenta',
+                      title: context.l10n.profileAccountStatementTitle,
                       onTap: () => context.push('/premium/account-statement'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.how_to_vote_outlined,
-                      title: 'Asambleas',
+                      title: context.l10n.profileAssembliesTitle,
                       onTap: () => context.push('/premium/assemblies'),
                     ),
                     _QuickAccessItem(
                       icon: Icons.menu_book_outlined,
-                      title: 'Manual de convivencia',
+                      title: context.l10n.profileManualTitle,
                       onTap: () => context.push('/premium/manual'),
                     ),
                   ],
@@ -147,29 +147,29 @@ class ProfileScreen extends ConsumerWidget {
               // Store panel (solo para quien tiene una tienda)
               if (hasStore)
                 _SectionCard(
-                  title: 'Mi Tienda',
+                  title: context.l10n.profileMyStoreSection,
                   children: [
                     _SettingsTile(
                       icon: Icons.storefront,
-                      title: 'Panel de tienda',
-                      subtitle: 'Gestionar pedidos y catálogo',
+                      title: context.l10n.profileStorePanelTitle,
+                      subtitle: context.l10n.profileManageOrdersSubtitle,
                       onTap: () => context.push('/store-panel'),
                     ),
                   ],
                 ),
 
               _SectionCard(
-                title: 'Configuración',
+                title: context.l10n.profileConfigSection,
                 children: [
                   _SettingsTile(
                     icon: Icons.notifications_outlined,
-                    title: 'Notificaciones',
+                    title: context.l10n.profileNotificationsTitle,
                     onTap: () => context.push('/notifications'),
                   ),
                   _SettingsTile(
                     icon: Icons.shield_outlined,
-                    title: 'Mi Privacidad',
-                    subtitle: 'Datos, derechos y eliminación de cuenta',
+                    title: context.l10n.privacyTitle,
+                    subtitle: context.l10n.profilePrivacySubtitle,
                     onTap: () => context.push('/profile/privacy'),
                   ),
                   Consumer(
@@ -177,11 +177,11 @@ class ProfileScreen extends ConsumerWidget {
                       final themeMode = ref.watch(themeModeProvider);
                       return _SettingsTile(
                         icon: Icons.brightness_6_outlined,
-                        title: 'Apariencia',
+                        title: context.l10n.profileAppearanceTitle,
                         subtitle: switch (themeMode) {
-                          ThemeMode.light => 'Claro',
-                          ThemeMode.dark => 'Oscuro',
-                          ThemeMode.system => 'Automático (sistema)',
+                          ThemeMode.light => context.l10n.profileThemeLight,
+                          ThemeMode.dark => context.l10n.profileThemeDark,
+                          ThemeMode.system => context.l10n.profileThemeSystem,
                         },
                         onTap: () => _showThemeModeDialog(context, ref),
                       );
@@ -191,16 +191,16 @@ class ProfileScreen extends ConsumerWidget {
               ),
 
               _SectionCard(
-                title: 'Legal',
+                title: context.l10n.profileLegalSection,
                 children: [
                   _SettingsTile(
                     icon: Icons.description_outlined,
-                    title: 'Términos de uso',
+                    title: context.l10n.termsOfUse,
                     onTap: () => context.push('/profile/terms'),
                   ),
                   _SettingsTile(
                     icon: Icons.privacy_tip_outlined,
-                    title: 'Política de privacidad',
+                    title: context.l10n.privacyPolicy,
                     onTap: () => context.push('/profile/privacy-policy'),
                   ),
                 ],
@@ -213,9 +213,9 @@ class ProfileScreen extends ConsumerWidget {
                   onPressed: () async {
                     final confirm = await showConfirmDialog(
                       context,
-                      title: 'Cerrar sesión',
-                      message: '¿Estás seguro de que quieres cerrar sesión?',
-                      confirmText: 'Cerrar sesión',
+                      title: context.l10n.logout,
+                      message: context.l10n.profileLogoutConfirmMessage,
+                      confirmText: context.l10n.logout,
                       isDestructive: true,
                     );
                     if (confirm) {
@@ -223,9 +223,9 @@ class ProfileScreen extends ConsumerWidget {
                     }
                   },
                   icon: const Icon(Icons.logout, color: AppColors.error),
-                  label: const Text(
-                    'Cerrar sesión',
-                    style: TextStyle(color: AppColors.error),
+                  label: Text(
+                    context.l10n.logout,
+                    style: const TextStyle(color: AppColors.error),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.error),
@@ -249,14 +249,14 @@ void _showThemeModeDialog(BuildContext context, WidgetRef ref) {
     builder: (dialogContext) {
       final current = ref.read(themeModeProvider);
       return AlertDialog(
-        title: const Text('Apariencia'),
+        title: Text(context.l10n.profileAppearanceTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: ThemeMode.values.map((mode) {
             final label = switch (mode) {
-              ThemeMode.light => 'Claro',
-              ThemeMode.dark => 'Oscuro',
-              ThemeMode.system => 'Automático (sistema)',
+              ThemeMode.light => context.l10n.profileThemeLight,
+              ThemeMode.dark => context.l10n.profileThemeDark,
+              ThemeMode.system => context.l10n.profileThemeSystem,
             };
             return RadioListTile<ThemeMode>(
               title: Text(label),
@@ -294,15 +294,21 @@ class _StatsRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _StatItem(
-            label: 'Posts',
+            label: context.l10n.profilePostsLabel,
             value: postCount.when(
               data: (count) => count.toString(),
               loading: () => '—',
               error: (_, __) => '—',
             ),
           ),
-          _StatItem(label: 'Pedidos', value: ordersCount.toString()),
-          _StatItem(label: 'Miembro desde', value: '${memberSince.year}'),
+          _StatItem(
+            label: context.l10n.profileOrdersLabel,
+            value: ordersCount.toString(),
+          ),
+          _StatItem(
+            label: context.l10n.profileMemberSinceLabel,
+            value: '${memberSince.year}',
+          ),
         ],
       ),
     );

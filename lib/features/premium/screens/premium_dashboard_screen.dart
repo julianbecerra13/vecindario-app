@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
@@ -24,7 +25,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
 
     if (!isPremium) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Vecindario Admin')),
+        appBar: AppBar(title: Text(context.l10n.premiumDashboardTitle)),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.xl),
@@ -37,17 +38,20 @@ class PremiumDashboardScreen extends ConsumerWidget {
                   color: context.colors.textHint,
                 ),
                 const SizedBox(height: AppSizes.md),
-                Text('Vecindario Admin', style: AppTextStyles.heading3),
+                Text(
+                  context.l10n.premiumDashboardTitle,
+                  style: AppTextStyles.heading3,
+                ),
                 const SizedBox(height: AppSizes.sm),
                 Text(
-                  'Tu comunidad aún no tiene Vecindario Admin activo.',
+                  context.l10n.premiumNotActive,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: context.colors.textSecondary),
                 ),
                 const SizedBox(height: AppSizes.lg),
                 ElevatedButton(
                   onPressed: () => context.push('/premium/plans'),
-                  child: const Text('Ver planes'),
+                  child: Text(context.l10n.premiumViewPlans),
                 ),
               ],
             ),
@@ -61,7 +65,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Vecindario Admin'),
+            Text(context.l10n.premiumDashboardTitle),
             if (plan != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -90,7 +94,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
             const SizedBox(height: AppSizes.lg),
             // Acciones rápidas (cards full-width como en diseño .pen)
             Text(
-              'ACCIONES RÁPIDAS',
+              context.l10n.premiumQuickActions,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
@@ -102,29 +106,29 @@ class PremiumDashboardScreen extends ConsumerWidget {
             _QuickActionCard(
               icon: Icons.campaign,
               color: AppColors.info,
-              title: 'Nueva Circular',
-              subtitle: 'Enviar comunicado oficial',
+              title: context.l10n.circularCreateTitle,
+              subtitle: context.l10n.premiumSendOfficialNotice,
               onTap: () => context.push('/premium/circulars/create'),
             ),
             _QuickActionCard(
               icon: Icons.warning_amber,
               color: AppColors.error,
-              title: 'Registrar Multa',
-              subtitle: 'Crear sanción con evidencia',
+              title: context.l10n.fineCreateTitle,
+              subtitle: context.l10n.premiumCreateSanctionWithEvidence,
               onTap: () => context.push('/premium/fines/create'),
             ),
             _QuickActionCard(
               icon: Icons.account_balance,
               color: AppColors.success,
-              title: 'Finanzas',
-              subtitle: 'Presupuesto y ejecución',
+              title: context.l10n.financeDashboardTitle,
+              subtitle: context.l10n.financeBudgetVsExecution,
               onTap: () => context.push('/premium/finances'),
             ),
             _QuickActionCard(
               icon: Icons.how_to_vote,
               color: const Color(0xFF8B5CF6),
-              title: 'Convocar Asamblea',
-              subtitle: 'Crear convocatoria con agenda',
+              title: context.l10n.assemblyConveneTitle,
+              subtitle: context.l10n.premiumCreateConvocationWithAgenda,
               onTap: () => context.push('/premium/assemblies'),
             ),
             const SizedBox(height: AppSizes.md),
@@ -132,7 +136,7 @@ class PremiumDashboardScreen extends ConsumerWidget {
 
           // === MÓDULOS ===
           Text(
-            'MÓDULOS',
+            context.l10n.premiumModules,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -145,68 +149,72 @@ class PremiumDashboardScreen extends ConsumerWidget {
             _ModuleTile(
               icon: Icons.campaign,
               color: AppColors.info,
-              title: 'Circulares',
+              title: context.l10n.circularScreenTitle,
               subtitle: isAdmin
-                  ? 'Enviar comunicados con tracking de lectura'
-                  : 'Comunicados oficiales de tu conjunto',
+                  ? context.l10n.premiumCircularsAdminSubtitle
+                  : context.l10n.premiumCircularsResidentSubtitle,
               onTap: () => context.push('/premium/circulars'),
             ),
           if (isFeatureAvailable(plan, 'fines'))
             _ModuleTile(
               icon: Icons.gavel,
               color: AppColors.warning,
-              title: isAdmin ? 'Gestión de Multas' : 'Mis Multas',
+              title: isAdmin
+                  ? context.l10n.fineManagementTitle
+                  : context.l10n.fineMyTitle,
               subtitle: isAdmin
-                  ? 'Registrar y gestionar sanciones'
-                  : 'Tus multas y descargos',
+                  ? context.l10n.premiumFinesAdminSubtitle
+                  : context.l10n.premiumFinesResidentSubtitle,
               onTap: () => context.push('/premium/fines'),
             ),
           if (isFeatureAvailable(plan, 'pqrs'))
             _ModuleTile(
               icon: Icons.assignment,
               color: AppColors.primary,
-              title: 'PQRS',
+              title: context.l10n.pqrsScreenTitle,
               subtitle: isAdmin
-                  ? 'Solicitudes de residentes con SLA'
-                  : 'Envía peticiones, quejas o sugerencias',
+                  ? context.l10n.premiumPqrsAdminSubtitle
+                  : context.l10n.premiumPqrsResidentSubtitle,
               onTap: () => context.push('/premium/pqrs'),
             ),
           if (isFeatureAvailable(plan, 'manual'))
             _ModuleTile(
               icon: Icons.menu_book,
               color: const Color(0xFF8B5CF6),
-              title: 'Manual de Convivencia',
-              subtitle: 'Reglamento del conjunto por capítulos',
+              title: context.l10n.manualScreenTitle,
+              subtitle: context.l10n.premiumManualSubtitle,
               onTap: () => context.push('/premium/manual'),
             ),
           if (isFeatureAvailable(plan, 'amenities'))
             _ModuleTile(
               icon: Icons.pool,
               color: const Color(0xFF06B6D4),
-              title: 'Zonas Sociales',
+              title: context.l10n.amenityScreenTitle,
               subtitle: isAdmin
-                  ? 'Gestionar reservas y depósitos'
-                  : 'Reservar salón, BBQ, cancha y más',
+                  ? context.l10n.premiumAmenitiesAdminSubtitle
+                  : context.l10n.premiumAmenitiesResidentSubtitle,
               onTap: () => context.push('/premium/amenities'),
             ),
           if (isFeatureAvailable(plan, 'finances'))
             _ModuleTile(
               icon: Icons.account_balance,
               color: AppColors.success,
-              title: isAdmin ? 'Dashboard Financiero' : 'Mi Estado de Cuenta',
+              title: isAdmin
+                  ? context.l10n.financeDashboardTitle
+                  : context.l10n.financeStatementTitle,
               subtitle: isAdmin
-                  ? 'Ingresos, egresos y presupuesto'
-                  : 'Tu saldo, pagos y cuotas',
+                  ? context.l10n.premiumFinancesAdminSubtitle
+                  : context.l10n.premiumFinancesResidentSubtitle,
               onTap: () => context.push('/premium/finances'),
             ),
           if (isFeatureAvailable(plan, 'assemblies'))
             _ModuleTile(
               icon: Icons.how_to_vote,
               color: AppColors.error,
-              title: 'Asambleas',
+              title: context.l10n.assemblyScreenTitle,
               subtitle: isAdmin
-                  ? 'Convocar y gestionar votaciones'
-                  : 'Participar y votar en tiempo real',
+                  ? context.l10n.premiumAssembliesAdminSubtitle
+                  : context.l10n.premiumAssembliesResidentSubtitle,
               onTap: () => context.push('/premium/assemblies'),
             ),
         ],
@@ -246,19 +254,19 @@ class _AdminStats extends ConsumerWidget {
       children: [
         _StatCard(
           value: '$memberCount',
-          label: 'Residentes',
+          label: context.l10n.premiumResidents,
           color: AppColors.primary,
         ),
         const SizedBox(width: AppSizes.sm),
         _StatCard(
           value: '$openPqrs',
-          label: 'PQRS abiertos',
+          label: context.l10n.premiumOpenPqrs,
           color: AppColors.warning,
         ),
         const SizedBox(width: AppSizes.sm),
         _StatCard(
           value: formatCOP(monthIncome),
-          label: 'Recaudo mes',
+          label: context.l10n.premiumMonthlyRevenue,
           color: AppColors.success,
         ),
       ],

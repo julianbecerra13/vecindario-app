@@ -10,6 +10,7 @@ import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/error_display.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 
 class StoresScreen extends ConsumerWidget {
   const StoresScreen({super.key});
@@ -23,7 +24,7 @@ class StoresScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tiendas del Barrio'),
+        title: Text(context.l10n.storeScreenTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.receipt_long_outlined),
@@ -43,25 +44,25 @@ class StoresScreen extends ConsumerWidget {
               ),
               borderRadius: BorderRadius.circular(AppSizes.radiusLg),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Text('🛒', style: TextStyle(fontSize: 28)),
-                SizedBox(width: AppSizes.md),
+                const Text('🛒', style: TextStyle(fontSize: 28)),
+                const SizedBox(width: AppSizes.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pide sin salir de casa',
-                        style: TextStyle(
+                        context.l10n.storeBannerTitle,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
                       Text(
-                        'Entrega directa en tu puerta',
-                        style: TextStyle(
+                        context.l10n.storeBannerSubtitle,
+                        style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFFD1FAE5),
                         ),
@@ -77,10 +78,10 @@ class StoresScreen extends ConsumerWidget {
             child: storesAsync.when(
               data: (stores) {
                 if (stores.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.store_outlined,
-                    title: 'Sin tiendas aún',
-                    subtitle: 'Las tiendas de tu barrio aparecerán aquí',
+                    title: context.l10n.storeEmptyTitle,
+                    subtitle: context.l10n.storeEmptySubtitle,
                   );
                 }
                 return RefreshIndicator(
@@ -98,7 +99,7 @@ class StoresScreen extends ConsumerWidget {
               },
               loading: () => const LoadingIndicator(),
               error: (e, _) => ErrorDisplay(
-                message: 'Error al cargar tiendas',
+                message: context.l10n.storeLoadError,
                 onRetry: () => ref.invalidate(storesListProvider),
               ),
             ),

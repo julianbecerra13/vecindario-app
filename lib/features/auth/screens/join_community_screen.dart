@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 
@@ -67,12 +68,12 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
   Future<void> _handleJoin() async {
     final code = _code.trim();
     if (code.length < 6) {
-      context.showErrorSnackBar('Ingresa el código completo');
+      context.showErrorSnackBar(context.l10n.authEnterFullCode);
       return;
     }
     if (_towerController.text.trim().isEmpty ||
         _apartmentController.text.trim().isEmpty) {
-      context.showErrorSnackBar('Completa torre y apartamento');
+      context.showErrorSnackBar(context.l10n.authFillTowerAndApartment);
       return;
     }
 
@@ -84,7 +85,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
 
       if (community == null) {
         if (mounted) {
-          context.showErrorSnackBar('Código de invitación inválido');
+          context.showErrorSnackBar(context.l10n.authInvalidInviteCode);
         }
         setState(() => _isLoading = false);
         return;
@@ -108,7 +109,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Error al unirse a la comunidad');
+        context.showErrorSnackBar(context.l10n.authJoinCommunityError);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -118,7 +119,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Únete a tu comunidad')),
+      appBar: AppBar(title: Text(context.l10n.authJoinCommunityTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: AppSizes.paddingAll,
@@ -132,7 +133,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
               ),
               const SizedBox(height: AppSizes.lg),
               Text(
-                'Ingresa el código de invitación que te dieron en la administración de tu conjunto.',
+                context.l10n.authJoinCommunityDesc,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
@@ -219,7 +220,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Solicitar ingreso'),
+                    : Text(context.l10n.requestJoin),
               ),
             ],
           ),

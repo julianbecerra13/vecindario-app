@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/external_services/models/external_service_model.dart';
 import 'package:vecindario_app/features/external_services/providers/external_services_provider.dart';
@@ -22,7 +23,7 @@ class ExternalServicesScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(externalCategoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Servicios')),
+      appBar: AppBar(title: Text(context.l10n.services)),
       body: Column(
         children: [
           // Chips de categoría
@@ -35,7 +36,7 @@ class ExternalServicesScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: AppSizes.sm),
                   child: ChoiceChip(
-                    label: const Text('Todos'),
+                    label: Text(context.l10n.allCategories),
                     selected: selectedCategory == null,
                     onSelected: (_) =>
                         ref.read(externalCategoryProvider.notifier).state =
@@ -98,7 +99,7 @@ class ExternalServicesScreen extends ConsumerWidget {
                 const SizedBox(width: AppSizes.sm),
                 Expanded(
                   child: Text(
-                    'Estos servicios son recomendados por vecinos — no son residentes del conjunto.',
+                    context.l10n.externalRecommendedNotice,
                     style: AppTextStyles.caption.copyWith(
                       color: context.colors.textSecondary,
                     ),
@@ -112,11 +113,10 @@ class ExternalServicesScreen extends ConsumerWidget {
             child: servicesAsync.when(
               data: (services) {
                 if (services.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.build_outlined,
-                    title: 'Sin servicios aún',
-                    subtitle:
-                        'Recomienda un profesional de confianza a tu comunidad',
+                    title: context.l10n.externalNoServicesYet,
+                    subtitle: context.l10n.externalNoServicesSubtitle,
                   );
                 }
                 return ListView.builder(
@@ -128,7 +128,7 @@ class ExternalServicesScreen extends ConsumerWidget {
               },
               loading: () => const LoadingIndicator(),
               error: (e, _) => ErrorDisplay(
-                message: 'Error al cargar servicios',
+                message: context.l10n.externalErrorLoading,
                 onRetry: () => ref.invalidate(externalServicesListProvider),
               ),
             ),
@@ -139,7 +139,7 @@ class ExternalServicesScreen extends ConsumerWidget {
         heroTag: 'external_services_fab',
         onPressed: () => context.push('/external-services/recommend'),
         icon: const Icon(Icons.recommend),
-        label: const Text('Recomendar'),
+        label: Text(context.l10n.externalRecommendCta),
       ),
     );
   }
@@ -257,7 +257,9 @@ class _ExternalServiceCard extends StatelessWidget {
                 const Spacer(),
                 if (service.recommendedByName != null)
                   Text(
-                    'Rec. por ${service.recommendedByName}',
+                    context.l10n.externalRecommendedByName(
+                      service.recommendedByName!,
+                    ),
                     style: TextStyle(
                       fontSize: 11,
                       color: AppColors.primaryLight,
@@ -277,7 +279,9 @@ class _ExternalServiceCard extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.phone, size: 16),
-                  label: Text('Llamar · ${service.phone}'),
+                  label: Text(
+                    context.l10n.externalCallWithPhone(service.phone),
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.warning,
                     side: BorderSide(

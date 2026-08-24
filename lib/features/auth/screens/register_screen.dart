@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/utils/validators.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 
@@ -75,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear cuenta')),
+      appBar: AppBar(title: Text(context.l10n.createAccount)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: AppSizes.paddingAll,
@@ -90,9 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   textCapitalization: TextCapitalization.words,
                   validator: Validators.validateName,
-                  decoration: const InputDecoration(
-                    hintText: 'Nombre completo',
-                  ),
+                  decoration: InputDecoration(hintText: context.l10n.name),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
@@ -100,7 +99,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: Validators.validateEmail,
-                  decoration: const InputDecoration(hintText: 'Email'),
+                  decoration: InputDecoration(hintText: context.l10n.email),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
@@ -110,7 +109,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.validatePassword,
                   onFieldSubmitted: (_) => _handleRegister(),
                   decoration: InputDecoration(
-                    hintText: 'Contraseña',
+                    hintText: context.l10n.password,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -134,7 +133,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Registrarse'),
+                      : Text(context.l10n.register),
                 ),
                 const SizedBox(height: AppSizes.lg),
                 Row(
@@ -145,7 +144,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         horizontal: AppSizes.md,
                       ),
                       child: Text(
-                        'o continuar con',
+                        context.l10n.authOrContinueWith,
                         style: TextStyle(
                           fontSize: 13,
                           color: context.colors.textHint,
@@ -195,19 +194,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         color: context.colors.textHint,
                         height: 1.5,
                       ),
-                      children: const [
-                        TextSpan(text: 'Al registrarte aceptas nuestra '),
+                      children: [
+                        TextSpan(text: context.l10n.authLegalConsentPrefix),
                         TextSpan(
-                          text: 'Política de Privacidad',
-                          style: TextStyle(
+                          text: context.l10n.privacyPolicy,
+                          style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        TextSpan(
-                          text:
-                              ' y autorizas el tratamiento de tus datos personales según la Ley 1581 de 2012.',
-                        ),
+                        TextSpan(text: context.l10n.authLegalConsentSuffix),
                       ],
                     ),
                   ),

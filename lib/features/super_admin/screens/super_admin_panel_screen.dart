@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/features/super_admin/providers/super_admin_providers.dart';
@@ -23,14 +24,14 @@ class SuperAdminPanelScreen extends ConsumerWidget {
     // Solo super_admin puede acceder
     if (user == null || !user.isSuperAdmin) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Acceso denegado')),
-        body: const Center(
+        appBar: AppBar(title: Text(context.l10n.superAdminAccessDeniedTitle)),
+        body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.block, size: 64, color: AppColors.error),
-              SizedBox(height: AppSizes.md),
-              Text('No tienes permisos de Super Admin'),
+              const Icon(Icons.block, size: 64, color: AppColors.error),
+              const SizedBox(height: AppSizes.md),
+              Text(context.l10n.superAdminNoPermission),
             ],
           ),
         ),
@@ -54,32 +55,32 @@ class SuperAdminPanelScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const Text('Panel Global'),
+            Text(context.l10n.superAdminPanelTitle),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_business),
-            tooltip: 'Crear comunidad',
+            tooltip: context.l10n.superAdminCreateCommunityTooltip,
             onPressed: () => context.push('/super-admin/create-community'),
           ),
           IconButton(
             icon: const Icon(Icons.logout, color: AppColors.error),
-            tooltip: 'Cerrar sesión',
+            tooltip: context.l10n.logout,
             onPressed: () async {
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Cerrar sesión'),
-                  content: const Text('¿Seguro que quieres salir?'),
+                  title: Text(context.l10n.logout),
+                  content: Text(context.l10n.superAdminLogoutConfirmMessage),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancelar'),
+                      child: Text(context.l10n.cancel),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Salir'),
+                      child: Text(context.l10n.superAdminExitAction),
                     ),
                   ],
                 ),
@@ -104,13 +105,13 @@ class SuperAdminPanelScreen extends ConsumerWidget {
                     color: context.colors.textHint,
                   ),
                   const SizedBox(height: AppSizes.md),
-                  const Text('No hay comunidades registradas'),
+                  Text(context.l10n.superAdminNoCommunitiesMessage),
                   const SizedBox(height: AppSizes.lg),
                   ElevatedButton.icon(
                     onPressed: () =>
                         context.push('/super-admin/create-community'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Crear primera comunidad'),
+                    label: Text(context.l10n.superAdminCreateFirstCommunity),
                   ),
                 ],
               ),
@@ -128,7 +129,9 @@ class SuperAdminPanelScreen extends ConsumerWidget {
               const SizedBox(height: AppSizes.lg),
 
               Text(
-                'COMUNIDADES (${communities.length})',
+                context.l10n.superAdminCommunitiesCountTitle(
+                  communities.length,
+                ),
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -147,7 +150,8 @@ class SuperAdminPanelScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(context.l10n.adminGenericError('$e'))),
       ),
     );
   }
@@ -172,19 +176,19 @@ class _GlobalStats extends StatelessWidget {
       children: [
         _StatCard(
           value: '${communities.length}',
-          label: 'Conjuntos',
+          label: context.l10n.superAdminGlobalStatsCommunities,
           color: AppColors.primary,
         ),
         const SizedBox(width: AppSizes.sm),
         _StatCard(
           value: '$totalMembers',
-          label: 'Residentes',
+          label: context.l10n.adminResidentsLabel,
           color: AppColors.success,
         ),
         const SizedBox(width: AppSizes.sm),
         _StatCard(
           value: '$activeSubscriptions',
-          label: 'Suscripciones',
+          label: context.l10n.superAdminSubscriptionsLabel,
           color: AppColors.warning,
         ),
       ],
@@ -305,7 +309,9 @@ class _CommunityCard extends ConsumerWidget {
                 children: [
                   _InfoChip(
                     icon: Icons.people,
-                    text: '${community.memberCount} residentes',
+                    text: context.l10n.superAdminMembersCount(
+                      community.memberCount,
+                    ),
                   ),
                   _InfoChip(icon: Icons.star, text: community.estratoLabel),
                   _InfoChip(icon: Icons.home, text: community.unitType.label),
@@ -348,12 +354,12 @@ class _CommunityCard extends ConsumerWidget {
                   TextButton(
                     onPressed: () =>
                         _showAssignAdminDialog(context, ref, community),
-                    child: const Text('Asignar Admin'),
+                    child: Text(context.l10n.superAdminAssignAdminButton),
                   ),
                   TextButton(
                     onPressed: () =>
                         _showActivatePlanDialog(context, ref, community),
-                    child: const Text('Plan'),
+                    child: Text(context.l10n.superAdminPlanButton),
                   ),
                 ],
               ),
@@ -373,26 +379,29 @@ class _CommunityCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Asignar Admin — ${community.name}'),
+        title: Text(
+          context.l10n.superAdminAssignAdminDialogTitle(community.name),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Ingresa el UID del usuario que será administrador del conjunto. '
-              'Puedes encontrarlo en Firebase Auth.',
+              context.l10n.superAdminPanelAssignAdminMessage,
               style: TextStyle(fontSize: 13, color: ctx.colors.textSecondary),
             ),
             const SizedBox(height: AppSizes.md),
             TextField(
               controller: uidController,
-              decoration: const InputDecoration(hintText: 'UID del usuario'),
+              decoration: InputDecoration(
+                hintText: context.l10n.superAdminUidLabel,
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -403,10 +412,12 @@ class _CommunityCard extends ConsumerWidget {
                   .assignAdmin(communityId: community.id, uid: uid);
               if (ctx.mounted) {
                 Navigator.pop(ctx);
-                context.showSuccessSnackBar('Admin asignado');
+                context.showSuccessSnackBar(
+                  context.l10n.superAdminAdminAssigned,
+                );
               }
             },
-            child: const Text('Asignar'),
+            child: Text(context.l10n.superAdminAssignAction),
           ),
         ],
       ),
@@ -423,7 +434,9 @@ class _CommunityCard extends ConsumerWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: Text('Activar Plan — ${community.name}'),
+          title: Text(
+            context.l10n.superAdminActivatePlanDialogTitle(community.name),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -448,7 +461,7 @@ class _CommunityCard extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               onPressed: () async {
@@ -461,11 +474,11 @@ class _CommunityCard extends ConsumerWidget {
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   context.showSuccessSnackBar(
-                    'Plan $selectedPlan activado (trial 30 días gratis)',
+                    context.l10n.superAdminPlanActivatedMessage(selectedPlan),
                   );
                 }
               },
-              child: const Text('Activar Trial'),
+              child: Text(context.l10n.superAdminActivateTrialAction),
             ),
           ],
         ),

@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
@@ -26,23 +27,23 @@ class CircularsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Circulares'),
+        title: Text(context.l10n.circularScreenTitle),
         actions: [
           if (isAdmin)
             TextButton.icon(
               onPressed: () => context.push('/premium/circulars/create'),
               icon: const Icon(Icons.add),
-              label: const Text('Nueva'),
+              label: Text(context.l10n.amenityNewButton),
             ),
         ],
       ),
       body: circularsAsync.when(
         data: (circulars) {
           if (circulars.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.mail_outline,
-              title: 'Sin circulares',
-              subtitle: 'Los comunicados oficiales aparecerán aquí',
+              title: context.l10n.circularEmptyTitle,
+              subtitle: context.l10n.circularEmptySubtitle,
             );
           }
           return ListView.builder(
@@ -53,7 +54,7 @@ class CircularsScreen extends ConsumerWidget {
           );
         },
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(context.l10n.errorGeneric(e))),
       ),
     );
   }
@@ -159,7 +160,9 @@ class _CircularCard extends ConsumerWidget {
                   if (circular.attachmentURLs.isNotEmpty)
                     _MetaChip(
                       icon: Icons.attach_file,
-                      text: '${circular.attachmentURLs.length} adjunto(s)',
+                      text: context.l10n.circularAttachmentsCount(
+                        circular.attachmentURLs.length,
+                      ),
                     ),
                   const Spacer(),
                   if (isAdmin) ...[
@@ -181,7 +184,7 @@ class _CircularCard extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              '$pctInt% leído',
+                              context.l10n.circularReadPercentage(pctInt),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -238,7 +241,7 @@ class _CircularCard extends ConsumerWidget {
                       }
                     },
                     icon: const Icon(Icons.draw, size: 16),
-                    label: const Text('Firmar acuse de recibo'),
+                    label: Text(context.l10n.circularSignAck),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF8B5CF6),
                       side: const BorderSide(color: Color(0xFF8B5CF6)),

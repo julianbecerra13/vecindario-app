@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -40,7 +41,7 @@ class _CreateFinanceEntryScreenState
     final communityId = ref.read(currentCommunityIdProvider);
     final user = ref.read(currentUserProvider).value;
     if (communityId == null || user == null) {
-      context.showErrorSnackBar('Usuario o comunidad no disponibles');
+      context.showErrorSnackBar(context.l10n.errorUserOrCommunityUnavailable);
       return;
     }
 
@@ -60,10 +61,10 @@ class _CreateFinanceEntryScreenState
           .read(premiumRepositoryProvider)
           .createFinanceEntry(communityId, entry);
       if (!mounted) return;
-      context.showSuccessSnackBar('Movimiento registrado');
+      context.showSuccessSnackBar(context.l10n.financeEntryRegistered);
       context.pop();
     } catch (e) {
-      if (mounted) context.showErrorSnackBar('Error: $e');
+      if (mounted) context.showErrorSnackBar(context.l10n.errorGeneric(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -72,23 +73,26 @@ class _CreateFinanceEntryScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nuevo movimiento')),
+      appBar: AppBar(title: Text(context.l10n.financeNewEntryTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: AppSizes.paddingAll,
           children: [
             SegmentedButton<FinanceType>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: FinanceType.income,
-                  label: Text('Ingreso'),
-                  icon: Icon(Icons.arrow_downward, color: AppColors.success),
+                  label: Text(context.l10n.financeIncome),
+                  icon: const Icon(
+                    Icons.arrow_downward,
+                    color: AppColors.success,
+                  ),
                 ),
                 ButtonSegment(
                   value: FinanceType.expense,
-                  label: Text('Egreso'),
-                  icon: Icon(Icons.arrow_upward, color: AppColors.error),
+                  label: Text(context.l10n.financeExpense),
+                  icon: const Icon(Icons.arrow_upward, color: AppColors.error),
                 ),
               ],
               selected: {_type},
@@ -98,11 +102,11 @@ class _CreateFinanceEntryScreenState
             TextFormField(
               controller: _categoryController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Categoría',
-                hintText: 'Ej: Cuota administración, Mantenimiento',
-                prefixIcon: Icon(Icons.category_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.financeCategoryLabel,
+                hintText: context.l10n.financeCategoryHint,
+                prefixIcon: const Icon(Icons.category_outlined),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? 'La categoría es obligatoria'
@@ -112,10 +116,10 @@ class _CreateFinanceEntryScreenState
             TextFormField(
               controller: _descController,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Descripción',
-                prefixIcon: Icon(Icons.description_outlined),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.formDescriptionLabel,
+                prefixIcon: const Icon(Icons.description_outlined),
+                border: const OutlineInputBorder(),
               ),
               maxLines: 2,
               validator: (v) => (v == null || v.trim().isEmpty)
@@ -126,11 +130,11 @@ class _CreateFinanceEntryScreenState
             TextFormField(
               controller: _amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Monto (COP)',
+              decoration: InputDecoration(
+                labelText: context.l10n.financeAmountLabel,
                 prefixText: '\$ ',
-                prefixIcon: Icon(Icons.attach_money),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.attach_money),
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return 'Monto requerido';
@@ -142,7 +146,7 @@ class _CreateFinanceEntryScreenState
             const SizedBox(height: AppSizes.md),
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('Fecha'),
+              title: Text(context.l10n.financeDateLabel),
               subtitle: Text(
                 '${_date.day.toString().padLeft(2, '0')}/${_date.month.toString().padLeft(2, '0')}/${_date.year}',
               ),
@@ -177,7 +181,11 @@ class _CreateFinanceEntryScreenState
                         ),
                       )
                     : const Icon(Icons.check),
-                label: Text(_saving ? 'Guardando...' : 'Registrar'),
+                label: Text(
+                  _saving
+                      ? context.l10n.savingEllipsis
+                      : context.l10n.financeRegister,
+                ),
               ),
             ),
           ],

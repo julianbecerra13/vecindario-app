@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 
@@ -22,7 +23,7 @@ class CategoryChips extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(right: AppSizes.sm),
             child: ChoiceChip(
-              label: const Text('Todas'),
+              label: Text(context.l10n.allCategories),
               selected: selected == null,
               onSelected: (_) =>
                   ref.read(selectedCategoryProvider.notifier).state = null,
