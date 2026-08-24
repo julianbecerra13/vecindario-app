@@ -1,7 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/circulars/screens/circulars_screen.dart';
 import 'package:vecindario_app/features/premium/finances/screens/finances_screen.dart';
@@ -12,11 +15,13 @@ import 'package:vecindario_app/features/premium/providers/premium_providers.dart
 import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
+import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 import 'package:go_router/go_router.dart';
 
-/// Shell del módulo Admin con 5 tabs según wireframe:
-/// Inicio | Circulares | Finanzas | Zonas | PQRS
+/// Shell del módulo único de Administración del conjunto — fusiona lo que
+/// antes eran dos paneles separados (/admin y /premium). 5 tabs según
+/// wireframe: Inicio | Circulares | Finanzas | Zonas | PQRS.
 class AdminShell extends ConsumerStatefulWidget {
   const AdminShell({super.key});
 
@@ -79,7 +84,15 @@ class _AdminShellState extends ConsumerState<AdminShell> {
   }
 }
 
-/// Página de inicio del admin con stats, acciones rápidas y solicitudes
+String _generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  final rng = Random();
+  return List.generate(6, (_) => chars[rng.nextInt(chars.length)]).join();
+}
+
+/// Página de inicio del admin: código de invitación, stats, solicitudes
+/// pendientes y accesos rápidos a todos los módulos (incluye lo que antes
+/// vivía en el panel /admin separado: aprobaciones y configuración).
 class _AdminHomePage extends ConsumerWidget {
   const _AdminHomePage();
 
@@ -135,6 +148,40 @@ class _AdminHomePage extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications),
+                pendingAsync.when(
+                  data: (list) => list.isNotEmpty
+                      ? Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: AppColors.error,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${list.length}',
+                              style: const TextStyle(
+                                fontSize: 9,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+              ],
+            ),
+            tooltip: 'Solicitudes pendientes',
+            onPressed: () => context.push('/premium/pending'),
+          ),
           if (plan != null)
             Padding(
               padding: const EdgeInsets.only(right: 12),
@@ -159,6 +206,78 @@ class _AdminHomePage extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppSizes.md),
         children: [
+          // Código de invitación
+          Container(
+            padding: const EdgeInsets.all(AppSizes.md),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E3A5F), Color(0xFF1A2744)],
+              ),
+              borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'CÓDIGO DE INVITACIÓN',
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Color(0xFF60A5FA),
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        communityAsync.value?.inviteCode ?? '------',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    _InviteCodeButton(
+                      icon: Icons.copy,
+                      label: 'Copiar',
+                      onTap: () {
+                        final code = communityAsync.value?.inviteCode;
+                        if (code != null) {
+                          Clipboard.setData(ClipboardData(text: code));
+                          context.showSuccessSnackBar('Código copiado');
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 6),
+                    _InviteCodeButton(
+                      icon: Icons.refresh,
+                      label: 'Rotar',
+                      onTap: () async {
+                        if (communityId == null) return;
+                        final newCode = _generateInviteCode();
+                        await ref
+                            .read(communityRepositoryProvider)
+                            .regenerateInviteCode(communityId, newCode);
+                        if (context.mounted) {
+                          context.showSuccessSnackBar('Nuevo código: $newCode');
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSizes.lg),
+
           // Stats
           Row(
             children: [
@@ -186,6 +305,20 @@ class _AdminHomePage extends ConsumerWidget {
           // Acciones rápidas
           Text('ACCIONES RÁPIDAS', style: AppTextStyles.label),
           const SizedBox(height: AppSizes.sm),
+          _QuickAction(
+            icon: Icons.person_add,
+            color: AppColors.primary,
+            title: 'Solicitudes pendientes',
+            subtitle: 'Aprobar o rechazar residentes',
+            onTap: () => context.push('/premium/pending'),
+          ),
+          _QuickAction(
+            icon: Icons.settings,
+            color: AppColors.textSecondary,
+            title: 'Configuración de comunidad',
+            subtitle: 'Nombre, código de invitación, estrato',
+            onTap: () => context.push('/premium/settings'),
+          ),
           _QuickAction(
             icon: Icons.campaign,
             color: AppColors.info,
@@ -420,6 +553,48 @@ class _MiniButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
         child: Icon(icon, size: 14, color: color),
+      ),
+    );
+  }
+}
+
+class _InviteCodeButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _InviteCodeButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: const Color(0xFF60A5FA)),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 9,
+                color: Color(0xFF60A5FA),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
