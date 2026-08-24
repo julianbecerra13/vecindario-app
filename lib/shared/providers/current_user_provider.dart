@@ -34,14 +34,30 @@ final currentCommunityIdProvider = Provider<String?>((ref) {
 
 final isVerifiedProvider = Provider<bool>((ref) {
   final userAsync = ref.watch(currentUserProvider);
-  return userAsync.whenOrNull(data: (user) => user?.verified ?? false) ?? false;
+  return userAsync.whenOrNull(data: (user) => user?.verified ?? false) ??
+      false;
 });
 
+/// True si administra el conjunto (communityRole == admin) o es super_admin
+/// de plataforma. Úsalo para mostrar accesos a "Administración" y proteger
+/// las pantallas de /premium.
 final isAdminProvider = Provider<bool>((ref) {
   final userAsync = ref.watch(currentUserProvider);
-  return userAsync.whenOrNull(
-        data: (user) =>
-            user?.role == UserRole.admin || user?.role == UserRole.superAdmin,
-      ) ??
+  return userAsync.whenOrNull(data: (user) => user?.isAdmin ?? false) ??
+      false;
+});
+
+/// True solo si el rol dentro de la comunidad es admin (excluye al
+/// super_admin de plataforma, que no pertenece a ninguna comunidad).
+final isCommunityAdminProvider = Provider<bool>((ref) {
+  final userAsync = ref.watch(currentUserProvider);
+  return userAsync.whenOrNull(data: (user) => user?.isCommunityAdmin ?? false) ??
+      false;
+});
+
+/// True solo para el super_admin de plataforma.
+final isSuperAdminProvider = Provider<bool>((ref) {
+  final userAsync = ref.watch(currentUserProvider);
+  return userAsync.whenOrNull(data: (user) => user?.isSuperAdmin ?? false) ??
       false;
 });
