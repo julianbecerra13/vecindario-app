@@ -20,7 +20,7 @@ service cloud.firestore {
     }
 
     function isCommunityAdmin(communityId) {
-      return isCommunityMember(communityId) && getUserData().role == 'admin';
+      return isCommunityMember(communityId) && getUserData().communityRole == 'admin';
     }
 
     function isVerified() {
@@ -29,11 +29,11 @@ service cloud.firestore {
 
     function isVerifiedMember(communityId) {
       return isCommunityMember(communityId)
-        && (getUserData().verified == true || getUserData().role == 'admin');
+        && (getUserData().verified == true || getUserData().communityRole == 'admin');
     }
 
     function isSuperAdmin() {
-      return isAuthenticated() && getUserData().role == 'super_admin';
+      return isAuthenticated() && getUserData().platformRole == 'super_admin';
     }
 
     // --- Usuarios ---
@@ -42,7 +42,7 @@ service cloud.firestore {
       allow create: if isOwner(uid);
       allow update: if isOwner(uid)
         && !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['verified', 'role']);
+            .hasAny(['verified', 'communityRole', 'platformRole']);
       allow delete: if false;
 
       // Notificaciones del usuario
