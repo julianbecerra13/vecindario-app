@@ -156,7 +156,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
             const SizedBox(height: AppSizes.lg),
 
             DropdownButtonFormField<_PriceMode>(
-              initialValue: _priceMode,
+              value: _priceMode,
               decoration: const InputDecoration(labelText: 'Tipo de precio'),
               items: _PriceMode.values
                   .map(

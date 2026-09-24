@@ -91,7 +91,7 @@ class AccessManagementScreen extends ConsumerWidget {
                                     12,
                                   ),
                                   child: DropdownButtonFormField<String>(
-                                    initialValue: status,
+                                    value: status,
                                     decoration: const InputDecoration(
                                       labelText: 'Estado de administración',
                                       isDense: true,
