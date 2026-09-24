@@ -109,6 +109,12 @@ class StoresRepository {
         .update(data);
   }
 
+  Future<void> cancelOrder(String orderId) async {
+    await _firestore.collection(FirestorePaths.orders).doc(orderId).update({
+      'status': OrderStatus.cancelled.name,
+    });
+  }
+
   Future<void> submitOrderReview({
     required String orderId,
     required ReviewModel review,
@@ -129,10 +135,14 @@ class StoresRepository {
     await batch.commit();
   }
 
-  Stream<List<StoreModel>> getStoresForOwner(String ownerUid) {
+  Stream<List<StoreModel>> getStoresForOwner(
+    String ownerUid,
+    String communityId,
+  ) {
     return _firestore
         .collection(FirestorePaths.stores)
         .where('ownerUid', isEqualTo: ownerUid)
+        .where('communityId', isEqualTo: communityId)
         .snapshots()
         .map(
           (snap) => snap.docs

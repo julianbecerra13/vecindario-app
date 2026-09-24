@@ -236,7 +236,12 @@ class PostCard extends ConsumerWidget {
                         icon: Icons.share_outlined,
                         label: '',
                         onTap: () {
-                          Share.share('${post.authorName}: ${post.text}');
+                          final link =
+                              'https://vecindario-app-a746b.web.app/feed/${post.id}';
+                          Share.share(
+                            '${post.authorName}: ${post.text}\n\n$link',
+                            subject: 'Publicación en Vecindario',
+                          );
                         },
                       ),
                     ],

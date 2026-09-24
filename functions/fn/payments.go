@@ -18,6 +18,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"google.golang.org/api/iterator"
 )
 
 func init() {
@@ -29,9 +30,9 @@ func init() {
 
 // WompiEvent estructura del webhook de Wompi
 type WompiEvent struct {
-	Event     string `json:"event"`
+	Event     string    `json:"event"`
 	Data      WompiData `json:"data"`
-	Timestamp int64  `json:"timestamp"`
+	Timestamp int64     `json:"timestamp"`
 	Signature struct {
 		Checksum   string   `json:"checksum"`
 		Properties []string `json:"properties"`
@@ -43,13 +44,13 @@ type WompiData struct {
 }
 
 type WompiTransaction struct {
-	ID              string `json:"id"`
-	Status          string `json:"status"`
-	Reference       string `json:"reference"`
-	AmountInCents   int64  `json:"amount_in_cents"`
-	Currency        string `json:"currency"`
+	ID                string `json:"id"`
+	Status            string `json:"status"`
+	Reference         string `json:"reference"`
+	AmountInCents     int64  `json:"amount_in_cents"`
+	Currency          string `json:"currency"`
 	PaymentMethodType string `json:"payment_method_type"`
-	FinalizedAt     string `json:"finalized_at"`
+	FinalizedAt       string `json:"finalized_at"`
 }
 
 // WompiWebhook — Recibe webhooks de Wompi cuando una transacción cambia de estado
@@ -75,15 +76,18 @@ func WompiWebhook(w http.ResponseWriter, r *http.Request) {
 	// Verificar firma del webhook. Wompi arma el checksum navegando data por las
 	// rutas de signature.properties, así que necesitamos data como mapa dinámico.
 	secret := os.Getenv("WOMPI_EVENTS_SECRET")
-	if secret != "" {
-		var payload struct {
-			Data map[string]interface{} `json:"data"`
-		}
-		_ = json.Unmarshal(body, &payload)
-		if !verifyWompiSignature(event, payload.Data, secret) {
-			http.Error(w, "Invalid signature", http.StatusUnauthorized)
-			return
-		}
+	if secret == "" {
+		log.Print("WOMPI_EVENTS_SECRET no está configurado")
+		http.Error(w, "Payment not configured", http.StatusServiceUnavailable)
+		return
+	}
+	var payload struct {
+		Data map[string]interface{} `json:"data"`
+	}
+	_ = json.Unmarshal(body, &payload)
+	if !verifyWompiSignature(event, payload.Data, secret) {
+		http.Error(w, "Invalid signature", http.StatusUnauthorized)
+		return
 	}
 
 	ctx := r.Context()
@@ -167,14 +171,14 @@ func resolveSignatureValue(data map[string]interface{}, path string) string {
 func handleApprovedPayment(ctx context.Context, fs *firestore.Client, ref string, tx WompiTransaction) error {
 	// Guardar registro del pago
 	_, _, err := fs.Collection("payments").Add(ctx, map[string]interface{}{
-		"transactionId":   tx.ID,
-		"reference":       ref,
-		"amountInCents":   tx.AmountInCents,
-		"currency":        tx.Currency,
-		"status":          "approved",
-		"paymentMethod":   tx.PaymentMethodType,
-		"wompiStatus":     tx.Status,
-		"processedAt":     time.Now(),
+		"transactionId": tx.ID,
+		"reference":     ref,
+		"amountInCents": tx.AmountInCents,
+		"currency":      tx.Currency,
+		"status":        "approved",
+		"paymentMethod": tx.PaymentMethodType,
+		"wompiStatus":   tx.Status,
+		"processedAt":   time.Now(),
 	})
 	if err != nil {
 		return fmt.Errorf("saving payment: %v", err)
@@ -279,11 +283,11 @@ func splitReference(ref string) []string {
 
 // CreatePaymentRequest estructura para crear un pago
 type CreatePaymentRequest struct {
-	Reference   string `json:"reference"`
-	Amount      int64  `json:"amount"`       // En pesos (no centavos)
-	Currency    string `json:"currency"`      // COP
-	Description string `json:"description"`
-	RedirectURL string `json:"redirect_url"`
+	Reference     string `json:"reference"`
+	Amount        int64  `json:"amount"`   // En pesos (no centavos)
+	Currency      string `json:"currency"` // COP
+	Description   string `json:"description"`
+	RedirectURL   string `json:"redirect_url"`
 	CustomerEmail string `json:"customer_email"`
 }
 
@@ -294,25 +298,138 @@ func CreateWompiTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req CreatePaymentRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	ctx := r.Context()
+	callerUID, err := verifyAuthToken(ctx, r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var clientReq CreatePaymentRequest
+	if err := json.NewDecoder(r.Body).Decode(&clientReq); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
+	fs, _, err := initFirebase(ctx)
+	if err != nil {
+		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	defer fs.Close()
+
+	req, paymentType, err := authoritativePaymentRequest(ctx, fs, callerUID, clientReq.Reference)
+	if err != nil {
+		log.Printf("Pago rechazado para %s: %v", callerUID, err)
+		http.Error(w, "Invalid payment reference", http.StatusBadRequest)
+		return
+	}
+
+	existing, err := fs.Collection("payment_intents").Where("reference", "==", req.Reference).Limit(1).Documents(ctx).GetAll()
+	if err != nil {
+		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	if len(existing) > 0 {
+		http.Error(w, "Payment reference already used", http.StatusConflict)
+		return
+	}
+
 	pubKey := os.Getenv("WOMPI_PUBLIC_KEY")
-	if pubKey == "" {
+	integritySecret := os.Getenv("WOMPI_INTEGRITY_SECRET")
+	if pubKey == "" || integritySecret == "" {
 		http.Error(w, "Payment not configured", http.StatusServiceUnavailable)
 		return
 	}
 
-	checkoutURL := buildWompiCheckoutURL(pubKey, req, os.Getenv("WOMPI_INTEGRITY_SECRET"))
+	checkoutURL := buildWompiCheckoutURL(pubKey, req, integritySecret)
+	if _, _, err := fs.Collection("payment_intents").Add(ctx, map[string]interface{}{
+		"uid": callerUID, "reference": req.Reference, "amount": req.Amount,
+		"amountInCents": req.Amount * 100, "currency": req.Currency,
+		"type": paymentType, "status": "pending", "customerEmail": req.CustomerEmail,
+		"checkoutURL": checkoutURL, "createdAt": time.Now(),
+	}); err != nil {
+		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"checkout_url": checkoutURL,
 	})
+}
+
+func authoritativePaymentRequest(ctx context.Context, fs *firestore.Client, uid, reference string) (CreatePaymentRequest, string, error) {
+	parts := splitReference(reference)
+	if len(parts) != 3 || parts[1] == "" {
+		return CreatePaymentRequest{}, "", fmt.Errorf("invalid reference")
+	}
+	paymentType, resourceID := parts[0], parts[1]
+	amount := int64(0)
+
+	switch paymentType {
+	case "order":
+		doc, err := fs.Collection("orders").Doc(resourceID).Get(ctx)
+		if err != nil || doc.Data()["buyerUid"] != uid {
+			return CreatePaymentRequest{}, "", fmt.Errorf("order not owned")
+		}
+		amount = getInt64(doc.Data(), "total")
+	case "fine":
+		data, err := findOwnedCollectionGroupDocument(ctx, fs, "fines", resourceID, uid)
+		if err != nil || data["status"] != "confirmed" {
+			return CreatePaymentRequest{}, "", fmt.Errorf("fine not payable")
+		}
+		amount = getInt64(data, "amount")
+	case "booking":
+		data, err := findOwnedCollectionGroupDocument(ctx, fs, "bookings", resourceID, uid)
+		if err != nil {
+			return CreatePaymentRequest{}, "", fmt.Errorf("booking not owned")
+		}
+		amount = getInt64(data, "totalPaid")
+	case "cuota":
+		if resourceID != uid {
+			return CreatePaymentRequest{}, "", fmt.Errorf("account statement not owned")
+		}
+		iter := fs.CollectionGroup("account_statements").Where("residentUid", "==", uid).Limit(1).Documents(ctx)
+		doc, err := iter.Next()
+		iter.Stop()
+		if err != nil {
+			return CreatePaymentRequest{}, "", fmt.Errorf("account statement unavailable")
+		}
+		amount = getInt64(doc.Data(), "balance")
+	default:
+		return CreatePaymentRequest{}, "", fmt.Errorf("unsupported payment type")
+	}
+
+	if amount <= 0 || amount > 100000000 {
+		return CreatePaymentRequest{}, "", fmt.Errorf("invalid amount")
+	}
+	userDoc, err := fs.Collection("users").Doc(uid).Get(ctx)
+	if err != nil {
+		return CreatePaymentRequest{}, "", fmt.Errorf("user unavailable")
+	}
+	email, _ := userDoc.Data()["email"].(string)
+	return CreatePaymentRequest{
+		Reference: reference, Amount: amount, Currency: "COP", CustomerEmail: email,
+	}, paymentType, nil
+}
+
+func findOwnedCollectionGroupDocument(ctx context.Context, fs *firestore.Client, collection, id, uid string) (map[string]interface{}, error) {
+	iter := fs.CollectionGroup(collection).Where("residentUid", "==", uid).Documents(ctx)
+	defer iter.Stop()
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			return nil, fmt.Errorf("document not found")
+		}
+		if err != nil {
+			return nil, err
+		}
+		if doc.Ref.ID == id {
+			return doc.Data(), nil
+		}
+	}
 }
 
 // buildWompiCheckoutURL arma la URL del Web Checkout de Wompi. Cuando hay secreto

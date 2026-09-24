@@ -44,6 +44,8 @@ void main() {
         buyerName: 'Juan',
         storeId: 'store1',
         storeName: 'Mi Tienda',
+        storeOwnerUid: 'owner1',
+        communityId: 'comm1',
         items: [],
         subtotal: 100000,
         serviceFee: 10000,

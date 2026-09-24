@@ -1,0 +1,4 @@
+storePassword=REEMPLAZAR
+keyPassword=REEMPLAZAR
+keyAlias=upload
+storeFile=../upload-keystore.jks

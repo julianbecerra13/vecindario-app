@@ -41,6 +41,8 @@ class ServiceModel {
   final bool active;
   final String ownerName;
   final String? ownerPhotoURL;
+  final String? contactPhone;
+  final String? communityName;
   final DateTime createdAt;
 
   const ServiceModel({
@@ -59,6 +61,8 @@ class ServiceModel {
     this.active = true,
     required this.ownerName,
     this.ownerPhotoURL,
+    this.contactPhone,
+    this.communityName,
     required this.createdAt,
   });
 
@@ -79,6 +83,8 @@ class ServiceModel {
       active: data['active'] ?? true,
       ownerName: data['ownerName'] ?? '',
       ownerPhotoURL: data['ownerPhotoURL'],
+      contactPhone: data['contactPhone'],
+      communityName: data['communityName'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -98,6 +104,8 @@ class ServiceModel {
     'active': active,
     'ownerName': ownerName,
     'ownerPhotoURL': ownerPhotoURL,
+    'contactPhone': contactPhone,
+    'communityName': communityName,
     'createdAt': Timestamp.fromDate(createdAt),
   };
 

@@ -8,7 +8,7 @@ service cloud.firestore {
     }
 
     function isOwner(uid) {
-      return request.auth.uid == uid;
+      return isAuthenticated() && request.auth.uid == uid;
     }
 
     function getUserData() {
@@ -33,16 +33,32 @@ service cloud.firestore {
     }
 
     function isSuperAdmin() {
-      return isAuthenticated() && getUserData().platformRole == 'super_admin';
+      return isAuthenticated()
+        && 'platformRole' in getUserData()
+        && getUserData().platformRole == 'super_admin';
     }
 
     // --- Usuarios ---
     match /users/{uid} {
-      allow read: if isAuthenticated();
-      allow create: if isOwner(uid);
+      allow read: if isOwner(uid)
+        || isSuperAdmin()
+        || (isCommunityAdmin(resource.data.communityId)
+            && resource.data.communityId != null);
+      allow create: if isOwner(uid)
+        && request.resource.data.verified == false
+        && request.resource.data.communityRole == 'resident'
+        && request.resource.data.keys().hasOnly([
+          'displayName', 'email', 'phone', 'photoURL', 'communityId',
+          'communityRole', 'estrato', 'verified', 'tower', 'apartment',
+          'createdAt', 'deletedAt'
+        ]);
       allow update: if isOwner(uid)
         && !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['verified', 'communityRole', 'platformRole']);
+            .hasAny(['verified', 'communityRole', 'platformRole', 'createdAt'])
+        && (request.resource.data.communityId == resource.data.communityId
+            || (resource.data.communityId == null
+                && resource.data.verified == false
+                && request.resource.data.verified == false));
       allow delete: if false;
 
       // Notificaciones del usuario
@@ -78,8 +94,81 @@ service cloud.firestore {
     }
 
     // --- Comunidades ---
+    // Resolución exacta de códigos de invitación para onboarding. No se
+    // permite listar la colección, por lo que conocer el código es obligatorio.
+    match /invite_codes/{code} {
+      allow get: if isAuthenticated();
+      allow list: if false;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    function isAccessOperator(communityId) {
+      return isVerifiedMember(communityId) && (
+        isCommunityAdmin(communityId) ||
+        exists(/databases/$(database)/documents/communities/$(communityId)/access_staff/$(request.auth.uid))
+        && get(/databases/$(database)/documents/communities/$(communityId)/access_staff/$(request.auth.uid)).data.active == true);
+    }
+
+    match /communities/{communityId}/access_staff/{uid} {
+      allow read: if isOwner(uid) || isCommunityAdmin(communityId);
+      allow write: if isCommunityAdmin(communityId)
+        && request.resource.data.keys().hasOnly(['active', 'updatedAt'])
+        && request.resource.data.active is bool
+        && request.resource.data.updatedAt == request.time;
+    }
+    match /communities/{communityId}/access_status/{uid} {
+      allow get: if isAccessOperator(communityId) ||
+        (isVerifiedMember(communityId) && isOwner(uid));
+      allow list: if isCommunityAdmin(communityId);
+      allow create, update: if isCommunityAdmin(communityId)
+        && request.resource.data.keys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['current', 'overdue', 'unknown']
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /communities/{communityId}/access_tokens/{token} {
+      allow get: if isAccessOperator(communityId) ||
+        (isVerifiedMember(communityId) && isOwner(resource.data.residentUid));
+      allow list: if false;
+      allow create: if isVerifiedMember(communityId)
+        && request.resource.data.keys().hasOnly(['residentUid', 'name', 'unit', 'createdAt', 'expiresAt', 'used'])
+        && request.resource.data.residentUid == request.auth.uid
+        && request.resource.data.name == getUserData().displayName
+        && request.resource.data.unit is string
+        && request.resource.data.unit.size() <= 150
+        && request.resource.data.unit == (getUserData().tower != null && getUserData().apartment != null
+          ? 'Torre ' + getUserData().tower + ' - Apto ' + getUserData().apartment : '')
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(5, 'm')
+        && request.resource.data.used == false;
+      allow update: if isAccessOperator(communityId)
+        && resource.data.used == false && resource.data.expiresAt > request.time
+        && request.resource.data.used == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used'])
+        && getAfter(/databases/$(database)/documents/communities/$(communityId)/access_logs/$(token)).data.operatorUid == request.auth.uid;
+      allow delete: if false;
+    }
+    match /communities/{communityId}/access_logs/{token} {
+      allow read: if isCommunityAdmin(communityId);
+      allow create: if isAccessOperator(communityId)
+        && get(/databases/$(database)/documents/users/$(request.resource.data.residentUid)).data.verified == true
+        && get(/databases/$(database)/documents/users/$(request.resource.data.residentUid)).data.communityId == communityId
+        && request.resource.data.keys().hasOnly(['residentUid', 'operatorUid', 'zone', 'residents', 'visitors', 'createdAt'])
+        && request.resource.data.operatorUid == request.auth.uid
+        && request.resource.data.residentUid == get(/databases/$(database)/documents/communities/$(communityId)/access_tokens/$(token)).data.residentUid
+        && get(/databases/$(database)/documents/communities/$(communityId)/access_tokens/$(token)).data.used == false
+        && get(/databases/$(database)/documents/communities/$(communityId)/access_tokens/$(token)).data.expiresAt > request.time
+        && getAfter(/databases/$(database)/documents/communities/$(communityId)/access_tokens/$(token)).data.used == true
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.zone is string && request.resource.data.zone.size() > 0 && request.resource.data.zone.size() <= 100
+        && request.resource.data.residents is int && request.resource.data.residents >= 1 && request.resource.data.residents <= 50
+        && request.resource.data.visitors is int && request.resource.data.visitors >= 0 && request.resource.data.visitors <= 50;
+      allow update, delete: if false;
+    }
+
     match /communities/{communityId} {
-      allow read: if isAuthenticated();
+      allow read: if isCommunityMember(communityId) || isSuperAdmin();
       allow create: if isSuperAdmin();
       allow update: if isCommunityAdmin(communityId) || isSuperAdmin();
       allow delete: if isSuperAdmin();
@@ -89,8 +178,18 @@ service cloud.firestore {
         allow read: if isVerifiedMember(communityId);
         allow create: if isVerifiedMember(communityId)
           && request.resource.data.authorUid == request.auth.uid;
-        allow update: if isVerifiedMember(communityId)
-          && (isOwner(resource.data.authorUid) || isCommunityAdmin(communityId));
+        allow update: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && isOwner(resource.data.authorUid)
+              && request.resource.data.authorUid == resource.data.authorUid
+              && request.resource.data.createdAt == resource.data.createdAt
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['text', 'imageURLs', 'type']))
+          || (isVerifiedMember(communityId)
+              && request.resource.data.authorUid == resource.data.authorUid
+              && request.resource.data.createdAt == resource.data.createdAt
+              && request.resource.data.diff(resource.data).affectedKeys()
+                  .hasOnly(['likedBy', 'likes', 'pollOptions', 'commentCount']));
         allow delete: if isOwner(resource.data.authorUid) || isCommunityAdmin(communityId);
       }
 
@@ -133,6 +232,9 @@ service cloud.firestore {
         allow update: if isCommunityAdmin(communityId)
           || (isVerifiedMember(communityId)
               && resource.data.residentUid == request.auth.uid
+              && request.resource.data.residentUid == resource.data.residentUid
+              && resource.data.status in ['notified', 'defense']
+              && request.resource.data.status == 'defense'
               && request.resource.data.diff(resource.data).affectedKeys()
                   .hasOnly(['defenseText', 'status']));
         allow delete: if false;
@@ -150,7 +252,10 @@ service cloud.firestore {
           || (isVerifiedMember(communityId)
               && resource.data.residentUid == request.auth.uid);
         allow create: if isVerifiedMember(communityId)
-          && request.resource.data.residentUid == request.auth.uid;
+          && request.resource.data.residentUid == request.auth.uid
+          && request.resource.data.slotKey == bookingId
+          && request.resource.data.status == 'confirmed'
+          && request.resource.data.createdAt == request.time;
         allow update: if isCommunityAdmin(communityId);
         allow delete: if false;
       }
@@ -195,27 +300,43 @@ service cloud.firestore {
               && resource.data.residentUid == request.auth.uid);
         allow create: if isVerifiedMember(communityId)
           && request.resource.data.residentUid == request.auth.uid;
-        allow update: if isCommunityAdmin(communityId)
-          || (isVerifiedMember(communityId)
-              && resource.data.residentUid == request.auth.uid);
+        allow update: if isCommunityAdmin(communityId);
         allow delete: if false;
       }
     }
 
     // --- Servicios de vecinos ---
     match /services/{serviceId} {
-      allow read: if isAuthenticated() && isVerified();
+      allow read: if isAuthenticated() && isVerified()
+        && resource.data.communityId == getUserData().communityId;
       allow create: if isAuthenticated() && isVerified()
-        && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if isOwner(resource.data.ownerUid);
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.communityId == getUserData().communityId;
+      allow update: if isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.communityId == resource.data.communityId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['title', 'description', 'category', 'price',
+              'priceDescription', 'imageURLs', 'active', 'ownerName',
+              'ownerPhotoURL', 'contactPhone', 'communityName']);
       allow delete: if isOwner(resource.data.ownerUid);
     }
 
     // --- Tiendas de barrio ---
     match /stores/{storeId} {
-      allow read: if isAuthenticated() && isVerified();
-      allow create: if isAuthenticated() && isVerified();
-      allow update: if isOwner(resource.data.ownerUid);
+      allow read: if isAuthenticated() && isVerified()
+        && resource.data.communityId == getUserData().communityId;
+      allow create: if isAuthenticated() && isVerified()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.communityId == getUserData().communityId;
+      allow update: if isOwner(resource.data.ownerUid)
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.communityId == resource.data.communityId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['name', 'description', 'imageURL', 'deliveryTime',
+              'minOrder', 'active']);
       allow delete: if isOwner(resource.data.ownerUid);
 
       // Items de la tienda (subcolección)
@@ -232,18 +353,34 @@ service cloud.firestore {
         && (isOwner(resource.data.buyerUid)
             || resource.data.storeOwnerUid == request.auth.uid);
       allow create: if isAuthenticated() && isVerified()
-        && request.resource.data.buyerUid == request.auth.uid;
-      allow update: if resource.data.storeOwnerUid == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['status']);
+        && request.resource.data.buyerUid == request.auth.uid
+        && request.resource.data.communityId == getUserData().communityId
+        && request.resource.data.storeOwnerUid ==
+          get(/databases/$(database)/documents/stores/$(request.resource.data.storeId)).data.ownerUid
+        && request.resource.data.communityId ==
+          get(/databases/$(database)/documents/stores/$(request.resource.data.storeId)).data.communityId
+        && get(/databases/$(database)/documents/stores/$(request.resource.data.storeId)).data.active == true;
+      allow update: if (resource.data.storeOwnerUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['status', 'confirmedAt', 'deliveredAt', 'reviewed']))
+        || (isOwner(resource.data.buyerUid)
+          && (resource.data.status == 'pending' || resource.data.status == 'confirmed')
+          && request.resource.data.status == 'cancelled'
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['status']));
       allow delete: if false;
     }
 
     // --- Servicios externos ---
     match /external_services/{serviceId} {
       allow read: if isAuthenticated() && isVerified();
-      allow create: if isAuthenticated() && isVerified();
-      allow update: if isOwner(resource.data.recommendedByUid);
+      allow create: if isAuthenticated() && isVerified()
+        && request.resource.data.recommendedByUid == request.auth.uid;
+      allow update: if isOwner(resource.data.recommendedByUid)
+        && request.resource.data.recommendedByUid == resource.data.recommendedByUid
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['name', 'description', 'category', 'phone', 'whatsapp',
+              'website', 'imageURL', 'active']);
       allow delete: if false;
     }
 
@@ -252,14 +389,20 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isVerified()
         && request.resource.data.authorUid == request.auth.uid;
-      allow update: if isOwner(resource.data.authorUid);
+      allow update: if isOwner(resource.data.authorUid)
+        && request.resource.data.authorUid == resource.data.authorUid
+        && request.resource.data.targetId == resource.data.targetId
+        && request.resource.data.targetType == resource.data.targetType
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['rating', 'comment', 'authorName', 'authorPhotoURL']);
       allow delete: if isOwner(resource.data.authorUid);
     }
 
     // --- Intenciones de pago ---
     match /payment_intents/{docId} {
       allow read: if isOwner(resource.data.uid);
-      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow create: if false;
       allow update, delete: if false;
     }
 
@@ -285,13 +428,8 @@ service cloud.firestore {
     // Admin de la comunidad puede crear el trial inicial (30 días).
     // Activaciones pagadas y cambios de plan los hace backend.
     match /subscriptions/{communityId} {
-      allow read: if isAuthenticated();
-      allow create: if isCommunityAdmin(communityId)
-        && !exists(/databases/$(database)/documents/subscriptions/$(communityId))
-        && request.resource.data.status == 'trial'
-        && request.resource.data.plan in ['starter', 'professional', 'enterprise']
-        && request.resource.data.createdBy == request.auth.uid;
-      allow update, delete: if false;
+      allow read: if isCommunityMember(communityId) || isSuperAdmin();
+      allow create, update, delete: if false;
     }
 
     // --- Logs de auditoría (solo backend) ---

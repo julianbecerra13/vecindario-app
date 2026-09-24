@@ -26,8 +26,9 @@ class StoresScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(context.l10n.storeScreenTitle),
         actions: [
-          IconButton(
+          TextButton.icon(
             icon: const Icon(Icons.receipt_long_outlined),
+            label: const Text('Mis pedidos'),
             onPressed: () => context.push('/stores/orders'),
           ),
         ],

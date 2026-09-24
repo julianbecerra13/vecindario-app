@@ -46,9 +46,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/key.properties
+*.jks
+*.keystore
+*.apk
 
 # Node modules
 node_modules/
+.firebase-emulators/
+.firebase/
+.go-cache/
+.gradle-home/
+.local-config/
+.npm-cache/
+.tmp/
+/tmp/
+/output/
 image.png
 
 # Binarios compilados de Go (ej. functions/cmd/*)

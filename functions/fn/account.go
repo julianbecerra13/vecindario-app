@@ -2,13 +2,18 @@ package fn
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cloudstorage "cloud.google.com/go/storage"
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"google.golang.org/api/iterator"
 )
 
@@ -65,10 +70,19 @@ func ProcessAccountDeletion(ctx context.Context, e cloudevents.Event) error {
 		if err := nullifyOrders(ctx, fs, uid); err != nil {
 			log.Printf("Error nullificando orders: %v", err)
 		}
+		if err := anonymizeOwnedResources(ctx, fs, uid); err != nil {
+			log.Printf("Error anonimizando recursos propios: %v", err)
+		}
 
 		// 4. Eliminar datos personales del usuario
 		if err := deleteUserData(ctx, fs, uid); err != nil {
-			log.Printf("Error eliminando datos: %v", err)
+			return fmt.Errorf("eliminando datos Firestore de %s: %w", uid, err)
+		}
+		if err := deleteUserStorage(ctx, uid); err != nil {
+			return fmt.Errorf("eliminando Storage de %s: %w", uid, err)
+		}
+		if err := deleteAuthUser(ctx, uid); err != nil {
+			return fmt.Errorf("eliminando Auth de %s: %w", uid, err)
 		}
 
 		// 5. Marcar solicitud como completada
@@ -150,6 +164,100 @@ func nullifyOrders(ctx context.Context, fs *firestore.Client, uid string) error 
 		if _, err := batch.Commit(ctx); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func anonymizeOwnedResources(ctx context.Context, fs *firestore.Client, uid string) error {
+	for _, collection := range []string{"services", "stores"} {
+		iter := fs.Collection(collection).Where("ownerUid", "==", uid).Documents(ctx)
+		batch := fs.Batch()
+		count := 0
+		for {
+			doc, err := iter.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				iter.Stop()
+				return err
+			}
+			updates := []firestore.Update{{Path: "ownerUid", Value: "deleted"}, {Path: "active", Value: false}}
+			if collection == "services" {
+				updates = append(updates,
+					firestore.Update{Path: "ownerName", Value: "Usuario eliminado"},
+					firestore.Update{Path: "ownerPhotoURL", Value: nil},
+				)
+			}
+			batch.Update(doc.Ref, updates)
+			count++
+			if count%400 == 0 {
+				if _, err := batch.Commit(ctx); err != nil {
+					iter.Stop()
+					return err
+				}
+				batch = fs.Batch()
+			}
+		}
+		iter.Stop()
+		if count%400 != 0 {
+			if _, err := batch.Commit(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func storageBucketName() (string, error) {
+	name := os.Getenv("FIREBASE_STORAGE_BUCKET")
+	if name == "" {
+		return "", fmt.Errorf("FIREBASE_STORAGE_BUCKET no configurado")
+	}
+	return name, nil
+}
+
+func deleteUserStorage(ctx context.Context, uid string) error {
+	bucketName, err := storageBucketName()
+	if err != nil {
+		return err
+	}
+	client, err := cloudstorage.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	bucket := client.Bucket(bucketName)
+	for _, prefix := range []string{"users/" + uid + "/", "data-exports/" + uid + "/"} {
+		iter := bucket.Objects(ctx, &cloudstorage.Query{Prefix: prefix})
+		for {
+			attrs, err := iter.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			if err := bucket.Object(attrs.Name).Delete(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func deleteAuthUser(ctx context.Context, uid string) error {
+	app, err := firebase.NewApp(ctx, nil)
+	if err != nil {
+		return err
+	}
+	client, err := app.Auth(ctx)
+	if err != nil {
+		return err
+	}
+	if err := client.DeleteUser(ctx, uid); err != nil && !auth.IsUserNotFound(err) {
+		return err
 	}
 	return nil
 }
@@ -314,15 +422,14 @@ func ProcessDataExport(ctx context.Context, e cloudevents.Event) error {
 		notifsIter.Stop()
 		exportData["notifications"] = notifs
 
-		// Guardar el JSON exportado en Firestore (colección temporal)
-		_, _, err = fs.Collection("data_exports").Add(ctx, map[string]interface{}{
-			"uid":      uid,
-			"data":     exportData,
-			"status":   "ready",
-			"readyAt":  time.Now(),
-		})
+		storagePath, expiresAt, err := writeDataExport(ctx, uid, doc.Ref.ID, exportData)
 		if err != nil {
-			log.Printf("Error saving export for %s: %v", uid, err)
+			_, _ = doc.Ref.Update(ctx, []firestore.Update{
+				{Path: "status", Value: "failed"},
+				{Path: "error", Value: "No fue posible generar la exportación"},
+				{Path: "failedAt", Value: time.Now()},
+			})
+			log.Printf("Error guardando exportación de %s: %v", uid, err)
 			continue
 		}
 
@@ -330,6 +437,8 @@ func ProcessDataExport(ctx context.Context, e cloudevents.Event) error {
 		_, err = doc.Ref.Update(ctx, []firestore.Update{
 			{Path: "status", Value: "completed"},
 			{Path: "completedAt", Value: time.Now()},
+			{Path: "storagePath", Value: storagePath},
+			{Path: "expiresAt", Value: expiresAt},
 		})
 		if err != nil {
 			log.Printf("Error updating export request: %v", err)
@@ -338,4 +447,35 @@ func ProcessDataExport(ctx context.Context, e cloudevents.Event) error {
 		log.Printf("Data export completed for user: %s", uid)
 	}
 	return nil
+}
+
+func writeDataExport(ctx context.Context, uid, requestID string, data map[string]interface{}) (string, time.Time, error) {
+	payload, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	bucketName, err := storageBucketName()
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	client, err := cloudstorage.NewClient(ctx)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	defer client.Close()
+
+	expiresAt := time.Now().Add(7 * 24 * time.Hour)
+	path := fmt.Sprintf("data-exports/%s/%s.json", uid, requestID)
+	writer := client.Bucket(bucketName).Object(path).NewWriter(ctx)
+	writer.ContentType = "application/json"
+	writer.CacheControl = "private, max-age=0, no-store"
+	writer.Metadata = map[string]string{"expiresAt": expiresAt.Format(time.RFC3339)}
+	if _, err := writer.Write(payload); err != nil {
+		_ = writer.Close()
+		return "", time.Time{}, err
+	}
+	if err := writer.Close(); err != nil {
+		return "", time.Time{}, err
+	}
+	return path, expiresAt, nil
 }

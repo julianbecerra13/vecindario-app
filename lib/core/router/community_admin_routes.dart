@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/features/access/access_management_screen.dart';
 import 'package:vecindario_app/features/admin/screens/community_settings_screen.dart';
 import 'package:vecindario_app/features/admin/screens/pending_approvals_screen.dart';
 import 'package:vecindario_app/features/premium/circulars/screens/circulars_screen.dart';
@@ -27,6 +28,10 @@ import 'package:vecindario_app/features/premium/subscriptions/screens/subscripti
 /// guard fino (communityRole == admin || platformRole == super_admin) vive
 /// en app_router.dart.
 final List<RouteBase> communityAdminRoutes = [
+  GoRoute(
+    path: '/premium/access-management',
+    builder: (_, __) => const AccessManagementScreen(),
+  ),
   GoRoute(path: '/premium', builder: (_, __) => const AdminShell()),
   GoRoute(
     path: '/premium/dashboard',
@@ -61,7 +66,10 @@ final List<RouteBase> communityAdminRoutes = [
   GoRoute(path: '/premium/pqrs', builder: (_, __) => const PqrsScreen()),
   GoRoute(
     path: '/premium/pqrs/create',
-    builder: (_, __) => const CreatePqrsScreen(),
+    builder: (_, state) => CreatePqrsScreen(
+      initialType: state.uri.queryParameters['type'],
+      initialCategory: state.uri.queryParameters['category'],
+    ),
   ),
   GoRoute(
     path: '/premium/amenities',

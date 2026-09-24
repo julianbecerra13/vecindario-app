@@ -11,7 +11,6 @@ import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/empty_state.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -484,22 +483,25 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                           totalPaid: widget.amenity.totalCost,
                           depositPaid: widget.amenity.deposit,
                           createdAt: DateTime.now(),
+                          slotKey:
+                              '${widget.amenity.id}_${_selectedDate!.year}${_selectedDate!.month.toString().padLeft(2, '0')}${_selectedDate!.day.toString().padLeft(2, '0')}',
                         );
-                        await ref
-                            .read(premiumRepositoryProvider)
-                            .createBooking(communityId, booking);
-
-                        // Abrir pago
-                        final paymentService = ref.read(paymentServiceProvider);
-                        await paymentService.startPayment(
-                          reference: PaymentService.generateReference(
-                            PaymentType.booking,
-                            widget.amenity.id,
-                          ),
-                          amountCOP: widget.amenity.totalCost,
-                          customerEmail: user.email,
-                          type: PaymentType.booking,
-                        );
+                        try {
+                          await ref
+                              .read(premiumRepositoryProvider)
+                              .createBooking(communityId, booking);
+                        } catch (error) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Ese dia ya fue reservado. Elige otra fecha.',
+                                ),
+                              ),
+                            );
+                          }
+                          return;
+                        }
 
                         if (context.mounted) {
                           Navigator.pop(context);
@@ -510,9 +512,9 @@ class _AmenityBookingSheetState extends ConsumerState<_AmenityBookingSheet> {
                           );
                         }
                       },
-                icon: const Icon(Icons.credit_card),
+                icon: const Icon(Icons.event_available),
                 label: Text(
-                  context.l10n.amenityPayAndBook,
+                  'Solicitar reserva',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

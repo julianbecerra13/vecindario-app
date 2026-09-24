@@ -12,10 +12,9 @@ import 'package:vecindario_app/features/stores/providers/stores_provider.dart';
 import 'package:vecindario_app/features/stores/widgets/checkout_bar.dart';
 import 'package:vecindario_app/features/stores/widgets/store_item_tile.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
-enum PaymentMethod { cashOnDelivery, online }
+enum PaymentMethod { cashOnDelivery, transfer }
 
 class StoreDetailScreen extends ConsumerStatefulWidget {
   final String storeId;
@@ -59,10 +58,21 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     setState(() => _isOrdering = true);
 
     try {
+      final store = await ref
+          .read(storesRepositoryProvider)
+          .getStore(cart.storeId);
+      if (store == null ||
+          !store.active ||
+          store.communityId != community.id ||
+          store.ownerUid.isEmpty) {
+        throw StateError('La tienda no esta disponible');
+      }
       final order = OrderModel(
         id: '',
         storeId: cart.storeId,
         storeName: cart.storeName,
+        storeOwnerUid: store.ownerUid,
+        communityId: community.id,
         buyerUid: user.id,
         buyerName: user.displayName,
         buyerApartment: user.unitInfo,
@@ -78,8 +88,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
         subtotal: subtotal,
         serviceFee: fee,
         total: subtotal + fee,
-        paymentMethod: _paymentMethod == PaymentMethod.online
-            ? 'online'
+        paymentMethod: _paymentMethod == PaymentMethod.transfer
+            ? 'transfer'
             : 'cash',
         createdAt: DateTime.now(),
       );
@@ -87,20 +97,6 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
       final orderId = await ref
           .read(storesRepositoryProvider)
           .createOrder(order);
-
-      // Si eligió pago online, abrir Wompi
-      if (_paymentMethod == PaymentMethod.online) {
-        final paymentService = ref.read(paymentServiceProvider);
-        await paymentService.startPayment(
-          reference: PaymentService.generateReference(
-            PaymentType.order,
-            orderId,
-          ),
-          amountCOP: subtotal + fee,
-          customerEmail: user.email,
-          type: PaymentType.order,
-        );
-      }
 
       ref.read(cartProvider.notifier).clear();
 
@@ -184,12 +180,13 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                       ),
                       const SizedBox(height: AppSizes.xs),
                       _PaymentMethodTile(
-                        icon: Icons.credit_card,
-                        title: context.l10n.storeOnlinePaymentTitle,
-                        subtitle: context.l10n.storeOnlinePaymentSubtitle,
-                        selected: _paymentMethod == PaymentMethod.online,
+                        icon: Icons.account_balance,
+                        title: 'Transferencia',
+                        subtitle:
+                            'La tienda confirmará los datos y el comprobante',
+                        selected: _paymentMethod == PaymentMethod.transfer,
                         onTap: () => setState(
-                          () => _paymentMethod = PaymentMethod.online,
+                          () => _paymentMethod = PaymentMethod.transfer,
                         ),
                       ),
                     ],
@@ -210,8 +207,8 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
               estrato: estrato,
               onCheckout: _handleCheckout,
               isLoading: _isOrdering,
-              paymentLabel: _paymentMethod == PaymentMethod.online
-                  ? context.l10n.storePayOnlineLabel
+              paymentLabel: _paymentMethod == PaymentMethod.transfer
+                  ? 'Pedir por transferencia'
                   : context.l10n.storeOrderCashLabel,
             )
           : null,

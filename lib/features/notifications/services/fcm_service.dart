@@ -47,7 +47,7 @@ class FCMService {
     // Inicializar local notifications
     await _localNotifications.initialize(
       const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: AndroidInitializationSettings('@mipmap/launcher_icon'),
         iOS: DarwinInitializationSettings(),
       ),
       onDidReceiveNotificationResponse: (response) {
@@ -115,7 +115,7 @@ class FCMService {
           _androidChannel.id,
           _androidChannel.name,
           channelDescription: _androidChannel.description,
-          icon: '@mipmap/ic_launcher',
+          icon: '@mipmap/launcher_icon',
           importance: Importance.high,
         ),
         iOS: const DarwinNotificationDetails(

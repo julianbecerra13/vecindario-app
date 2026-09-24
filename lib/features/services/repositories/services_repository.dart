@@ -45,10 +45,14 @@ class ServicesRepository {
     return ServiceModel.fromFirestore(doc.data()!, doc.id);
   }
 
-  Stream<List<ServiceModel>> getServicesForOwner(String ownerUid) {
+  Stream<List<ServiceModel>> getServicesForOwner(
+    String ownerUid,
+    String communityId,
+  ) {
     return _firestore
         .collection(FirestorePaths.services)
         .where('ownerUid', isEqualTo: ownerUid)
+        .where('communityId', isEqualTo: communityId)
         .snapshots()
         .map(
           (snap) => snap.docs

@@ -3,6 +3,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
+import 'package:vecindario_app/features/premium/models/amenity_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_repository.dart';
 
 void main() {
@@ -360,6 +361,30 @@ void main() {
         // Assert
         expect(result.length, 1);
         expect(result[0].residentUid, uid);
+      });
+
+      test('createBooking impide reservar dos veces el mismo cupo', () async {
+        final booking = BookingModel(
+          id: '',
+          amenityId: 'pool',
+          amenityName: 'Piscina',
+          residentUid: 'user-1',
+          residentName: 'Ana',
+          date: DateTime(2026, 10, 1),
+          startTime: '08:00',
+          endTime: '22:00',
+          totalPaid: 0,
+          createdAt: DateTime.now(),
+          slotKey: 'pool_20261001',
+        );
+        expect(
+          await repository.createBooking('comm-1', booking),
+          'pool_20261001',
+        );
+        await expectLater(
+          repository.createBooking('comm-1', booking),
+          throwsStateError,
+        );
       });
     });
   });

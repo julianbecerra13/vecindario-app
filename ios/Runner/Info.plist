@@ -24,6 +24,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Vecindario usa la cámara para publicar fotos y escanear códigos QR de acceso.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Vecindario accede a tus fotos para que puedas compartirlas en tu comunidad.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

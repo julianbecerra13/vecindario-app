@@ -27,9 +27,9 @@ final storeItemsProvider = StreamProvider.family<List<StoreItemModel>, String>((
 /// reales (ownerUid) en vez de un rol exclusivo.
 final ownerStoreProvider = StreamProvider<StoreModel?>((ref) {
   final user = ref.watch(currentUserProvider).value;
-  if (user == null) return Stream.value(null);
+  if (user == null || user.communityId == null) return Stream.value(null);
   return ref
       .watch(storesRepositoryProvider)
-      .getStoresForOwner(user.id)
+      .getStoresForOwner(user.id, user.communityId!)
       .map((list) => list.isEmpty ? null : list.first);
 });

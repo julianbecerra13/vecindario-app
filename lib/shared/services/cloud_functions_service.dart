@@ -68,6 +68,30 @@ class CloudFunctionsService {
     return callFunction('RotateInviteCode', {'communityId': communityId});
   }
 
+  Future<Map<String, dynamic>> joinCommunity({
+    required String inviteCode,
+    String? tower,
+    String? apartment,
+    bool preview = false,
+  }) {
+    return callFunction('JoinCommunity', {
+      'inviteCode': inviteCode,
+      'tower': tower ?? '',
+      'apartment': apartment ?? '',
+      'preview': preview,
+    });
+  }
+
+  Future<Map<String, dynamic>> startSubscriptionTrial(
+    String communityId,
+    String plan,
+  ) {
+    return callFunction('StartSubscriptionTrial', {
+      'communityId': communityId,
+      'plan': plan,
+    });
+  }
+
   Future<Map<String, dynamic>> createOrder(
     String storeId,
     List<Map<String, dynamic>> items,

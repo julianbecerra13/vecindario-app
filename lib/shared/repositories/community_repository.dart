@@ -38,6 +38,24 @@ class CommunityRepository {
     return CommunityModel.fromFirestore(doc.data(), doc.id);
   }
 
+  /// Resuelve un código mediante un documento de acceso exacto. Esta ruta se
+  /// usa como respaldo cuando Cloud Functions no está disponible.
+  Future<Map<String, String>?> resolveInviteCode(String code) async {
+    final normalizedCode = code.trim().toUpperCase();
+    final doc = await _firestore
+        .collection('invite_codes')
+        .doc(normalizedCode)
+        .get();
+    final data = doc.data();
+    if (!doc.exists || data == null) return null;
+    final communityId = data['communityId'] as String?;
+    if (communityId == null || communityId.isEmpty) return null;
+    return {
+      'communityId': communityId,
+      'unitType': data['unitType'] as String? ?? 'apartment',
+    };
+  }
+
   Future<void> joinCommunity({
     required String communityId,
     required String uid,

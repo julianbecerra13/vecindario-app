@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"google.golang.org/api/iterator"
 )
 
@@ -23,15 +23,25 @@ func init() {
 	functions.CloudEvent("OnNewPQRS", OnNewPQRS)
 }
 
+func firestoreSubjectParts(subject string) []string {
+	parts := strings.Split(strings.Trim(subject, "/"), "/")
+	for i, part := range parts {
+		if part == "documents" && i+1 < len(parts) {
+			return parts[i+1:]
+		}
+	}
+	return parts
+}
+
 // Estructura para notificaciones Firestore
 type notification struct {
-	UID       string            `firestore:"uid"`
-	Type      string            `firestore:"type"`
-	Title     string            `firestore:"title"`
-	Body      string            `firestore:"body"`
-	Route     string            `firestore:"route,omitempty"`
-	Read      bool              `firestore:"read"`
-	CreatedAt time.Time         `firestore:"createdAt"`
+	UID       string    `firestore:"uid"`
+	Type      string    `firestore:"type"`
+	Title     string    `firestore:"title"`
+	Body      string    `firestore:"body"`
+	Route     string    `firestore:"route,omitempty"`
+	Read      bool      `firestore:"read"`
+	CreatedAt time.Time `firestore:"createdAt"`
 }
 
 // initFirebase inicializa Firebase Admin SDK
@@ -95,7 +105,7 @@ func sendPushToUser(ctx context.Context, fs *firestore.Client, msg *messaging.Cl
 			},
 		})
 		if err != nil {
-			log.Printf("Error enviando push a token %s: %v", token[:20], err)
+			log.Printf("Error enviando push a usuario %s: %v", uid, err)
 		}
 	}
 	return nil
@@ -171,13 +181,12 @@ func OnNewCircular(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("DataAs: %v", err)
 	}
 
-	subject := e.Subject()
-	documentID := subject[strings.LastIndex(subject, "/")+1:]
-	pathParts := strings.Split(subject, "/")
+	pathParts := firestoreSubjectParts(e.Subject())
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
 	communityID := pathParts[1]
+	documentID := pathParts[3]
 
 	// Obtener la circular
 	doc, err := fs.Collection("communities").Doc(communityID).Collection("circulars").Doc(documentID).Get(ctx)
@@ -185,8 +194,11 @@ func OnNewCircular(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("get circular: %v", err)
 	}
 
-	title := doc.Data()["title"].(string)
-	description := doc.Data()["description"].(string)
+	title, _ := doc.Data()["title"].(string)
+	description, _ := doc.Data()["description"].(string)
+	if title == "" {
+		title = "Circular"
+	}
 
 	// Notificar a todos los miembros verificados de la comunidad
 	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("verified", "==", true).Documents(ctx)
@@ -216,7 +228,7 @@ func OnNewPost(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject(), "/")
+	pathParts := firestoreSubjectParts(e.Subject())
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -229,20 +241,25 @@ func OnNewPost(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("get post: %v", err)
 	}
 
-	isPinned := doc.Data()["isPinned"].(bool)
+	isPinned, _ := doc.Data()["pinned"].(bool)
 	if !isPinned {
 		return nil // Solo notificar si está fijado
 	}
 
-	title := doc.Data()["title"].(string)
-	authorUID := doc.Data()["authorUid"].(string)
+	title, _ := doc.Data()["text"].(string)
+	authorUID, _ := doc.Data()["authorUid"].(string)
+	if authorUID == "" {
+		return fmt.Errorf("post %s has no authorUid", postID)
+	}
 
 	// Obtener autor para nombre
 	authorDoc, err := fs.Collection("users").Doc(authorUID).Get(ctx)
 	if err != nil {
 		authorUID = "Vecino"
 	} else {
-		authorUID = authorDoc.Data()["displayName"].(string)
+		if displayName, ok := authorDoc.Data()["displayName"].(string); ok && displayName != "" {
+			authorUID = displayName
+		}
 	}
 
 	// Notificar a todos los miembros verificados
@@ -273,7 +290,7 @@ func OnOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject(), "/")
+	pathParts := firestoreSubjectParts(e.Subject())
 	if len(pathParts) < 2 {
 		return fmt.Errorf("invalid path")
 	}
@@ -285,8 +302,11 @@ func OnOrderStatusChange(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("get order: %v", err)
 	}
 
-	buyerUID := doc.Data()["buyerUid"].(string)
-	status := doc.Data()["status"].(string)
+	buyerUID, _ := doc.Data()["buyerUid"].(string)
+	status, _ := doc.Data()["status"].(string)
+	if buyerUID == "" || status == "" {
+		return nil
+	}
 
 	var title, body string
 	switch status {
@@ -320,7 +340,7 @@ func OnNewPQRS(ctx context.Context, e cloudevents.Event) error {
 	}
 	defer fs.Close()
 
-	pathParts := strings.Split(e.Subject(), "/")
+	pathParts := firestoreSubjectParts(e.Subject())
 	if len(pathParts) < 4 {
 		return fmt.Errorf("invalid path")
 	}
@@ -333,8 +353,11 @@ func OnNewPQRS(ctx context.Context, e cloudevents.Event) error {
 		return fmt.Errorf("get pqrs: %v", err)
 	}
 
-	title := doc.Data()["title"].(string)
-	pqrsType := doc.Data()["type"].(string)
+	title, _ := doc.Data()["description"].(string)
+	pqrsType, _ := doc.Data()["type"].(string)
+	if title == "" {
+		title = "Nueva solicitud"
+	}
 
 	// Notificar a todos los admins de la comunidad
 	iter := fs.Collection("users").Where("communityId", "==", communityID).Where("communityRole", "==", "admin").Documents(ctx)

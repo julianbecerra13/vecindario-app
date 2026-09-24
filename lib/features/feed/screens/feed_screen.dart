@@ -7,6 +7,7 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/widgets/post_card.dart';
+import 'package:vecindario_app/features/feed/widgets/comments_sheet.dart';
 import 'package:vecindario_app/shared/providers/capabilities_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
@@ -209,6 +210,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                       PostCard(
                         post: posts[i],
                         onTap: () => context.push('/feed/${posts[i].id}'),
+                        onComment: () =>
+                            showCommentsSheet(context, posts[i].id),
                       ),
                     ],
                   );
@@ -216,6 +219,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 return PostCard(
                   post: posts[i],
                   onTap: () => context.push('/feed/${posts[i].id}'),
+                  onComment: () => showCommentsSheet(context, posts[i].id),
                 );
               },
             ),

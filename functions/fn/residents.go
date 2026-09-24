@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -20,6 +21,81 @@ func init() {
 	functions.HTTP("ApproveResident", ApproveResident)
 	functions.HTTP("RejectResident", RejectResident)
 	functions.HTTP("RotateInviteCode", RotateInviteCode)
+	functions.HTTP("JoinCommunity", JoinCommunity)
+}
+
+type JoinCommunityRequest struct {
+	InviteCode string `json:"inviteCode"`
+	Tower      string `json:"tower"`
+	Apartment  string `json:"apartment"`
+	Preview    bool   `json:"preview"`
+}
+
+// JoinCommunity resolves private invite codes server-side and returns only the
+// minimum information needed by onboarding.
+func JoinCommunity(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	ctx := r.Context()
+	uid, err := verifyAuthToken(ctx, r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	var req JoinCommunityRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+	code := strings.ToUpper(strings.TrimSpace(req.InviteCode))
+	if len(code) != 6 {
+		http.Error(w, "Invalid invite code", http.StatusBadRequest)
+		return
+	}
+	fs, _, err := initFirebase(ctx)
+	if err != nil {
+		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	defer fs.Close()
+	docs, err := fs.Collection("communities").Where("inviteCode", "==", code).Limit(1).Documents(ctx).GetAll()
+	if err != nil || len(docs) == 0 {
+		http.Error(w, "Invite code not found", http.StatusNotFound)
+		return
+	}
+	community := docs[0]
+	unitType, _ := community.Data()["unitType"].(string)
+	if unitType == "" {
+		unitType = "apartment"
+	}
+	if !req.Preview {
+		if strings.TrimSpace(req.Tower) == "" || strings.TrimSpace(req.Apartment) == "" {
+			http.Error(w, "Unit information required", http.StatusBadRequest)
+			return
+		}
+		userRef := fs.Collection("users").Doc(uid)
+		err = fs.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+			user, err := tx.Get(userRef)
+			if err != nil {
+				return err
+			}
+			if verified, _ := user.Data()["verified"].(bool); verified {
+				return fmt.Errorf("verified users cannot change community")
+			}
+			return tx.Update(userRef, []firestore.Update{
+				{Path: "communityId", Value: community.Ref.ID}, {Path: "tower", Value: strings.TrimSpace(req.Tower)},
+				{Path: "apartment", Value: strings.TrimSpace(req.Apartment)}, {Path: "verified", Value: false},
+			})
+		})
+		if err != nil {
+			http.Error(w, "Unable to join community", http.StatusConflict)
+			return
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{"status": "ok", "communityId": community.Ref.ID, "unitType": unitType})
 }
 
 // ApproveResidentRequest — Payload para aprobar un residente

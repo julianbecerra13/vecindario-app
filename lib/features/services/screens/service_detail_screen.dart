@@ -7,7 +7,9 @@ import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/services/providers/services_provider.dart';
 import 'package:vecindario_app/features/services/widgets/rating_stars.dart';
+import 'package:vecindario_app/features/services/widgets/service_reviews_sheet.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ServiceDetailScreen extends ConsumerWidget {
   final String serviceId;
@@ -17,6 +19,8 @@ class ServiceDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final serviceAsync = ref.watch(serviceDetailProvider(serviceId));
+    final reviews =
+        ref.watch(serviceReviewsProvider(serviceId)).value ?? const [];
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.serviceDetailTitle)),
@@ -87,10 +91,19 @@ class ServiceDetailScreen extends ConsumerWidget {
                 // Rating y contador
                 Row(
                   children: [
-                    RatingStars(rating: service.rating, size: 16),
+                    RatingStars(
+                      rating: reviews.isEmpty
+                          ? service.rating
+                          : reviews.fold<double>(
+                                  0,
+                                  (sum, item) => sum + item.rating,
+                                ) /
+                                reviews.length,
+                      size: 16,
+                    ),
                     const SizedBox(width: AppSizes.xs),
                     Text(
-                      '${service.rating.toStringAsFixed(1)} (${service.ratingCount})',
+                      '${(reviews.isEmpty ? service.rating : reviews.fold<double>(0, (sum, item) => sum + item.rating) / reviews.length).toStringAsFixed(1)} (${reviews.isEmpty ? service.ratingCount : reviews.length})',
                       style: AppTextStyles.bodySmall,
                     ),
                     const Spacer(),
@@ -99,6 +112,11 @@ class ServiceDetailScreen extends ConsumerWidget {
                       style: AppTextStyles.caption,
                     ),
                   ],
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.rate_review_outlined),
+                  label: const Text('Ver o escribir una reseña'),
+                  onPressed: () => showServiceReviewsSheet(context, service.id),
                 ),
                 const SizedBox(height: AppSizes.lg),
 
@@ -176,12 +194,53 @@ class ServiceDetailScreen extends ConsumerWidget {
                               context.l10n.serviceProviderLabel,
                               style: AppTextStyles.caption,
                             ),
+                            if (service.communityName != null)
+                              Text(
+                                service.communityName!,
+                                style: AppTextStyles.caption,
+                              ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
+                if (service.contactPhone != null &&
+                    service.contactPhone!.trim().isNotEmpty) ...[
+                  const SizedBox(height: AppSizes.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.chat),
+                      label: const Text('Solicitar por WhatsApp'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF25D366),
+                      ),
+                      onPressed: () async {
+                        final phone = service.contactPhone!.replaceAll(
+                          RegExp(r'[^0-9]'),
+                          '',
+                        );
+                        final message = Uri.encodeComponent(
+                          'Hola, vi "${service.title}" en Vecindario y quiero más información.',
+                        );
+                        final uri = Uri.parse(
+                          'https://wa.me/$phone?text=$message',
+                        );
+                        if (!await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        )) {
+                          if (context.mounted) {
+                            context.showErrorSnackBar(
+                              'No se pudo abrir WhatsApp.',
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSizes.xl),
               ],
             ),

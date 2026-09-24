@@ -7,6 +7,8 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
+import 'package:vecindario_app/shared/models/community_model.dart';
+import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 
 class JoinCommunityScreen extends ConsumerStatefulWidget {
   const JoinCommunityScreen({super.key});
@@ -55,13 +57,49 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
   }
 
   Future<void> _lookupCommunity(String code) async {
-    final repo = ref.read(communityRepositoryProvider);
-    final community = await repo.getCommunityByInviteCode(code);
-    if (community != null && mounted) {
+    try {
+      final result = await _resolveInvite(code, preview: true);
+      final unitType = UnitType.fromString(
+        result['unitType'] as String? ?? 'apartment',
+      );
+      if (!mounted) return;
       setState(() {
-        _primaryLabel = community.unitType.primaryLabel;
-        _secondaryLabel = community.unitType.secondaryLabel;
+        _primaryLabel = unitType.primaryLabel;
+        _secondaryLabel = unitType.secondaryLabel;
       });
+    } catch (_) {}
+  }
+
+  Future<Map<String, dynamic>> _resolveInvite(
+    String code, {
+    required bool preview,
+  }) async {
+    try {
+      return await ref
+          .read(cloudFunctionsProvider)
+          .joinCommunity(
+            inviteCode: code,
+            tower: preview ? null : _towerController.text.trim(),
+            apartment: preview ? null : _apartmentController.text.trim(),
+            preview: preview,
+          );
+    } catch (_) {
+      final repository = ref.read(communityRepositoryProvider);
+      final invite = await repository.resolveInviteCode(code);
+      if (invite == null) {
+        throw StateError('Código de invitación inválido');
+      }
+      if (!preview) {
+        final user = ref.read(currentUserProvider).value;
+        if (user == null) throw StateError('Usuario no autenticado');
+        await repository.joinCommunity(
+          communityId: invite['communityId']!,
+          uid: user.id,
+          tower: _towerController.text.trim(),
+          apartment: _apartmentController.text.trim(),
+        );
+      }
+      return invite;
     }
   }
 
@@ -80,29 +118,13 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final repo = ref.read(communityRepositoryProvider);
-      final community = await repo.getCommunityByInviteCode(code);
-
-      if (community == null) {
-        if (mounted) {
-          context.showErrorSnackBar(context.l10n.authInvalidInviteCode);
-        }
-        setState(() => _isLoading = false);
-        return;
-      }
-
       final user = ref.read(currentUserProvider).value;
       if (user == null) {
         setState(() => _isLoading = false);
         return;
       }
 
-      await repo.joinCommunity(
-        communityId: community.id,
-        uid: user.id,
-        tower: _towerController.text.trim(),
-        apartment: _apartmentController.text.trim(),
-      );
+      await _resolveInvite(code, preview: false);
 
       if (mounted) {
         context.go('/pending-approval');

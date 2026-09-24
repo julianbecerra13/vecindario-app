@@ -21,6 +21,8 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _maxPriceController = TextEditingController();
+  _PriceMode _priceMode = _PriceMode.fixed;
   ServiceCategory _selectedCategory = ServiceCategory.hogar;
   bool _isSubmitting = false;
 
@@ -29,6 +31,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
     _titleController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
+    _maxPriceController.dispose();
     super.dispose();
   }
 
@@ -49,9 +52,22 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final price = _priceController.text.isEmpty
-          ? null
-          : double.parse(_priceController.text);
+      final price =
+          _priceMode == _PriceMode.fixed &&
+              _priceController.text.trim().isNotEmpty
+          ? double.parse(_priceController.text.trim())
+          : null;
+      String? priceDescription;
+      if (_priceMode == _PriceMode.range) {
+        if (_priceController.text.trim().isEmpty ||
+            _maxPriceController.text.trim().isEmpty) {
+          throw const FormatException('El rango requiere dos valores');
+        }
+        priceDescription =
+            '\$${_priceController.text.trim()} – \$${_maxPriceController.text.trim()} COP';
+      } else if (_priceMode == _PriceMode.noPrice) {
+        priceDescription = 'Sin precio';
+      }
 
       final service = ServiceModel(
         id: '',
@@ -61,8 +77,11 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
         description: _descriptionController.text.trim(),
         category: _selectedCategory,
         price: price,
+        priceDescription: priceDescription,
         ownerName: user.displayName,
         ownerPhotoURL: user.photoURL,
+        contactPhone: user.phone,
+        communityName: community.name,
         createdAt: DateTime.now(),
       );
 
@@ -136,18 +155,52 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
             ),
             const SizedBox(height: AppSizes.lg),
 
-            // Precio
-            TextField(
-              controller: _priceController,
-              decoration: InputDecoration(
-                labelText: context.l10n.servicePriceLabel,
-                prefixText: '\$ ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                ),
-              ),
-              keyboardType: TextInputType.number,
+            DropdownButtonFormField<_PriceMode>(
+              initialValue: _priceMode,
+              decoration: const InputDecoration(labelText: 'Tipo de precio'),
+              items: _PriceMode.values
+                  .map(
+                    (mode) =>
+                        DropdownMenuItem(value: mode, child: Text(mode.label)),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) setState(() => _priceMode = value);
+              },
             ),
+            if (_priceMode == _PriceMode.fixed ||
+                _priceMode == _PriceMode.range) ...[
+              const SizedBox(height: AppSizes.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _priceController,
+                      decoration: InputDecoration(
+                        labelText: _priceMode == _PriceMode.range
+                            ? 'Precio mínimo'
+                            : context.l10n.servicePriceLabel,
+                        prefixText: '\$ ',
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  if (_priceMode == _PriceMode.range) ...[
+                    const SizedBox(width: AppSizes.sm),
+                    Expanded(
+                      child: TextField(
+                        controller: _maxPriceController,
+                        decoration: const InputDecoration(
+                          labelText: 'Precio máximo',
+                          prefixText: '\$ ',
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
             const SizedBox(height: AppSizes.xl),
 
             // Botón de publicar
@@ -169,4 +222,14 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
       ),
     );
   }
+}
+
+enum _PriceMode {
+  fixed('Precio fijo'),
+  range('Rango de precios'),
+  consult('Consultar precio'),
+  noPrice('Sin precio');
+
+  const _PriceMode(this.label);
+  final String label;
 }

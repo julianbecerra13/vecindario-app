@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -112,15 +113,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             icon: Icons.download,
             title: context.l10n.downloadData,
             subtitle: context.l10n.profileDownloadDataSubtitle,
-            onTap: () {
-              final user = ref.read(currentUserProvider).value;
-              if (user != null) {
-                ref.read(userRepositoryProvider).requestDataExport(user.id);
-                context.showSuccessSnackBar(
-                  context.l10n.profileDataExportRequested,
-                );
-              }
-            },
+            onTap: _requestDataExport,
           ),
           const Divider(height: 1),
           _PrivacyAction(
@@ -371,7 +364,7 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
                         Navigator.pop(ctx);
                         final user = ref.read(currentUserProvider).value;
                         if (user != null) {
-                          ref
+                          await ref
                               .read(userRepositoryProvider)
                               .requestAccountDeletion(user.id);
                           if (context.mounted) {
@@ -408,6 +401,98 @@ class _PrivacyScreenState extends ConsumerState<PrivacyScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _requestDataExport() async {
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+    try {
+      final requestId = await ref
+          .read(userRepositoryProvider)
+          .requestDataExport(user.id);
+      if (!mounted) return;
+      context.showSuccessSnackBar(context.l10n.profileDataExportRequested);
+      _showExportDialog(requestId);
+    } catch (e) {
+      AppLogger.error('Error solicitando exportación', e);
+      if (mounted) {
+        context.showErrorSnackBar(context.l10n.profileUnexpectedErrorShort);
+      }
+    }
+  }
+
+  void _showExportDialog(String requestId) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StreamBuilder<Map<String, dynamic>?>(
+        stream: ref.read(userRepositoryProvider).watchDataExport(requestId),
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final status = data?['status'] as String? ?? 'pending';
+          final storagePath = data?['storagePath'] as String?;
+          final failed = status == 'failed';
+          final ready = status == 'completed' && storagePath != null;
+          return AlertDialog(
+            title: Text(context.l10n.profileExportDialogTitle),
+            content: Row(
+              children: [
+                if (!ready && !failed)
+                  const Padding(
+                    padding: EdgeInsets.only(right: AppSizes.md),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    failed
+                        ? context.l10n.profileExportFailed
+                        : ready
+                        ? context.l10n.profileExportReady
+                        : context.l10n.profileExportProcessing,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+              ),
+              if (ready)
+                FilledButton.icon(
+                  onPressed: () async {
+                    try {
+                      final bytes = await ref
+                          .read(userRepositoryProvider)
+                          .downloadDataExport(storagePath);
+                      await Share.shareXFiles([
+                        XFile.fromData(
+                          bytes,
+                          mimeType: 'application/json',
+                          name: 'vecindario-datos.json',
+                        ),
+                      ]);
+                    } catch (e) {
+                      AppLogger.error('Error descargando exportación', e);
+                      if (mounted) {
+                        context.showErrorSnackBar(
+                          context.l10n.profileExportDownloadError,
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.download),
+                  label: Text(context.l10n.downloadData),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

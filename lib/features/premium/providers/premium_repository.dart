@@ -184,10 +184,21 @@ class PremiumRepository {
         );
   }
 
-  Future<void> createBooking(String communityId, BookingModel booking) async {
-    await _firestore
+  Future<String> createBooking(String communityId, BookingModel booking) async {
+    final ref = _firestore
         .collection(FirestorePaths.bookings(communityId))
-        .add(booking.toFirestore());
+        .doc(booking.slotKey);
+    await _firestore.runTransaction((transaction) async {
+      final current = await transaction.get(ref);
+      if (current.exists && current.data()?['status'] != 'cancelled') {
+        throw StateError('Este horario acaba de ser reservado');
+      }
+      transaction.set(ref, {
+        ...booking.toFirestore(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    });
+    return ref.id;
   }
 
   Future<void> createAmenity(String communityId, AmenityModel amenity) async {

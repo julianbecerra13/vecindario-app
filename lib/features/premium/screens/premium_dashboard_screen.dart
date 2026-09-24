@@ -104,6 +104,13 @@ class PremiumDashboardScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSizes.sm),
             _QuickActionCard(
+              icon: Icons.badge_outlined,
+              color: AppColors.primary,
+              title: 'Operarios y acceso QR',
+              subtitle: 'Autoriza empleados para controlar zonas comunes',
+              onTap: () => context.push('/premium/access-management'),
+            ),
+            _QuickActionCard(
               icon: Icons.campaign,
               color: AppColors.info,
               title: context.l10n.circularCreateTitle,

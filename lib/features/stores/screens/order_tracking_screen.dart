@@ -8,6 +8,7 @@ import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/providers/orders_provider.dart';
+import 'package:vecindario_app/features/stores/providers/stores_provider.dart';
 import 'package:vecindario_app/features/stores/widgets/order_timeline.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -150,6 +151,61 @@ class OrderTrackingScreen extends ConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.warning,
                       ),
+                    ),
+                  ),
+                ],
+                if (order.status == OrderStatus.pending ||
+                    order.status == OrderStatus.confirmed) ...[
+                  const SizedBox(height: AppSizes.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: const Text('Cancelar pedido'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            title: const Text('Cancelar pedido'),
+                            content: const Text(
+                              '¿Seguro que deseas cancelar este pedido? Esta acción no se puede deshacer.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, false),
+                                child: const Text('Volver'),
+                              ),
+                              FilledButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, true),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.error,
+                                ),
+                                child: const Text('Sí, cancelar'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed != true) return;
+                        try {
+                          await ref
+                              .read(storesRepositoryProvider)
+                              .cancelOrder(order.id);
+                          if (context.mounted) {
+                            context.showSuccessSnackBar('Pedido cancelado');
+                          }
+                        } catch (error) {
+                          if (context.mounted) {
+                            context.showErrorSnackBar(
+                              'No se pudo cancelar el pedido: $error',
+                            );
+                          }
+                        }
+                      },
                     ),
                   ),
                 ],

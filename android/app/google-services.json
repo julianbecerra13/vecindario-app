@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "606807280271-dvmp9vjqitifc76v2tn1h80jc9djrvfi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vecindario.vecindario_app",
+            "certificate_hash": "8d1307f7c88f91a34171ee97175ff31f14ba6400"
+          }
+        },
+        {
           "client_id": "606807280271-vhgkv9pn39o1jbih6sgq28e8q6lkhrmj.apps.googleusercontent.com",
           "client_type": 3
         }

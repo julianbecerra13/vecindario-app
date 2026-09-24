@@ -11,7 +11,10 @@ import 'package:vecindario_app/features/premium/providers/premium_providers.dart
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 class CreatePqrsScreen extends ConsumerStatefulWidget {
-  const CreatePqrsScreen({super.key});
+  const CreatePqrsScreen({super.key, this.initialType, this.initialCategory});
+
+  final String? initialType;
+  final String? initialCategory;
 
   @override
   ConsumerState<CreatePqrsScreen> createState() => _CreatePqrsScreenState();
@@ -22,6 +25,17 @@ class _CreatePqrsScreenState extends ConsumerState<CreatePqrsScreen> {
   PqrsType _type = PqrsType.petition;
   PqrsCategory _category = PqrsCategory.maintenance;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialType != null) {
+      _type = PqrsType.fromString(widget.initialType!);
+    }
+    if (widget.initialCategory != null) {
+      _category = PqrsCategory.fromString(widget.initialCategory!);
+    }
+  }
 
   @override
   void dispose() {

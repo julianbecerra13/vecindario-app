@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/features/access/access_screen.dart';
 import 'package:vecindario_app/features/external_services/screens/external_services_screen.dart';
+import 'package:vecindario_app/features/community_center/screens/community_center_screen.dart';
 import 'package:vecindario_app/features/external_services/screens/recommend_external_service_screen.dart';
 import 'package:vecindario_app/features/feed/screens/create_post_screen.dart';
 import 'package:vecindario_app/features/feed/screens/feed_screen.dart';
@@ -28,6 +30,7 @@ import 'package:vecindario_app/features/stores/screens/rate_order_screen.dart';
 /// conjunto como residente. La entrada a administración vive en
 /// community_admin_routes.dart, bajo /premium.
 final List<RouteBase> residentRoutes = [
+  GoRoute(path: '/community-access', builder: (_, __) => const AccessScreen()),
   StatefulShellRoute.indexedStack(
     builder: (_, __, navigationShell) =>
         HomeShell(navigationShell: navigationShell),
@@ -137,5 +140,9 @@ final List<RouteBase> residentRoutes = [
   GoRoute(
     path: '/notifications',
     builder: (_, __) => const NotificationsScreen(),
+  ),
+  GoRoute(
+    path: '/community-center',
+    builder: (_, __) => const CommunityCenterScreen(),
   ),
 ];

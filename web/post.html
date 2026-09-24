@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Publicación en Vecindario</title>
+  <meta name="description" content="Abre esta publicación en la aplicación Vecindario.">
+  <style>
+    body{font:16px system-ui;background:#f5f7fb;color:#172033;margin:0;display:grid;min-height:100vh;place-items:center}
+    main{background:white;border-radius:18px;padding:32px;max-width:440px;margin:20px;box-shadow:0 12px 40px #17203318;text-align:center}
+    a.button{display:block;background:#2563eb;color:white;text-decoration:none;padding:14px 20px;border-radius:12px;font-weight:700;margin:24px 0 12px}
+    small{color:#667085}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Vecindario</h1>
+    <p>Te compartieron una publicación de la comunidad.</p>
+    <a class="button" id="open-app" href="#">Abrir en la aplicación</a>
+    <small>Si tienes Vecindario instalado, Android abrirá directamente la publicación.</small>
+  </main>
+  <script>
+    const path = location.pathname.replace(/^\/feed\//, '');
+    document.getElementById('open-app').href = `vecindario://app/feed/${encodeURIComponent(path)}`;
+  </script>
+</body>
+</html>

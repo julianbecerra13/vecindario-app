@@ -2005,8 +2005,26 @@ class AppLocalizationsEs extends AppLocalizations {
       'Recibe un archivo con toda tu información';
 
   @override
-  String get profileDataExportRequested =>
-      'Solicitud enviada. Recibirás un email en máximo 48 horas.';
+  String get profileDataExportRequested => 'Solicitud de exportación enviada.';
+
+  @override
+  String get profileExportDialogTitle => 'Exportación de datos';
+
+  @override
+  String get profileExportProcessing =>
+      'Estamos preparando tu archivo. Puedes cerrar esta ventana y volver a solicitarlo más tarde.';
+
+  @override
+  String get profileExportReady =>
+      'Tu archivo está listo. Estará disponible durante 7 días.';
+
+  @override
+  String get profileExportFailed =>
+      'No fue posible preparar el archivo. Intenta nuevamente.';
+
+  @override
+  String get profileExportDownloadError =>
+      'No fue posible descargar la exportación.';
 
   @override
   String get profileEditPersonalInfoTitle => 'Editar información personal';

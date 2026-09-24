@@ -28,7 +28,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _Section(
               title: '1. Responsable del Tratamiento',
               body:
-                  'Vecindario App es responsable del tratamiento de los datos personales recopilados a través de la aplicación. Los datos son almacenados en servidores de Google Cloud Platform (Firebase) con encriptación en tránsito y en reposo.',
+                  'Vecindario App es responsable del tratamiento de los datos personales recopilados a través de la aplicación. Contacto: info@kory.com.co. Los datos son almacenados en Google Cloud Platform (Firebase) con cifrado en tránsito y en reposo.',
             ),
             _Section(
               title: '2. Datos Recopilados',
@@ -48,17 +48,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _Section(
               title: '5. Descarga de Datos',
               body:
-                  'Puede solicitar una copia de todos sus datos personales en formato JSON. La solicitud se procesa en un máximo de 48 horas y se entrega por correo electrónico.',
+                  'Puede solicitar una copia de sus datos personales en formato JSON. Cuando termina el proceso, el archivo se descarga de forma privada desde la aplicación y permanece disponible durante 7 días.',
             ),
             _Section(
               title: '6. Eliminación de Cuenta',
               body:
-                  'Al solicitar eliminación, se aplica un período de gracia de 15 días durante el cual puede reactivar su cuenta. Después de 15 días:\n• Se eliminan: perfil, foto, documentos, tokens\n• Se anonimizan: posts, reseñas y pedidos (se cambia el nombre a "Usuario eliminado")',
+                  'Al solicitar eliminación se aplica un período de gracia de 15 días. Después se eliminan la cuenta de autenticación, perfil, foto, documentos y tokens; las publicaciones, reseñas, pedidos y recursos comerciales se eliminan o anonimizan cuando deben conservarse por integridad transaccional.',
             ),
             _Section(
               title: '7. Retención de Datos',
               body:
-                  'Los datos personales se conservan mientras la cuenta esté activa. El historial de pedidos se anonimiza después de 12 meses. Los documentos de verificación se eliminan 30 días después de la aprobación.',
+                  'Los datos personales se conservan mientras la cuenta esté activa o durante los plazos legales aplicables. Los documentos de verificación se eliminan automáticamente después de su período de retención.',
             ),
             _Section(
               title: '8. Consentimientos',
@@ -78,7 +78,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             _Section(
               title: '11. Contacto',
               body:
-                  'Para consultas sobre el tratamiento de sus datos personales, contáctenos a través de la sección PQRS de la aplicación o al correo electrónico de soporte.',
+                  'Para consultas, reclamos o solicitudes sobre sus datos personales, use la sección PQRS o escriba a info@kory.com.co.',
             ),
             const SizedBox(height: AppSizes.xl),
           ],

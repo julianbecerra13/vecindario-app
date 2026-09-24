@@ -75,6 +75,8 @@ void main() {
         id: '1',
         storeId: 's1',
         storeName: 'Tienda',
+        storeOwnerUid: 'owner1',
+        communityId: 'comm1',
         buyerUid: 'b1',
         buyerName: 'Juan',
         items: [
@@ -95,6 +97,8 @@ void main() {
         id: '1',
         storeId: 's1',
         storeName: 'T',
+        storeOwnerUid: 'owner1',
+        communityId: 'comm1',
         buyerUid: 'b1',
         buyerName: 'J',
         items: [],

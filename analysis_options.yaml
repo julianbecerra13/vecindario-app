@@ -6,6 +6,12 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "node_modules/**"
+    - ".firebase-emulators/**"
+    - ".go-cache/**"
+    - ".gradle-home/**"
+    - ".npm-cache/**"
+    - ".tmp/**"
 
 linter:
   rules:

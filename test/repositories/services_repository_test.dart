@@ -183,7 +183,9 @@ void main() {
         'createdAt': DateTime(2026, 4, 1),
       });
 
-      final owned = await repo.getServicesForOwner('owner1').first;
+      final owned = await repo
+          .getServicesForOwner('owner1', 'comm1')
+          .first;
       expect(owned.length, 1);
       expect(owned.first.ownerUid, 'owner1');
     });

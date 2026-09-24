@@ -93,27 +93,10 @@ class PaymentService {
       throw StateError('No autenticado');
     }
 
-    // Guardar intención de pago en Firestore
-    await _firestore.collection('payment_intents').add({
-      'uid': uid,
-      'reference': reference,
-      'amount': amountCOP,
-      'amountInCents': amountCOP * 100,
-      'currency': currency,
-      'type': type.value,
-      'status': 'pending',
-      'customerEmail': customerEmail,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    // El backend arma la URL de checkout con la firma de integridad que exige
-    // Wompi; el cliente nunca maneja llaves ni construye la firma.
+    // El backend valida la referencia contra el pedido, multa, reserva o
+    // estado de cuenta y calcula el monto autoritativo antes de firmar.
     final result = await _functions.callFunction('CreateWompiTransaction', {
       'reference': reference,
-      'amount': amountCOP,
-      'currency': currency,
-      'description': type.label,
-      'customer_email': customerEmail,
     });
 
     final checkoutUrl = result['checkout_url'] as String?;

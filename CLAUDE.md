@@ -39,10 +39,12 @@ flutter analyze                    # Análisis estático
 flutter test                       # Correr tests
 ```
 
-## Firebase (pendiente configuración)
-- Ejecutar `flutterfire configure` cuando se tenga proyecto Firebase
-- Descomentar Firebase.initializeApp en main.dart
-- Configurar google-services.json (Android) y GoogleService-Info.plist (iOS)
+## Firebase
+- Proyecto configurado: `vecindario-app-a746b`
+- Authentication, Firestore y Hosting están activos.
+- Las reglas de Firestore se prueban con emuladores antes de desplegarse.
+- Storage multimedia no está disponible mientras el proyecto permanezca sin facturación.
+- No activar facturación ni desplegar funciones que la requieran sin autorización expresa.
 
 ## Reglas
 - Firestore Security Rules en `firestore.rules`

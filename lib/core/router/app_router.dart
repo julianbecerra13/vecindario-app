@@ -73,13 +73,25 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
-        // Guard: /premium (Administración del conjunto) solo para
-        // communityRole == admin o super_admin de plataforma.
-        final isCommunityAdminRoute = state.matchedLocation.startsWith(
+        // Los residentes pueden consultar módulos comunitarios. Las pantallas
+        // de configuración, aprobación y creación siguen siendo solo admin.
+        const adminOnlyRoutes = {
           '/premium',
+          '/premium/pending',
+          '/premium/settings',
+          '/premium/access-management',
+          '/premium/circulars/create',
+          '/premium/fines/create',
+          '/premium/amenities/create',
+          '/premium/finances/create',
+          '/premium/assemblies/create',
+          '/premium/plans',
+        };
+        final isAdminOnlyRoute = adminOnlyRoutes.contains(
+          state.matchedLocation,
         );
-        if (isCommunityAdminRoute && isLoading) return null;
-        if (isCommunityAdminRoute && user != null && !user.isAdmin) {
+        if (isAdminOnlyRoute && isLoading) return null;
+        if (isAdminOnlyRoute && user != null && !user.isAdmin) {
           return '/feed';
         }
 

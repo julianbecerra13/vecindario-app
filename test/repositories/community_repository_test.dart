@@ -163,6 +163,25 @@ void main() {
       });
     });
 
+    group('resolveInviteCode', () {
+      test('resuelve el código exacto normalizado', () async {
+        await firestore.collection('invite_codes').doc('CEDR26').set({
+          'communityId': 'demo-mirador-cedros',
+          'unitType': 'apartment',
+        });
+
+        final invite = await repository.resolveInviteCode(' cedr26 ');
+
+        expect(invite, isNotNull);
+        expect(invite!['communityId'], 'demo-mirador-cedros');
+        expect(invite['unitType'], 'apartment');
+      });
+
+      test('retorna null si el código exacto no existe', () async {
+        expect(await repository.resolveInviteCode('NOEXST'), isNull);
+      });
+    });
+
     group('joinCommunity', () {
       test(
         'actualiza usuario con communityId, tower, apartment, verified=false',

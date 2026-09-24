@@ -8,6 +8,7 @@ import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
+import 'package:vecindario_app/features/feed/widgets/comments_sheet.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
 
@@ -268,7 +269,7 @@ class FeedDetailScreen extends ConsumerWidget {
                     ),
                     Expanded(
                       child: TextButton.icon(
-                        onPressed: () {},
+                        onPressed: () => showCommentsSheet(context, postId),
                         icon: const Icon(Icons.comment_outlined),
                         label: Text(context.l10n.feedCommentAction),
                       ),

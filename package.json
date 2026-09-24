@@ -1,7 +1,11 @@
 {
+  "scripts": {
+    "test:rules": "firebase emulators:exec --only firestore,storage \"jest --runInBand --runTestsByPath firestore.rules.test.js storage.rules.test.js\""
+  },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.0",
     "firebase-admin": "^13.8.0",
+    "firebase-tools": "^15.28.2",
     "jest": "^30.3.0"
   },
   "dependencies": {

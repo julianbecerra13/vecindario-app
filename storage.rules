@@ -1,59 +1,143 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-
-    // Solo usuarios autenticados pueden leer
-    match /{allPaths=**} {
-      allow read: if request.auth != null;
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    // Fotos de perfil: solo el dueño puede subir, max 5MB, solo imagenes
-    match /users/{uid}/profile/{fileName} {
-      allow write: if request.auth != null
+    function userData() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isVerifiedMember(communityId) {
+      return isAuthenticated()
+        && userData().communityId == communityId
+        && (userData().verified == true || userData().communityRole == 'admin');
+    }
+
+    function isCommunityAdmin(communityId) {
+      return isAuthenticated()
+        && userData().communityId == communityId
+        && userData().communityRole == 'admin';
+    }
+
+    function isImage(maxBytes) {
+      return request.resource != null
+        && request.resource.size <= maxBytes
+        && request.resource.contentType.matches('image/(jpeg|png|webp|heic|heif)');
+    }
+
+    function isDocument(maxBytes) {
+      return request.resource != null
+        && request.resource.size <= maxBytes
+        && request.resource.contentType.matches(
+          '(application/pdf|image/(jpeg|png|webp|heic|heif))'
+        );
+    }
+
+    match /users/{uid}/profile.jpg {
+      allow read: if isAuthenticated()
+        && (request.auth.uid == uid
+            || (userData().verified == true
+                && userData().communityId ==
+                  firestore.get(/databases/(default)/documents/users/$(uid)).data.communityId));
+      allow create, update: if isAuthenticated()
         && request.auth.uid == uid
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && isImage(5 * 1024 * 1024);
+      allow delete: if isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Imagenes de posts: miembro verificado, max 5MB
+    match /users/{uid}/verification/{fileName} {
+      allow read: if isAuthenticated() && request.auth.uid == uid;
+      allow create, update: if isAuthenticated()
+        && request.auth.uid == uid
+        && isDocument(10 * 1024 * 1024);
+      allow delete: if isAuthenticated() && request.auth.uid == uid;
+    }
+
+    match /data-exports/{uid}/{fileName} {
+      allow read: if isAuthenticated() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     match /communities/{communityId}/posts/{postId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow read: if isVerifiedMember(communityId);
+      allow create, update: if isVerifiedMember(communityId)
+        && firestore.get(
+          /databases/(default)/documents/communities/$(communityId)/posts/$(postId)
+        ).data.authorUid == request.auth.uid
+        && isImage(5 * 1024 * 1024);
+      allow delete: if isVerifiedMember(communityId)
+        && (firestore.get(
+              /databases/(default)/documents/communities/$(communityId)/posts/$(postId)
+            ).data.authorUid == request.auth.uid
+            || isCommunityAdmin(communityId));
     }
 
-    // Imagenes de servicios
     match /services/{serviceId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow read: if isAuthenticated()
+        && userData().verified == true
+        && firestore.get(/databases/(default)/documents/services/$(serviceId)).data.communityId
+          == userData().communityId;
+      allow create, update: if isAuthenticated()
+        && firestore.get(/databases/(default)/documents/services/$(serviceId)).data.ownerUid
+          == request.auth.uid
+        && isImage(5 * 1024 * 1024);
+      allow delete: if isAuthenticated()
+        && firestore.get(/databases/(default)/documents/services/$(serviceId)).data.ownerUid
+          == request.auth.uid;
     }
 
-    // Imagenes de tiendas y productos
     match /stores/{storeId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow read: if isAuthenticated()
+        && userData().verified == true
+        && firestore.get(/databases/(default)/documents/stores/$(storeId)).data.communityId
+          == userData().communityId;
+      allow create, update: if isAuthenticated()
+        && firestore.get(/databases/(default)/documents/stores/$(storeId)).data.ownerUid
+          == request.auth.uid
+        && isImage(5 * 1024 * 1024);
+      allow delete: if isAuthenticated()
+        && firestore.get(/databases/(default)/documents/stores/$(storeId)).data.ownerUid
+          == request.auth.uid;
     }
 
-    // Adjuntos de circulares (admin)
     match /communities/{communityId}/circulars/{circularId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 10 * 1024 * 1024;
+      allow read: if isVerifiedMember(communityId);
+      allow create, update, delete: if isCommunityAdmin(communityId)
+        && (request.resource == null || isDocument(10 * 1024 * 1024));
     }
 
-    // Evidencia de multas (admin)
     match /communities/{communityId}/fines/{fineId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow read: if isCommunityAdmin(communityId)
+        || (isVerifiedMember(communityId)
+            && firestore.get(
+              /databases/(default)/documents/communities/$(communityId)/fines/$(fineId)
+            ).data.residentUid == request.auth.uid);
+      allow create, update, delete: if isCommunityAdmin(communityId)
+        && (request.resource == null || isImage(5 * 1024 * 1024));
     }
 
-    // Fotos de PQRS
     match /communities/{communityId}/pqrs/{pqrsId}/{fileName} {
-      allow write: if request.auth != null
-        && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+      allow read: if isCommunityAdmin(communityId)
+        || (isVerifiedMember(communityId)
+            && firestore.get(
+              /databases/(default)/documents/communities/$(communityId)/pqrs/$(pqrsId)
+            ).data.residentUid == request.auth.uid);
+      allow create, update: if isVerifiedMember(communityId)
+        && firestore.get(
+          /databases/(default)/documents/communities/$(communityId)/pqrs/$(pqrsId)
+        ).data.residentUid == request.auth.uid
+        && isImage(5 * 1024 * 1024);
+      allow delete: if isCommunityAdmin(communityId)
+        || (isVerifiedMember(communityId)
+            && firestore.get(
+              /databases/(default)/documents/communities/$(communityId)/pqrs/$(pqrsId)
+            ).data.residentUid == request.auth.uid);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

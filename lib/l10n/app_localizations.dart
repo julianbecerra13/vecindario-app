@@ -3749,8 +3749,38 @@ abstract class AppLocalizations {
   /// No description provided for @profileDataExportRequested.
   ///
   /// In es, this message translates to:
-  /// **'Solicitud enviada. Recibirás un email en máximo 48 horas.'**
+  /// **'Solicitud de exportación enviada.'**
   String get profileDataExportRequested;
+
+  /// No description provided for @profileExportDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Exportación de datos'**
+  String get profileExportDialogTitle;
+
+  /// No description provided for @profileExportProcessing.
+  ///
+  /// In es, this message translates to:
+  /// **'Estamos preparando tu archivo. Puedes cerrar esta ventana y volver a solicitarlo más tarde.'**
+  String get profileExportProcessing;
+
+  /// No description provided for @profileExportReady.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu archivo está listo. Estará disponible durante 7 días.'**
+  String get profileExportReady;
+
+  /// No description provided for @profileExportFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No fue posible preparar el archivo. Intenta nuevamente.'**
+  String get profileExportFailed;
+
+  /// No description provided for @profileExportDownloadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No fue posible descargar la exportación.'**
+  String get profileExportDownloadError;
 
   /// No description provided for @profileEditPersonalInfoTitle.
   ///

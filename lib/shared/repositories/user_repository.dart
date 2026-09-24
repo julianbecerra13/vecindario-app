@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
@@ -53,13 +54,30 @@ class UserRepository {
     });
   }
 
-  Future<void> requestDataExport(String uid) async {
+  Future<String> requestDataExport(String uid) async {
     // La Cloud Function processará esta solicitud
-    await _firestore.collection('data_export_requests').add({
+    final doc = await _firestore.collection('data_export_requests').add({
       'uid': uid,
       'requestedAt': FieldValue.serverTimestamp(),
       'status': 'pending',
     });
+    return doc.id;
+  }
+
+  Stream<Map<String, dynamic>?> watchDataExport(String requestId) {
+    return _firestore
+        .collection('data_export_requests')
+        .doc(requestId)
+        .snapshots()
+        .map((doc) => doc.data());
+  }
+
+  Future<Uint8List> downloadDataExport(String storagePath) async {
+    final data = await _storage.ref(storagePath).getData(20 * 1024 * 1024);
+    if (data == null) {
+      throw StateError('La exportación no está disponible');
+    }
+    return data;
   }
 
   // --- Consentimientos ---

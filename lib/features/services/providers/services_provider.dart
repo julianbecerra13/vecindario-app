@@ -3,6 +3,7 @@ import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/features/services/repositories/services_repository.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/models/review_model.dart';
 
 final servicesRepositoryProvider = Provider<ServicesRepository>((ref) {
   return ServicesRepository(ref.watch(firestoreProvider));
@@ -64,14 +65,19 @@ final serviceDetailProvider = FutureProvider.family<ServiceModel?, String>((
   return ref.read(servicesRepositoryProvider).getService(serviceId);
 });
 
+final serviceReviewsProvider = StreamProvider.family<List<ReviewModel>, String>(
+  (ref, serviceId) =>
+      ref.watch(servicesRepositoryProvider).watchServiceReviews(serviceId),
+);
+
 /// El primer servicio ofrecido por el usuario actual, si tiene alguno. Null
 /// si no ofrece ningún servicio — capacidad "offersService", derivada de
 /// datos reales (ownerUid) en vez de un rol exclusivo.
 final ownerServiceProvider = StreamProvider<ServiceModel?>((ref) {
   final user = ref.watch(currentUserProvider).value;
-  if (user == null) return Stream.value(null);
+  if (user == null || user.communityId == null) return Stream.value(null);
   return ref
       .watch(servicesRepositoryProvider)
-      .getServicesForOwner(user.id)
+      .getServicesForOwner(user.id, user.communityId!)
       .map((list) => list.isEmpty ? null : list.first);
 });

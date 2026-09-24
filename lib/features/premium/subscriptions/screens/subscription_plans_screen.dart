@@ -8,9 +8,9 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/subscriptions/models/subscription_model.dart';
-import 'package:vecindario_app/features/premium/subscriptions/repositories/subscription_repository.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/app_card.dart';
+import 'package:vecindario_app/shared/services/cloud_functions_service.dart';
 
 class SubscriptionPlansScreen extends ConsumerStatefulWidget {
   const SubscriptionPlansScreen({super.key});
@@ -155,8 +155,8 @@ class _SubscriptionPlansScreenState
     setState(() => _isLoading = true);
     try {
       await ref
-          .read(subscriptionRepositoryProvider)
-          .startTrial(communityId: communityId, plan: plan, adminUid: user.id);
+          .read(cloudFunctionsProvider)
+          .startSubscriptionTrial(communityId, plan.value);
       if (!mounted) return;
       context.showSuccessSnackBar(
         context.l10n.subscriptionTrialActivated(plan.label),

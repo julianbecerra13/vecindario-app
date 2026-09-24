@@ -89,6 +89,7 @@ class BookingModel {
   final bool depositRefunded;
   final BookingStatus status;
   final DateTime createdAt;
+  final String slotKey;
 
   const BookingModel({
     required this.id,
@@ -104,6 +105,7 @@ class BookingModel {
     this.depositRefunded = false,
     this.status = BookingStatus.confirmed,
     required this.createdAt,
+    required this.slotKey,
   });
 
   factory BookingModel.fromFirestore(Map<String, dynamic> data, String id) {
@@ -121,6 +123,7 @@ class BookingModel {
       depositRefunded: data['depositRefunded'] ?? false,
       status: BookingStatus.fromString(data['status'] ?? 'confirmed'),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      slotKey: data['slotKey'] ?? id,
     );
   }
 
@@ -137,5 +140,6 @@ class BookingModel {
     'depositRefunded': depositRefunded,
     'status': status.name,
     'createdAt': Timestamp.fromDate(createdAt),
+    'slotKey': slotKey,
   };
 }

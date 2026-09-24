@@ -54,6 +54,8 @@ class OrderModel {
   final String id;
   final String storeId;
   final String storeName;
+  final String storeOwnerUid;
+  final String communityId;
   final String buyerUid;
   final String buyerName;
   final String? buyerApartment;
@@ -72,6 +74,8 @@ class OrderModel {
     required this.id,
     required this.storeId,
     required this.storeName,
+    required this.storeOwnerUid,
+    required this.communityId,
     required this.buyerUid,
     required this.buyerName,
     this.buyerApartment,
@@ -97,6 +101,8 @@ class OrderModel {
       id: id,
       storeId: data['storeId'] ?? '',
       storeName: data['storeName'] ?? '',
+      storeOwnerUid: data['storeOwnerUid'] ?? '',
+      communityId: data['communityId'] ?? '',
       buyerUid: data['buyerUid'] ?? '',
       buyerName: data['buyerName'] ?? '',
       buyerApartment: data['buyerApartment'],
@@ -116,6 +122,8 @@ class OrderModel {
   Map<String, dynamic> toFirestore() => {
     'storeId': storeId,
     'storeName': storeName,
+    'storeOwnerUid': storeOwnerUid,
+    'communityId': communityId,
     'buyerUid': buyerUid,
     'buyerName': buyerName,
     'buyerApartment': buyerApartment,

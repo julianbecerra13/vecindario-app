@@ -6,6 +6,16 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "hosting": {
+    "public": "web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "cleanUrls": true,
+    "rewrites": [{"source": "/feed/**", "destination": "/post.html"}],
+    "headers": [{
+      "source": "**",
+      "headers": [{"key": "X-Content-Type-Options", "value": "nosniff"}, {"key": "Referrer-Policy", "value": "no-referrer"}]
+    }]
+  },
   "functions": [
     {
       "source": "functions",
