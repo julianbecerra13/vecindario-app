@@ -14,7 +14,9 @@ plugins {
 
 android {
     namespace = "com.vecindario.vecindario_app"
-    compileSdk = flutter.compileSdkVersion
+    // mobile_scanner uses CameraX 1.5, which requires API 23 and compiles
+    // against Android SDK 36. Keep these explicit so local and CI builds match.
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -32,7 +34,7 @@ android {
         applicationId = "com.vecindario.vecindario_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
