@@ -187,7 +187,7 @@ class _CreditsTab extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<UserModel>(
-                  initialValue: selected,
+                  value: selected,
                   decoration: const InputDecoration(labelText: 'Residente'),
                   items: members
                       .map(

@@ -199,7 +199,7 @@ class _AccessOperatorScreenState extends ConsumerState<AccessOperatorScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      initialValue: _residents,
+                      value: _residents,
                       decoration: const InputDecoration(
                         labelText: 'Residentes',
                       ),
@@ -218,7 +218,7 @@ class _AccessOperatorScreenState extends ConsumerState<AccessOperatorScreen> {
                   const SizedBox(width: AppSizes.sm),
                   Expanded(
                     child: DropdownButtonFormField<int>(
-                      initialValue: _visitors,
+                      value: _visitors,
                       decoration: const InputDecoration(
                         labelText: 'Visitantes',
                       ),
