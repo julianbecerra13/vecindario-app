@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/shared/widgets/media_image.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<String> imageUrls;
@@ -28,20 +28,10 @@ class _ImageCarouselState extends State<ImageCarousel> {
             child: PageView.builder(
               itemCount: widget.imageUrls.length,
               onPageChanged: (i) => setState(() => _current = i),
-              itemBuilder: (_, i) => CachedNetworkImage(
-                imageUrl: widget.imageUrls[i],
+              itemBuilder: (_, i) => MediaImage(
+                url: widget.imageUrls[i],
                 fit: BoxFit.cover,
                 width: double.infinity,
-                placeholder: (_, __) => Container(
-                  color: context.colors.surfaceVariant,
-                  child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-                errorWidget: (_, __, ___) => Container(
-                  color: context.colors.surfaceVariant,
-                  child: const Icon(Icons.broken_image, size: 40),
-                ),
               ),
             ),
           ),

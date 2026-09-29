@@ -6,12 +6,14 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
 import 'package:vecindario_app/features/feed/widgets/image_carousel.dart';
 import 'package:vecindario_app/features/feed/widgets/poll_widget.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:vecindario_app/core/services/media_opener.dart';
 import 'package:vecindario_app/shared/widgets/cached_avatar.dart';
 
 class PostCard extends ConsumerWidget {
@@ -192,6 +194,39 @@ class PostCard extends ConsumerWidget {
                   if (post.imageURLs.isNotEmpty) ...[
                     const SizedBox(height: AppSizes.sm),
                     ImageCarousel(imageUrls: post.imageURLs),
+                  ],
+                  if (post.attachments.any(
+                    (item) => item.type != FeedAttachmentType.image,
+                  )) ...[
+                    const SizedBox(height: AppSizes.sm),
+                    Wrap(
+                      spacing: AppSizes.xs,
+                      runSpacing: AppSizes.xs,
+                      children: post.attachments
+                          .where(
+                            (item) => item.type != FeedAttachmentType.image,
+                          )
+                          .map(
+                            (item) => ActionChip(
+                              avatar: Icon(switch (item.type) {
+                                FeedAttachmentType.document =>
+                                  Icons.picture_as_pdf_outlined,
+                                FeedAttachmentType.audio =>
+                                  Icons.audio_file_outlined,
+                                FeedAttachmentType.video =>
+                                  Icons.video_file_outlined,
+                                FeedAttachmentType.image =>
+                                  Icons.image_outlined,
+                              }, size: 18),
+                              label: Text(
+                                item.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onPressed: () => openMedia(item.url),
+                            ),
+                          )
+                          .toList(),
+                    ),
                   ],
                   // Encuesta
                   if (post.type == PostType.poll &&

@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primarios (del diseño .pen)
-  static const primary = Color(0xFF3B82F6);
-  static const primaryLight = Color(0xFF60A5FA);
-  static const primaryDark = Color(0xFF2563EB);
+  // Identidad aprobada en la revisión integral de producto v0.1.
+  static const primary = Color(0xFF08695E);
+  static const primaryLight = Color(0xFFDDF1A7);
+  static const primaryDark = Color(0xFF064D46);
 
   // Secundarios
-  static const secondary = Color(0xFF10B981);
-  static const secondaryLight = Color(0xFF34D399);
-  static const secondaryDark = Color(0xFF059669);
+  static const secondary = Color(0xFFDDF1A7);
+  static const secondaryLight = Color(0xFFEDFAC9);
+  static const secondaryDark = Color(0xFFB9D873);
 
   // Fondos, texto y bordes (SOLO variante oscura — fijas, no se adaptan a
   // light mode). No las uses en widgets con BuildContext disponible: usá

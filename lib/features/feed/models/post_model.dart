@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 
 enum PostType {
   news('Noticia'),
@@ -53,6 +54,7 @@ class PostModel {
   final String? authorPhotoURL;
   final String text;
   final List<String> imageURLs;
+  final List<FeedAttachment> attachments;
   final PostType type;
   final bool pinned;
   final int likes;
@@ -68,6 +70,7 @@ class PostModel {
     this.authorPhotoURL,
     required this.text,
     this.imageURLs = const [],
+    this.attachments = const [],
     this.type = PostType.news,
     this.pinned = false,
     this.likes = 0,
@@ -85,6 +88,10 @@ class PostModel {
       authorPhotoURL: data['authorPhotoURL'],
       text: data['text'] ?? '',
       imageURLs: List<String>.from(data['imageURLs'] ?? []),
+      attachments: (data['attachments'] as List<dynamic>? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(FeedAttachment.fromMap)
+          .toList(),
       type: PostType.fromString(data['type'] ?? 'news'),
       pinned: data['pinned'] ?? false,
       likes: data['likes'] ?? 0,
@@ -105,6 +112,7 @@ class PostModel {
     'authorPhotoURL': authorPhotoURL,
     'text': text,
     'imageURLs': imageURLs,
+    'attachments': attachments.map((attachment) => attachment.toMap()).toList(),
     'type': type.name,
     'pinned': pinned,
     'likes': likes,

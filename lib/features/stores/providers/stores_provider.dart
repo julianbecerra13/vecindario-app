@@ -6,7 +6,10 @@ import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 final storesRepositoryProvider = Provider<StoresRepository>((ref) {
-  return StoresRepository(ref.watch(firestoreProvider));
+  return StoresRepository(
+    ref.watch(firestoreProvider),
+    ref.watch(firebaseStorageProvider),
+  );
 });
 
 final storesListProvider = StreamProvider<List<StoreModel>>((ref) {

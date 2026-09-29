@@ -22,13 +22,21 @@ class PendingApprovalScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              const Icon(
-                Icons.hourglass_top_rounded,
-                size: 80,
-                color: AppColors.warning,
+              Container(
+                width: 88,
+                height: 88,
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryLight,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.schedule_rounded,
+                  size: 46,
+                  color: AppColors.primaryDark,
+                ),
               ),
               const SizedBox(height: AppSizes.lg),
-              Text(
+              const Text(
                 'Tu solicitud está en revisión',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.heading2,
@@ -39,6 +47,24 @@ class PendingApprovalScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: context.colors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSizes.md),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: const Text(
+                  'Solicitud enviada',
+                  style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSizes.md),

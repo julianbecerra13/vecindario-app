@@ -56,15 +56,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  Future<void> _handleAppleRegister() async {
-    final success = await ref
-        .read(authNotifierProvider.notifier)
-        .loginWithApple();
-    if (success && mounted) {
-      context.go('/join-community');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -86,12 +77,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSizes.md),
+                Text(
+                  'Crea tu cuenta',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.xs),
+                Text(
+                  'Después podrás solicitar acceso a tu conjunto.',
+                  style: TextStyle(color: context.colors.textSecondary),
+                ),
+                const SizedBox(height: AppSizes.lg),
                 TextFormField(
                   controller: _nameController,
                   textInputAction: TextInputAction.next,
                   textCapitalization: TextCapitalization.words,
                   validator: Validators.validateName,
-                  decoration: InputDecoration(hintText: context.l10n.name),
+                  decoration: InputDecoration(labelText: context.l10n.name),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
@@ -99,7 +102,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: Validators.validateEmail,
-                  decoration: InputDecoration(hintText: context.l10n.email),
+                  decoration: InputDecoration(labelText: context.l10n.email),
                 ),
                 const SizedBox(height: AppSizes.md),
                 TextFormField(
@@ -109,7 +112,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: Validators.validatePassword,
                   onFieldSubmitted: (_) => _handleRegister(),
                   decoration: InputDecoration(
-                    hintText: context.l10n.password,
+                    labelText: context.l10n.password,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -155,28 +158,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSizes.md),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: authState.isLoading
-                            ? null
-                            : _handleGoogleRegister,
-                        icon: const Icon(Icons.g_mobiledata, size: 24),
-                        label: const Text('Google'),
-                      ),
-                    ),
-                    const SizedBox(width: AppSizes.sm),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: authState.isLoading
-                            ? null
-                            : _handleAppleRegister,
-                        icon: const Icon(Icons.apple, size: 24),
-                        label: const Text('Apple'),
-                      ),
-                    ),
-                  ],
+                OutlinedButton.icon(
+                  onPressed: authState.isLoading ? null : _handleGoogleRegister,
+                  icon: const Icon(Icons.g_mobiledata, size: 24),
+                  label: const Text('Continuar con Google'),
                 ),
                 const SizedBox(height: AppSizes.lg),
                 // Consentimiento legal (como en el diseño .pen)

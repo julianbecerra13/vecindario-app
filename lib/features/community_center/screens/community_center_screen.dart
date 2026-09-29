@@ -31,7 +31,13 @@ class CommunityCenterScreen extends ConsumerWidget {
             subtitle: 'Identificación y registro de ingreso con el operario',
             onTap: () => context.push('/community-access'),
           ),
-          Text('¿Qué necesitas?', style: AppTextStyles.heading3),
+          _SectionTile(
+            icon: Icons.badge_outlined,
+            title: 'Mis visitas',
+            subtitle: 'Autoriza visitantes con vigencia y QR individual',
+            onTap: () => context.push('/visitors'),
+          ),
+          const Text('¿Qué necesitas?', style: AppTextStyles.heading3),
           const SizedBox(height: AppSizes.sm),
           Row(
             children: [
@@ -51,9 +57,7 @@ class CommunityCenterScreen extends ConsumerWidget {
                   icon: Icons.event_available_outlined,
                   label: 'Solicitar\nuna cita',
                   color: AppColors.info,
-                  onTap: () => context.push(
-                    '/premium/pqrs/create?type=petition&category=administration',
-                  ),
+                  onTap: () => context.push('/appointments/new'),
                 ),
               ),
               const SizedBox(width: AppSizes.sm),
@@ -68,7 +72,7 @@ class CommunityCenterScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSizes.xl),
-          Text('Mi información', style: AppTextStyles.heading3),
+          const Text('Mi información', style: AppTextStyles.heading3),
           const SizedBox(height: AppSizes.sm),
           _SectionTile(
             icon: Icons.account_balance_wallet_outlined,
@@ -89,7 +93,10 @@ class CommunityCenterScreen extends ConsumerWidget {
             onTap: () => context.push('/premium/pqrs'),
           ),
           const SizedBox(height: AppSizes.lg),
-          Text('Transparencia y comunidad', style: AppTextStyles.heading3),
+          const Text(
+            'Transparencia y comunidad',
+            style: AppTextStyles.heading3,
+          ),
           const SizedBox(height: AppSizes.sm),
           _SectionTile(
             icon: Icons.account_balance_outlined,

@@ -1,55 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
-import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
-class HomeShell extends ConsumerWidget {
+class HomeShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const HomeShell({super.key, required this.navigationShell});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isAdmin = ref.watch(isAdminProvider);
+  Widget build(BuildContext context) {
+    final selectedIndex = switch (navigationShell.currentIndex) {
+      2 => 3,
+      3 => 2,
+      final index => index,
+    };
     return Scaffold(
       body: navigationShell,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'community_center_fab',
-        tooltip: 'Administración del conjunto',
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        onPressed: () =>
-            context.push(isAdmin ? '/premium' : '/community-center'),
-        child: const Icon(Icons.apartment),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
-        ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper_outlined),
-            activeIcon: Icon(Icons.newspaper),
-            label: 'Noticias',
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        indicatorColor: AppColors.primaryLight,
+        onDestinationSelected: (index) {
+          final branchIndex = switch (index) {
+            2 => 3,
+            3 => 2,
+            final value => value,
+          };
+          navigationShell.goBranch(
+            branchIndex,
+            initialLocation: branchIndex == navigationShell.currentIndex,
+          );
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Inicio',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
+            icon: Icon(Icons.groups_outlined),
+            selectedIcon: Icon(Icons.groups),
+            label: 'Comunidad',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.apartment_outlined),
+            selectedIcon: Icon(Icons.apartment),
+            label: 'Mi conjunto',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.storefront_outlined),
-            activeIcon: Icon(Icons.storefront),
-            label: 'Vecinos',
+            selectedIcon: Icon(Icons.storefront),
+            label: 'Barrio',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            activeIcon: Icon(Icons.shopping_cart),
-            label: 'Tiendas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.handyman_outlined),
-            activeIcon: Icon(Icons.handyman),
-            label: 'Servicios',
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Cuenta',
           ),
         ],
       ),

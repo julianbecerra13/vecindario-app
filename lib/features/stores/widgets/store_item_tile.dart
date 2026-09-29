@@ -4,6 +4,7 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
+import 'package:vecindario_app/shared/widgets/media_image.dart';
 
 class StoreItemTile extends StatelessWidget {
   final StoreItemModel item;
@@ -31,11 +32,40 @@ class StoreItemTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          if (item.imageURL?.isNotEmpty == true) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              child: MediaImage(url: item.imageURL!, width: 64, height: 64),
+            ),
+            const SizedBox(width: AppSizes.sm),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.name, style: AppTextStyles.bodyMedium),
+                if (item.description?.trim().isNotEmpty == true)
+                  Text(
+                    item.description!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                if (item.variants.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text(
+                      '${item.variants.length} opciones: ${item.variants.take(3).join(', ')}${item.variants.length > 3 ? '…' : ''}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 Text(
                   item.formattedPrice,
                   style: AppTextStyles.bodySmall.copyWith(

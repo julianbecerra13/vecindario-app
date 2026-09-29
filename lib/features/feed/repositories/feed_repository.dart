@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/models/comment_model.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 
 class FeedRepository {
   final FirebaseFirestore _firestore;
+  final FirebaseStorage? _storage;
 
-  FeedRepository(this._firestore);
+  FeedRepository(this._firestore, [this._storage]);
 
   Stream<List<PostModel>> watchPosts(String communityId, {int limit = 30}) {
     return _firestore
@@ -35,6 +38,39 @@ class FeedRepository {
     await _firestore
         .collection(FirestorePaths.posts(communityId))
         .add(post.toFirestore());
+  }
+
+  Future<String> createPostWithAttachments(
+    String communityId,
+    PostModel post,
+    List<PendingFeedAttachment> pending,
+  ) async {
+    final doc = await _firestore
+        .collection(FirestorePaths.posts(communityId))
+        .add(post.toFirestore());
+    if (pending.isEmpty) return doc.id;
+    try {
+      final attachments = <FeedAttachment>[];
+      for (var index = 0; index < pending.length; index++) {
+        attachments.add(
+          await _upload(
+            pending[index],
+            'communities/$communityId/posts/${doc.id}/${index}_${_safeName(pending[index].name)}',
+          ),
+        );
+      }
+      await doc.update({
+        'attachments': attachments.map((item) => item.toMap()).toList(),
+        'imageURLs': attachments
+            .where((item) => item.type == FeedAttachmentType.image)
+            .map((item) => item.url)
+            .toList(),
+      });
+      return doc.id;
+    } catch (_) {
+      await doc.delete();
+      rethrow;
+    }
   }
 
   Future<void> deletePost(String communityId, String postId) async {
@@ -151,6 +187,57 @@ class FeedRepository {
 
     await batch.commit();
   }
+
+  Future<void> addCommentWithAttachment(
+    String communityId,
+    String postId,
+    CommentModel comment,
+    PendingFeedAttachment pending,
+  ) async {
+    final commentRef = _firestore
+        .collection(FirestorePaths.comments(communityId, postId))
+        .doc();
+    final postRef = _firestore
+        .collection(FirestorePaths.posts(communityId))
+        .doc(postId);
+    await commentRef.set(comment.toFirestore());
+    try {
+      final attachment = await _upload(
+        pending,
+        'communities/$communityId/posts/$postId/comments/${commentRef.id}/${_safeName(pending.name)}',
+      );
+      final batch = _firestore.batch();
+      batch.update(commentRef, {'attachment': attachment.toMap()});
+      batch.update(postRef, {'commentCount': FieldValue.increment(1)});
+      await batch.commit();
+    } catch (_) {
+      await commentRef.delete();
+      rethrow;
+    }
+  }
+
+  Future<FeedAttachment> _upload(
+    PendingFeedAttachment pending,
+    String path,
+  ) async {
+    final storage = _storage;
+    if (storage == null) throw StateError('Almacenamiento no configurado');
+    final snapshot = await storage
+        .ref(path)
+        .putFile(
+          pending.file,
+          SettableMetadata(contentType: pending.contentType),
+        );
+    return FeedAttachment(
+      url: await snapshot.ref.getDownloadURL(),
+      name: pending.name,
+      type: pending.type,
+      size: pending.size,
+    );
+  }
+
+  String _safeName(String value) =>
+      value.replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
 
   Future<void> deleteComment(
     String communityId,

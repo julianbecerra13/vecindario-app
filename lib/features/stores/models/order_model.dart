@@ -26,11 +26,13 @@ class OrderItemModel {
   final String name;
   final int price;
   final int quantity;
+  final String? variant;
 
   const OrderItemModel({
     required this.name,
     required this.price,
     required this.quantity,
+    this.variant,
   });
 
   int get total => price * quantity;
@@ -40,6 +42,7 @@ class OrderItemModel {
       name: map['name'] ?? '',
       price: map['price'] ?? 0,
       quantity: map['quantity'] ?? 1,
+      variant: map['variant'],
     );
   }
 
@@ -47,6 +50,7 @@ class OrderItemModel {
     'name': name,
     'price': price,
     'quantity': quantity,
+    if (variant != null) 'variant': variant,
   };
 }
 
@@ -139,8 +143,12 @@ class OrderModel {
     if (deliveredAt != null) 'deliveredAt': Timestamp.fromDate(deliveredAt!),
   };
 
-  String get itemsSummary =>
-      items.map((e) => '${e.name} x${e.quantity}').join(', ');
+  String get itemsSummary => items
+      .map(
+        (e) =>
+            '${e.name}${e.variant == null ? '' : ' (${e.variant})'} x${e.quantity}',
+      )
+      .join(', ');
 
   static int calculateServiceFee(int estrato) {
     const fees = [200, 200, 300, 350, 450, 500];

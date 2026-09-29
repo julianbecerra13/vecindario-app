@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
+import 'package:vecindario_app/shared/widgets/media_image.dart';
 
 class CachedAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -30,13 +30,11 @@ class CachedAvatar extends StatelessWidget {
         radius: radius,
         backgroundColor: context.colors.surfaceVariant,
         child: ClipOval(
-          child: CachedNetworkImage(
-            imageUrl: imageUrl!,
+          child: MediaImage(
+            url: imageUrl!,
             width: radius * 2,
             height: radius * 2,
             fit: BoxFit.cover,
-            placeholder: (_, __) => _initialsWidget(),
-            errorWidget: (_, __, ___) => _initialsWidget(),
           ),
         ),
       );
@@ -44,23 +42,6 @@ class CachedAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor: AppColors.primaryLight,
-      child: Text(
-        _initials,
-        style: TextStyle(
-          fontSize: radius * 0.7,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _initialsWidget() {
-    return Container(
-      width: radius * 2,
-      height: radius * 2,
-      color: AppColors.primaryLight,
-      alignment: Alignment.center,
       child: Text(
         _initials,
         style: TextStyle(

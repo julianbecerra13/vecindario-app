@@ -35,6 +35,14 @@ service firebase.storage {
         );
     }
 
+    function isFeedAttachment() {
+      return request.resource != null
+        && request.resource.size <= 30 * 1024 * 1024
+        && request.resource.contentType.matches(
+          '(image/(jpeg|png|webp)|application/pdf|audio/(mpeg|mp4|wav)|video/(mp4|quicktime))'
+        );
+    }
+
     match /users/{uid}/profile.jpg {
       allow read: if isAuthenticated()
         && (request.auth.uid == uid
@@ -66,10 +74,25 @@ service firebase.storage {
         && firestore.get(
           /databases/(default)/documents/communities/$(communityId)/posts/$(postId)
         ).data.authorUid == request.auth.uid
-        && isImage(5 * 1024 * 1024);
+        && isFeedAttachment();
       allow delete: if isVerifiedMember(communityId)
         && (firestore.get(
               /databases/(default)/documents/communities/$(communityId)/posts/$(postId)
+            ).data.authorUid == request.auth.uid
+            || isCommunityAdmin(communityId));
+    }
+
+
+    match /communities/{communityId}/posts/{postId}/comments/{commentId}/{fileName} {
+      allow read: if isVerifiedMember(communityId);
+      allow create, update: if isVerifiedMember(communityId)
+        && firestore.get(
+          /databases/(default)/documents/communities/$(communityId)/posts/$(postId)/comments/$(commentId)
+        ).data.authorUid == request.auth.uid
+        && isFeedAttachment();
+      allow delete: if isVerifiedMember(communityId)
+        && (firestore.get(
+              /databases/(default)/documents/communities/$(communityId)/posts/$(postId)/comments/$(commentId)
             ).data.authorUid == request.auth.uid
             || isCommunityAdmin(communityId));
     }

@@ -9,6 +9,7 @@ import 'package:vecindario_app/features/services/providers/services_provider.dar
 import 'package:vecindario_app/features/services/widgets/rating_stars.dart';
 import 'package:vecindario_app/features/services/widgets/service_reviews_sheet.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:vecindario_app/shared/widgets/media_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ServiceDetailScreen extends ConsumerWidget {
@@ -44,8 +45,8 @@ class ServiceDetailScreen extends ConsumerWidget {
                     ),
                     child: PageView.builder(
                       itemCount: service.imageURLs.length,
-                      itemBuilder: (_, i) => Image.network(
-                        service.imageURLs[i],
+                      itemBuilder: (_, i) => MediaImage(
+                        url: service.imageURLs[i],
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -217,10 +218,13 @@ class ServiceDetailScreen extends ConsumerWidget {
                         backgroundColor: const Color(0xFF25D366),
                       ),
                       onPressed: () async {
-                        final phone = service.contactPhone!.replaceAll(
+                        var phone = service.contactPhone!.replaceAll(
                           RegExp(r'[^0-9]'),
                           '',
                         );
+                        if (phone.length == 10) {
+                          phone = '57$phone';
+                        }
                         final message = Uri.encodeComponent(
                           'Hola, vi "${service.title}" en Vecindario y quiero más información.',
                         );

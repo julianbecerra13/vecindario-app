@@ -21,12 +21,18 @@ void main() {
     });
 
     test('fromMap y toMap son inversos', () {
-      final map = {'name': 'Pan', 'price': 5800, 'quantity': 2};
+      final map = {
+        'name': 'Pijama luna',
+        'price': 5800,
+        'quantity': 2,
+        'variant': 'Talla M - Azul',
+      };
       final item = OrderItemModel.fromMap(map);
       final result = item.toMap();
-      expect(result['name'], 'Pan');
+      expect(result['name'], 'Pijama luna');
       expect(result['price'], 5800);
       expect(result['quantity'], 2);
+      expect(result['variant'], 'Talla M - Azul');
     });
   });
 

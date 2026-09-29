@@ -6,7 +6,10 @@ import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/models/review_model.dart';
 
 final servicesRepositoryProvider = Provider<ServicesRepository>((ref) {
-  return ServicesRepository(ref.watch(firestoreProvider));
+  return ServicesRepository(
+    ref.watch(firestoreProvider),
+    ref.watch(firebaseStorageProvider),
+  );
 });
 
 final selectedCategoryProvider = StateProvider<ServiceCategory?>((ref) => null);

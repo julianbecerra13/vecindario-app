@@ -42,8 +42,11 @@ class UserRepository {
 
   Future<String> uploadProfilePhoto(String uid, File file) async {
     final ref = _storage.ref().child('users/$uid/profile.jpg');
-    await ref.putFile(file);
-    return await ref.getDownloadURL();
+    final snapshot = await ref.putFile(
+      file,
+      SettableMetadata(contentType: 'image/jpeg'),
+    );
+    return snapshot.ref.getDownloadURL();
   }
 
   Future<void> requestAccountDeletion(String uid) async {

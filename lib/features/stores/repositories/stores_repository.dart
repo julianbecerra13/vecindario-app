@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
@@ -7,8 +10,9 @@ import 'package:vecindario_app/shared/models/review_model.dart';
 
 class StoresRepository {
   final FirebaseFirestore _firestore;
+  final FirebaseStorage? _storage;
 
-  StoresRepository(this._firestore);
+  StoresRepository(this._firestore, [this._storage]);
 
   Stream<List<StoreModel>> watchStores(String communityId) {
     return _firestore
@@ -179,12 +183,25 @@ class StoresRepository {
         .update(data);
   }
 
-  Future<void> addStoreItem(String storeId, StoreItemModel item) async {
-    await _firestore
+  Future<String> addStoreItem(String storeId, StoreItemModel item) async {
+    final doc = await _firestore
         .collection(FirestorePaths.stores)
         .doc(storeId)
         .collection('items')
         .add(item.toFirestore());
+    return doc.id;
+  }
+
+  Future<String> uploadStoreItemImage(
+    String storeId,
+    String itemId,
+    File file,
+  ) async {
+    final storage = _storage;
+    if (storage == null) throw StateError('Almacenamiento no configurado');
+    final ref = storage.ref('stores/$storeId/item_$itemId.jpg');
+    await ref.putFile(file, SettableMetadata(contentType: 'image/jpeg'));
+    return ref.getDownloadURL();
   }
 
   Future<void> updateStoreItem(
@@ -207,5 +224,24 @@ class StoresRepository {
         .collection('items')
         .doc(itemId)
         .delete();
+  }
+
+  Future<void> importStoreItems(
+    String storeId,
+    List<StoreItemModel> items,
+  ) async {
+    for (var offset = 0; offset < items.length; offset += 400) {
+      final end = (offset + 400).clamp(0, items.length);
+      final batch = _firestore.batch();
+      for (final item in items.sublist(offset, end)) {
+        final ref = _firestore
+            .collection(FirestorePaths.stores)
+            .doc(storeId)
+            .collection('items')
+            .doc();
+        batch.set(ref, item.toFirestore());
+      }
+      await batch.commit();
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
@@ -34,7 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .read(authNotifierProvider.notifier)
         .login(_emailController.text.trim(), _passwordController.text);
     if (success && mounted) {
-      context.go('/feed');
+      context.go('/home');
     }
   }
 
@@ -43,16 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .read(authNotifierProvider.notifier)
         .loginWithGoogle();
     if (success && mounted) {
-      context.go('/feed');
-    }
-  }
-
-  Future<void> _handleAppleLogin() async {
-    final success = await ref
-        .read(authNotifierProvider.notifier)
-        .loginWithApple();
-    if (success && mounted) {
-      context.go('/feed');
+      context.go('/home');
     }
   }
 
@@ -77,21 +69,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: AppSizes.xl),
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(Icons.apartment, color: Colors.white),
+                  ),
+                  const SizedBox(height: AppSizes.lg),
                   Text(
-                    context.l10n.appName.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.appTitle,
+                    'Qué bueno verte.',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: AppSizes.xs),
                   Text(
-                    context.l10n.appSlogan,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMedium.copyWith(
+                    'Entra a tu cuenta de Vecindario.',
+                    style: AppTextStyles.bodyLarge.copyWith(
                       color: context.colors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: AppSizes.xxl),
+                  const SizedBox(height: AppSizes.xl),
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -146,32 +147,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         : Text(context.l10n.login),
                   ),
                   const SizedBox(height: AppSizes.md),
-                  Row(
-                    children: [
-                      const Expanded(child: Divider()),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSizes.md,
-                        ),
-                        child: Text(
-                          context.l10n.authOrContinueWith,
-                          style: AppTextStyles.bodySmall,
-                        ),
-                      ),
-                      const Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: AppSizes.md),
                   OutlinedButton.icon(
                     onPressed: authState.isLoading ? null : _handleGoogleLogin,
                     icon: const Icon(Icons.g_mobiledata, size: 24),
                     label: Text(context.l10n.continueWithGoogle),
                   ),
                   const SizedBox(height: AppSizes.sm),
-                  OutlinedButton.icon(
-                    onPressed: authState.isLoading ? null : _handleAppleLogin,
-                    icon: const Icon(Icons.apple, size: 24),
-                    label: Text(context.l10n.authContinueWithApple),
+                  Text(
+                    'Usa tu cuenta de Google para identificarte. La aprobación del conjunto se verifica por separado.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: AppSizes.xl),
                   Row(

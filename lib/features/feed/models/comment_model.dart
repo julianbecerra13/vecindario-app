@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 
 class CommentModel {
   final String id;
@@ -6,6 +7,7 @@ class CommentModel {
   final String authorName;
   final String? authorPhotoURL;
   final String text;
+  final FeedAttachment? attachment;
   final DateTime createdAt;
 
   const CommentModel({
@@ -14,6 +16,7 @@ class CommentModel {
     required this.authorName,
     this.authorPhotoURL,
     required this.text,
+    this.attachment,
     required this.createdAt,
   });
 
@@ -24,6 +27,9 @@ class CommentModel {
       authorName: data['authorName'] ?? '',
       authorPhotoURL: data['authorPhotoURL'],
       text: data['text'] ?? '',
+      attachment: data['attachment'] is Map<String, dynamic>
+          ? FeedAttachment.fromMap(data['attachment'] as Map<String, dynamic>)
+          : null,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -33,6 +39,7 @@ class CommentModel {
     'authorName': authorName,
     'authorPhotoURL': authorPhotoURL,
     'text': text,
+    if (attachment != null) 'attachment': attachment!.toMap(),
     'createdAt': Timestamp.fromDate(createdAt),
   };
 }

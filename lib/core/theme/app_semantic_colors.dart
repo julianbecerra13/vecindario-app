@@ -43,15 +43,15 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   );
 
   static const light = AppSemanticColors(
-    background: Color(0xFFF9FAFB),
+    background: Color(0xFFF3F6F5),
     surface: Color(0xFFFFFFFF),
-    surfaceVariant: Color(0xFFF3F4F6),
-    textPrimary: Color(0xFF111827),
-    textSecondary: Color(0xFF4B5563),
-    textHint: Color(0xFF9CA3AF),
-    border: Color(0xFFE5E7EB),
-    borderLight: Color(0xFFF3F4F6),
-    divider: Color(0xFFE5E7EB),
+    surfaceVariant: Color(0xFFEDF2F0),
+    textPrimary: Color(0xFF192E32),
+    textSecondary: Color(0xFF526B70),
+    textHint: Color(0xFF829397),
+    border: Color(0xFFDCE5E2),
+    borderLight: Color(0xFFEAF0EE),
+    divider: Color(0xFFDCE5E2),
   );
 
   @override

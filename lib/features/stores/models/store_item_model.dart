@@ -7,6 +7,7 @@ class StoreItemModel {
   final String? imageURL;
   final bool available;
   final String? category;
+  final List<String> variants;
   final int sortOrder;
 
   const StoreItemModel({
@@ -18,6 +19,7 @@ class StoreItemModel {
     this.imageURL,
     this.available = true,
     this.category,
+    this.variants = const [],
     this.sortOrder = 0,
   });
 
@@ -31,6 +33,12 @@ class StoreItemModel {
       imageURL: data['imageURL'],
       available: data['available'] ?? true,
       category: data['category'],
+      variants:
+          (data['variants'] as List?)
+              ?.map((value) => value.toString().trim())
+              .where((value) => value.isNotEmpty)
+              .toList() ??
+          const [],
       sortOrder: data['sortOrder'] ?? 0,
     );
   }
@@ -43,6 +51,7 @@ class StoreItemModel {
     'imageURL': imageURL,
     'available': available,
     'category': category,
+    'variants': variants,
     'sortOrder': sortOrder,
   };
 

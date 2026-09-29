@@ -148,12 +148,27 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
           child: Column(
             children: [
               const SizedBox(height: AppSizes.lg),
-              Icon(
-                Icons.lock_outlined,
-                size: 48,
-                color: context.colors.textPrimary,
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.apartment,
+                  size: 34,
+                  color: AppColors.primaryDark,
+                ),
               ),
               const SizedBox(height: AppSizes.lg),
+              Text(
+                'Únete a tu conjunto',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSizes.sm),
               Text(
                 context.l10n.authJoinCommunityDesc,
                 textAlign: TextAlign.center,
@@ -207,7 +222,7 @@ class _JoinCommunityScreenState extends ConsumerState<JoinCommunityScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(
-                            color: AppColors.primaryLight,
+                            color: AppColors.primaryDark,
                             width: 2,
                           ),
                         ),

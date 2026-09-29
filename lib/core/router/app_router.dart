@@ -25,7 +25,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final hasStore = ref.watch(hasStoreProvider);
 
   return GoRouter(
-    initialLocation: '/feed',
+    initialLocation: '/home',
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
       final isAuthRoute =
@@ -42,7 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (user.isSuperAdmin) return '/super-admin';
         if (user.communityId == null) return '/join-community';
         if (!user.verified) return '/pending-approval';
-        return '/feed';
+        return '/home';
       }
 
       if (isLoggedIn) {
@@ -92,23 +92,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         );
         if (isAdminOnlyRoute && isLoading) return null;
         if (isAdminOnlyRoute && user != null && !user.isAdmin) {
-          return '/feed';
+          return '/home';
         }
 
         // Guard: /super-admin exclusivo para super_admin de plataforma
         final isSuperAdminRoute = state.matchedLocation.startsWith(
           '/super-admin',
         );
-        if (isSuperAdminRoute && isLoading) return '/feed';
+        if (isSuperAdminRoute && isLoading) return '/home';
         if (isSuperAdminRoute && user != null && !user.isSuperAdmin) {
-          return '/feed';
+          return '/home';
         }
 
         // Guard: /store-panel solo para quien tiene al menos una tienda
         // propia (capacidad derivada de datos, ya no un rol exclusivo).
         final isStorePanel = state.matchedLocation.startsWith('/store-panel');
         if (isStorePanel && !hasStore) {
-          return '/feed';
+          return '/home';
         }
       }
 

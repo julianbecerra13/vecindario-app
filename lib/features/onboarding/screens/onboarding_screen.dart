@@ -4,164 +4,122 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
-import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
-import 'package:vecindario_app/core/theme/text_styles.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
-  @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _pageController = PageController();
-  int _currentPage = 0;
-
-  List<_OnboardingPage> _pages(BuildContext context) => [
-    _OnboardingPage(
-      icon: Icons.groups_rounded,
-      title: context.l10n.onboardingPage1Title,
-      description: context.l10n.onboardingPage1Desc,
-    ),
-    _OnboardingPage(
-      icon: Icons.storefront_rounded,
-      title: context.l10n.onboardingPage2Title,
-      description: context.l10n.onboardingPage2Desc,
-    ),
-    _OnboardingPage(
-      icon: Icons.verified_user_rounded,
-      title: context.l10n.onboardingPage3Title,
-      description: context.l10n.onboardingPage3Desc,
-    ),
-  ];
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _complete() async {
+  Future<void> _complete(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
-    if (mounted) context.go('/login');
+    if (context.mounted) context.go('/login');
   }
 
   @override
   Widget build(BuildContext context) {
-    final pages = _pages(context);
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: _complete,
-                child: Text(context.l10n.onboardingSkip),
-              ),
-            ),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: pages.length,
-                onPageChanged: (i) => setState(() => _currentPage = i),
-                itemBuilder: (_, i) => pages[i],
-              ),
-            ),
-            Padding(
-              padding: AppSizes.paddingAll,
-              child: Column(
+        child: Padding(
+          padding: AppSizes.paddingAll,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      pages.length,
-                      (i) => Container(
-                        width: _currentPage == i ? 24 : 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: _currentPage == i
-                              ? AppColors.primary
-                              : context.colors.border,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    child: const Icon(Icons.apartment, color: Colors.white),
                   ),
-                  const SizedBox(height: AppSizes.lg),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_currentPage < pages.length - 1) {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      } else {
-                        _complete();
-                      }
-                    },
-                    child: Text(
-                      _currentPage < pages.length - 1
-                          ? context.l10n.onboardingNext
-                          : context.l10n.onboardingStart,
-                    ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'vecindario',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: AppSizes.md),
                 ],
               ),
-            ),
-          ],
+              const Spacer(),
+              Container(
+                height: 190,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight.withValues(alpha: .55),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Icon(
+                  Icons.location_city_rounded,
+                  size: 104,
+                  color: AppColors.primaryDark,
+                ),
+              ),
+              const SizedBox(height: AppSizes.xl),
+              Text(
+                'Esto también es vivir en comunidad.',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              Text(
+                'Conecta con tus vecinos, compra cerca y resuelve lo de tu conjunto.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: context.colors.textSecondary,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: AppSizes.lg),
+              Container(
+                padding: const EdgeInsets.all(AppSizes.md),
+                decoration: BoxDecoration(
+                  color: context.colors.surface,
+                  border: Border.all(color: context.colors.border),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.verified_user_outlined,
+                      color: AppColors.primary,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Una comunidad privada',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Entra con la invitación de tu conjunto. La administración revisará tu solicitud.',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: () => _complete(context),
+                child: const Text('Empezar'),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              const Text(
+                'Solo miembros aprobados',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _OnboardingPage extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-
-  const _OnboardingPage({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: AppSizes.paddingAll,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 60, color: AppColors.primary),
-          ),
-          const SizedBox(height: AppSizes.xl),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.heading2,
-          ),
-          const SizedBox(height: AppSizes.md),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: context.colors.textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }

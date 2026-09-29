@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/utils/logger.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
@@ -17,11 +18,16 @@ class PostNotifier extends StateNotifier<PostActionState> {
 
   String? get _communityId => _ref.read(currentCommunityIdProvider);
 
-  Future<bool> createPost(PostModel post) async {
+  Future<bool> createPost(
+    PostModel post, {
+    List<PendingFeedAttachment> attachments = const [],
+  }) async {
     if (_communityId == null) return false;
     state = const PostActionState(isLoading: true);
     try {
-      await _ref.read(feedRepositoryProvider).createPost(_communityId!, post);
+      await _ref
+          .read(feedRepositoryProvider)
+          .createPostWithAttachments(_communityId!, post, attachments);
       state = const PostActionState();
       return true;
     } catch (e) {

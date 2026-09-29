@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
+import 'package:vecindario_app/core/services/media_opener.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 import 'package:vecindario_app/features/feed/providers/feed_provider.dart';
 import 'package:vecindario_app/features/feed/providers/post_notifier.dart';
 import 'package:vecindario_app/features/feed/widgets/comments_sheet.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:vecindario_app/shared/widgets/media_image.dart';
 
 class FeedDetailScreen extends ConsumerWidget {
   final String postId;
@@ -139,11 +142,30 @@ class FeedDetailScreen extends ConsumerWidget {
                     itemCount: post.imageURLs.length,
                     itemBuilder: (_, i) => ClipRRect(
                       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                      child: Image.network(
-                        post.imageURLs[i],
+                      child: MediaImage(
+                        url: post.imageURLs[i],
                         fit: BoxFit.cover,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: AppSizes.lg),
+                ],
+                if (post.attachments.any(
+                  (item) => item.type != FeedAttachmentType.image,
+                )) ...[
+                  Wrap(
+                    spacing: AppSizes.xs,
+                    runSpacing: AppSizes.xs,
+                    children: post.attachments
+                        .where((item) => item.type != FeedAttachmentType.image)
+                        .map(
+                          (item) => ActionChip(
+                            avatar: const Icon(Icons.attach_file, size: 18),
+                            label: Text(item.name),
+                            onPressed: () => openMedia(item.url),
+                          ),
+                        )
+                        .toList(),
                   ),
                   const SizedBox(height: AppSizes.lg),
                 ],

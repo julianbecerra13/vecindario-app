@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/core/config/backend_features.dart';
 import 'package:vecindario_app/core/constants/app_colors.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
@@ -44,6 +45,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _pickPhoto() async {
+    if (!kMediaUploadsEnabled) {
+      context.showSnackBar(kMediaUploadsUnavailableMessage);
+      return;
+    }
     final file = await showImagePickerSheet(context);
     if (file != null) setState(() => _newPhoto = file);
   }
@@ -132,7 +137,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: kMediaUploadsEnabled
+                              ? AppColors.primary
+                              : context.colors.textHint,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
@@ -147,6 +154,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ],
               ),
             ),
+            if (!kMediaUploadsEnabled) ...[
+              const SizedBox(height: AppSizes.sm),
+              const Text(
+                'La foto de perfil se habilitará al activar el almacenamiento.',
+                textAlign: TextAlign.center,
+              ),
+            ],
             const SizedBox(height: AppSizes.xl),
             TextFormField(
               controller: _nameController,

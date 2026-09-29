@@ -5,7 +5,10 @@ import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 
 final feedRepositoryProvider = Provider<FeedRepository>((ref) {
-  return FeedRepository(ref.watch(firestoreProvider));
+  return FeedRepository(
+    ref.watch(firestoreProvider),
+    ref.watch(firebaseStorageProvider),
+  );
 });
 
 final feedSearchProvider = StateProvider<String>((ref) => '');

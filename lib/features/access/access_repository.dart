@@ -130,4 +130,56 @@ class AccessRepository {
       });
     });
   }
+
+  Future<Map<String, dynamic>> inspectVisitor(
+    String community,
+    String token,
+  ) async {
+    final doc = await db
+        .collection('communities')
+        .doc(community)
+        .collection('visitor_passes')
+        .doc(token)
+        .get(const GetOptions(source: Source.server));
+    final data = doc.data();
+    final now = DateTime.now();
+    if (data == null ||
+        data['used'] == true ||
+        !(data['validFrom'] as Timestamp).toDate().isBefore(now) ||
+        !(data['expiresAt'] as Timestamp).toDate().isAfter(now)) {
+      throw StateError('Autorización no vigente');
+    }
+    return data;
+  }
+
+  Future<void> admitVisitor(
+    String community,
+    String token,
+    String operatorUid,
+    String zone,
+  ) async {
+    final root = db.collection('communities').doc(community);
+    final passRef = root.collection('visitor_passes').doc(token);
+    final logRef = root.collection('visitor_access_logs').doc(token);
+    await db.runTransaction((tx) async {
+      final doc = await tx.get(passRef);
+      final data = doc.data();
+      final now = DateTime.now();
+      if (data == null ||
+          data['used'] == true ||
+          !(data['validFrom'] as Timestamp).toDate().isBefore(now) ||
+          !(data['expiresAt'] as Timestamp).toDate().isAfter(now)) {
+        throw StateError('Autorización no vigente');
+      }
+      tx.update(passRef, {'used': true});
+      tx.set(logRef, {
+        'passId': token,
+        'residentUid': data['residentUid'],
+        'visitorName': data['visitorName'],
+        'operatorUid': operatorUid,
+        'zone': zone,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
 }

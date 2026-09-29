@@ -12,6 +12,8 @@ class StoreModel {
   final bool active;
   final double rating;
   final int orderCount;
+  final String? contactPhone;
+  final String? paymentInstructions;
   final DateTime createdAt;
 
   const StoreModel({
@@ -26,6 +28,8 @@ class StoreModel {
     this.active = true,
     this.rating = 0,
     this.orderCount = 0,
+    this.contactPhone,
+    this.paymentInstructions,
     required this.createdAt,
   });
 
@@ -42,6 +46,8 @@ class StoreModel {
       active: data['active'] ?? true,
       rating: (data['rating'] ?? 0).toDouble(),
       orderCount: data['orderCount'] ?? 0,
+      contactPhone: data['contactPhone'],
+      paymentInstructions: data['paymentInstructions'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
@@ -57,6 +63,8 @@ class StoreModel {
     'active': active,
     'rating': rating,
     'orderCount': orderCount,
+    'contactPhone': contactPhone,
+    'paymentInstructions': paymentInstructions,
     'createdAt': Timestamp.fromDate(createdAt),
   };
 

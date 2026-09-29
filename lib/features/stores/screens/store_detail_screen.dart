@@ -7,6 +7,7 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
+import 'package:vecindario_app/features/stores/models/store_item_model.dart';
 import 'package:vecindario_app/features/stores/providers/cart_provider.dart';
 import 'package:vecindario_app/features/stores/providers/stores_provider.dart';
 import 'package:vecindario_app/features/stores/widgets/checkout_bar.dart';
@@ -28,6 +29,13 @@ class StoreDetailScreen extends ConsumerStatefulWidget {
 class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
   bool _isOrdering = false;
   PaymentMethod _paymentMethod = PaymentMethod.cashOnDelivery;
+  final _noteController = TextEditingController();
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -49,8 +57,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     final user = ref.read(currentUserProvider).value;
     final community = ref.read(currentCommunityProvider).value;
 
-    if (cart == null || cart.isEmpty || user == null || community == null)
+    if (cart == null || cart.isEmpty || user == null || community == null) {
       return;
+    }
 
     final fee = OrderModel.calculateServiceFee(community.estrato);
     final subtotal = cart.subtotal;
@@ -67,6 +76,79 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
           store.ownerUid.isEmpty) {
         throw StateError('La tienda no esta disponible');
       }
+      if (!mounted) return;
+      final confirmed = await showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        builder: (sheetContext) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppSizes.lg,
+            AppSizes.lg,
+            AppSizes.lg,
+            MediaQuery.viewInsetsOf(sheetContext).bottom + AppSizes.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Confirma tu pedido',
+                style: Theme.of(sheetContext).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              Text(
+                '${cart.itemCount} productos · ${formatCOP(subtotal + fee)}',
+              ),
+              const SizedBox(height: AppSizes.md),
+              if (_paymentMethod == PaymentMethod.transfer)
+                Container(
+                  padding: const EdgeInsets.all(AppSizes.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    store.paymentInstructions?.trim().isNotEmpty == true
+                        ? store.paymentInstructions!
+                        : 'La tienda te confirmará los datos para realizar la transferencia. Subir un comprobante no confirma el pago.',
+                  ),
+                ),
+              const SizedBox(height: AppSizes.md),
+              TextField(
+                controller: _noteController,
+                maxLength: 300,
+                decoration: const InputDecoration(
+                  labelText: 'Nota para la tienda (opcional)',
+                ),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(sheetContext, false),
+                      child: const Text('Volver'),
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.sm),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(sheetContext, true),
+                      child: const Text('Crear pedido'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      if (confirmed != true) {
+        setState(() => _isOrdering = false);
+        return;
+      }
       final order = OrderModel(
         id: '',
         storeId: cart.storeId,
@@ -82,6 +164,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity,
+                variant: item.variant,
               ),
             )
             .toList(),
@@ -91,6 +174,9 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
         paymentMethod: _paymentMethod == PaymentMethod.transfer
             ? 'transfer'
             : 'cash',
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
         createdAt: DateTime.now(),
       );
 
@@ -124,6 +210,18 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(cart?.storeName ?? context.l10n.storeDefaultTitle),
+        actions: [
+          IconButton(
+            tooltip: 'Mi cuenta de fiado',
+            onPressed: () {
+              final uid = ref.read(currentUserProvider).value?.id;
+              if (uid != null) {
+                context.push('/store-credit/${widget.storeId}/$uid');
+              }
+            },
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+          ),
+        ],
       ),
       body: itemsAsync.when(
         data: (items) {
@@ -141,13 +239,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                 return StoreItemTile(
                   item: item,
                   quantity: quantity,
-                  onAdd: () => ref
-                      .read(cartProvider.notifier)
-                      .addItem(
-                        storeItemId: item.id,
-                        name: item.name,
-                        price: item.price,
-                      ),
+                  onAdd: () => _addItem(item),
                   onRemove: () =>
                       ref.read(cartProvider.notifier).removeItem(item.id),
                 );
@@ -213,6 +305,56 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
             )
           : null,
     );
+  }
+
+  Future<void> _addItem(StoreItemModel item) async {
+    String? variant;
+    if (item.variants.isNotEmpty) {
+      variant = await showModalBottomSheet<String>(
+        context: context,
+        showDragHandle: true,
+        builder: (sheetContext) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.md,
+              0,
+              AppSizes.md,
+              AppSizes.lg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Elige una opción para ${item.name}',
+                  style: Theme.of(
+                    sheetContext,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: AppSizes.sm),
+                ...item.variants.map(
+                  (option) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(option),
+                    trailing: const Icon(Icons.add_circle_outline),
+                    onTap: () => Navigator.pop(sheetContext, option),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      if (variant == null || !mounted) return;
+    }
+    ref
+        .read(cartProvider.notifier)
+        .addItem(
+          storeItemId: item.id,
+          name: item.name,
+          price: item.price,
+          variant: variant,
+        );
   }
 }
 

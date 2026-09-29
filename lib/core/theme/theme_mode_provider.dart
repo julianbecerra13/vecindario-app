@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const _themeModeKey = 'theme_mode';
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.system) {
+  ThemeModeNotifier() : super(ThemeMode.light) {
     _load();
   }
 
@@ -15,7 +15,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     state = switch (saved) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
+      _ => ThemeMode.light,
     };
   }
 
@@ -27,7 +27,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 }
 
 /// Preferencia de tema del usuario (claro/oscuro/sistema), persistida en
-/// shared_preferences. Default: ThemeMode.system.
+/// shared_preferences. La dirección visual aprobada usa tema claro por defecto.
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
   (ref) => ThemeModeNotifier(),
 );

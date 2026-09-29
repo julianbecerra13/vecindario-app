@@ -96,6 +96,17 @@ class OrderTrackingScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
+                      if (order.note?.isNotEmpty == true) ...[
+                        const Divider(height: AppSizes.md),
+                        Text(
+                          'Nota para la tienda',
+                          style: AppTextStyles.caption.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: AppSizes.xs),
+                        Text(order.note!, style: AppTextStyles.bodySmall),
+                      ],
                       const Divider(height: AppSizes.md),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -157,6 +168,52 @@ class OrderTrackingScreen extends ConsumerWidget {
                 if (order.status == OrderStatus.pending ||
                     order.status == OrderStatus.confirmed) ...[
                   const SizedBox(height: AppSizes.md),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Editar pedido'),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            title: const Text('Editar pedido'),
+                            content: const Text(
+                              'Para proteger el historial, el pedido actual se cancelará y podrás crear uno nuevo con los cambios.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, false),
+                                child: const Text('Volver'),
+                              ),
+                              FilledButton(
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, true),
+                                child: const Text('Cancelar y editar'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed != true) return;
+                        try {
+                          await ref
+                              .read(storesRepositoryProvider)
+                              .cancelOrder(order.id);
+                          if (context.mounted) {
+                            context.go('/stores/${order.storeId}');
+                          }
+                        } catch (_) {
+                          if (context.mounted) {
+                            context.showErrorSnackBar(
+                              'No se pudo preparar la edición del pedido.',
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.sm),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(

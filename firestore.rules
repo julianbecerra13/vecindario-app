@@ -166,6 +166,54 @@ service cloud.firestore {
         && request.resource.data.visitors is int && request.resource.data.visitors >= 0 && request.resource.data.visitors <= 50;
       allow update, delete: if false;
     }
+    match /communities/{communityId}/visitor_passes/{passId} {
+      allow read: if isAccessOperator(communityId)
+        || (isVerifiedMember(communityId)
+            && resource.data.residentUid == request.auth.uid);
+      allow create: if isVerifiedMember(communityId)
+        && request.resource.data.keys().hasOnly([
+          'residentUid', 'residentName', 'unit', 'visitorName', 'validFrom',
+          'expiresAt', 'used', 'createdAt'
+        ])
+        && request.resource.data.residentUid == request.auth.uid
+        && request.resource.data.residentName == getUserData().displayName
+        && request.resource.data.unit is string
+        && request.resource.data.visitorName is string
+        && request.resource.data.visitorName.size() >= 3
+        && request.resource.data.visitorName.size() <= 120
+        && request.resource.data.validFrom >= request.time - duration.value(5, 'm')
+        && request.resource.data.expiresAt > request.resource.data.validFrom
+        && request.resource.data.expiresAt <= request.resource.data.validFrom + duration.value(7, 'd')
+        && request.resource.data.used == false
+        && request.resource.data.createdAt == request.time;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used'])
+        && resource.data.used == false
+        && request.resource.data.used == true
+        && ((isVerifiedMember(communityId)
+             && resource.data.residentUid == request.auth.uid)
+          || (isAccessOperator(communityId)
+             && resource.data.validFrom <= request.time
+             && resource.data.expiresAt > request.time
+             && getAfter(/databases/$(database)/documents/communities/$(communityId)/visitor_access_logs/$(passId)).data.operatorUid == request.auth.uid));
+      allow delete: if false;
+    }
+    match /communities/{communityId}/visitor_access_logs/{passId} {
+      allow read: if isCommunityAdmin(communityId);
+      allow create: if isAccessOperator(communityId)
+        && request.resource.data.keys().hasOnly([
+          'passId', 'residentUid', 'visitorName', 'operatorUid', 'zone', 'createdAt'
+        ])
+        && request.resource.data.passId == passId
+        && request.resource.data.operatorUid == request.auth.uid
+        && request.resource.data.residentUid == get(/databases/$(database)/documents/communities/$(communityId)/visitor_passes/$(passId)).data.residentUid
+        && request.resource.data.visitorName == get(/databases/$(database)/documents/communities/$(communityId)/visitor_passes/$(passId)).data.visitorName
+        && request.resource.data.zone is string
+        && request.resource.data.zone.size() > 0
+        && request.resource.data.zone.size() <= 100
+        && request.resource.data.createdAt == request.time
+        && getAfter(/databases/$(database)/documents/communities/$(communityId)/visitor_passes/$(passId)).data.used == true;
+      allow update, delete: if false;
+    }
 
     match /communities/{communityId} {
       allow read: if isCommunityMember(communityId) || isSuperAdmin();
@@ -184,7 +232,7 @@ service cloud.firestore {
               && request.resource.data.authorUid == resource.data.authorUid
               && request.resource.data.createdAt == resource.data.createdAt
               && request.resource.data.diff(resource.data).affectedKeys()
-                  .hasOnly(['text', 'imageURLs', 'type']))
+                  .hasOnly(['text', 'imageURLs', 'attachments', 'type']))
           || (isVerifiedMember(communityId)
               && request.resource.data.authorUid == resource.data.authorUid
               && request.resource.data.createdAt == resource.data.createdAt
@@ -198,6 +246,12 @@ service cloud.firestore {
         allow read: if isVerifiedMember(communityId);
         allow create: if isVerifiedMember(communityId)
           && request.resource.data.authorUid == request.auth.uid;
+        allow update: if isVerifiedMember(communityId)
+          && isOwner(resource.data.authorUid)
+          && request.resource.data.authorUid == resource.data.authorUid
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['attachment']);
         allow delete: if isOwner(resource.data.authorUid) || isCommunityAdmin(communityId);
       }
 
@@ -303,6 +357,32 @@ service cloud.firestore {
         allow update: if isCommunityAdmin(communityId);
         allow delete: if false;
       }
+
+      // Citas con administración: proceso independiente de PQRS.
+      match /appointments/{appointmentId} {
+        allow read: if isCommunityAdmin(communityId)
+          || (isVerifiedMember(communityId)
+              && resource.data.residentUid == request.auth.uid);
+        allow create: if isVerifiedMember(communityId)
+          && request.resource.data.residentUid == request.auth.uid
+          && request.resource.data.keys().hasOnly([
+            'residentUid', 'residentName', 'scheduledAt', 'reason',
+            'status', 'createdAt'
+          ])
+          && request.resource.data.status == 'requested'
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.scheduledAt > request.time
+          && request.resource.data.reason is string
+          && request.resource.data.reason.size() >= 10
+          && request.resource.data.reason.size() <= 500;
+        allow update: if isCommunityAdmin(communityId)
+          && request.resource.data.residentUid == resource.data.residentUid
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.status in [
+            'requested', 'confirmed', 'rescheduled', 'cancelled', 'completed'
+          ];
+        allow delete: if false;
+      }
     }
 
     // --- Servicios de vecinos ---
@@ -336,7 +416,7 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['name', 'description', 'imageURL', 'deliveryTime',
-              'minOrder', 'active']);
+              'minOrder', 'active', 'contactPhone', 'paymentInstructions']);
       allow delete: if isOwner(resource.data.ownerUid);
 
       // Items de la tienda (subcolección)
@@ -344,6 +424,87 @@ service cloud.firestore {
         allow read: if isAuthenticated() && isVerified();
         allow write: if isAuthenticated()
           && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerUid == request.auth.uid;
+      }
+
+      // Cuentas privadas de fiado. Solo las ve el dueño de la tienda y el
+      // residente titular; la administración del conjunto no obtiene acceso.
+      match /credit_accounts/{residentUid} {
+        function storeData() {
+          return get(/databases/$(database)/documents/stores/$(storeId)).data;
+        }
+
+        function isStoreOwner() {
+          return isAuthenticated() && storeData().ownerUid == request.auth.uid;
+        }
+
+        function isCreditParty() {
+          return isAuthenticated()
+            && (request.auth.uid == residentUid || isStoreOwner());
+        }
+
+        allow read: if isCreditParty();
+        allow create: if isStoreOwner()
+          && exists(/databases/$(database)/documents/users/$(residentUid))
+          && get(/databases/$(database)/documents/users/$(residentUid)).data.verified == true
+          && get(/databases/$(database)/documents/users/$(residentUid)).data.communityId == storeData().communityId
+          && request.resource.data.keys().hasOnly([
+            'residentName', 'code', 'limit', 'balance', 'active',
+            'lastMovementId', 'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.residentName is string
+          && request.resource.data.residentName.size() > 0
+          && request.resource.data.residentName.size() <= 100
+          && request.resource.data.code is string
+          && request.resource.data.code.size() >= 4
+          && request.resource.data.code.size() <= 12
+          && request.resource.data.limit is int
+          && request.resource.data.limit > 0
+          && request.resource.data.balance == 0
+          && request.resource.data.active == true
+          && request.resource.data.lastMovementId == ''
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+        allow update: if isStoreOwner()
+          && request.resource.data.residentName == resource.data.residentName
+          && request.resource.data.code == resource.data.code
+          && request.resource.data.limit == resource.data.limit
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.lastMovementId is string
+          && request.resource.data.lastMovementId != resource.data.lastMovementId
+          && request.resource.data.balance is int
+          && request.resource.data.balance >= 0
+          && request.resource.data.balance <= resource.data.limit
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['balance', 'lastMovementId', 'updatedAt'])
+          && existsAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)/movements/$(request.resource.data.lastMovementId))
+          && (
+            (getAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)/movements/$(request.resource.data.lastMovementId)).data.type == 'charge'
+              && request.resource.data.balance == resource.data.balance
+                + getAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)/movements/$(request.resource.data.lastMovementId)).data.amount)
+            ||
+            (getAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)/movements/$(request.resource.data.lastMovementId)).data.type == 'payment'
+              && request.resource.data.balance == resource.data.balance
+                - getAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)/movements/$(request.resource.data.lastMovementId)).data.amount)
+          )
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if false;
+
+        match /movements/{movementId} {
+          allow read: if isCreditParty();
+          allow create: if isStoreOwner()
+            && request.resource.data.keys().hasOnly([
+              'type', 'amount', 'note', 'createdAt'
+            ])
+            && request.resource.data.type in ['charge', 'payment']
+            && request.resource.data.amount is int
+            && request.resource.data.amount > 0
+            && request.resource.data.note is string
+            && request.resource.data.note.size() > 0
+            && request.resource.data.note.size() <= 120
+            && request.resource.data.createdAt == request.time
+            && getAfter(/databases/$(database)/documents/stores/$(storeId)/credit_accounts/$(residentUid)).data.lastMovementId == movementId;
+          allow update, delete: if false;
+        }
       }
     }
 

@@ -20,7 +20,7 @@ class AppTheme {
     final baseTextTheme = brightness == Brightness.dark
         ? ThemeData.dark().textTheme
         : ThemeData.light().textTheme;
-    final textTheme = GoogleFonts.interTextTheme(baseTextTheme);
+    final textTheme = GoogleFonts.latoTextTheme(baseTextTheme);
 
     return ThemeData(
       useMaterial3: true,
@@ -58,7 +58,7 @@ class AppTheme {
         centerTitle: false,
         scrolledUnderElevation: 1,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: GoogleFonts.lato(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: colors.textPrimary,
@@ -110,7 +110,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.lato(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -125,7 +125,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           side: BorderSide(color: colors.border),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.lato(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -134,7 +134,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.lato(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

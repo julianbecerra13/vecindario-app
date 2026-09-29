@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
+import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 
 void main() {
   group('PostType', () {
@@ -102,6 +103,29 @@ void main() {
       expect(data['authorUid'], 'author');
       expect(data['type'], 'alert');
       expect(data['pinned'], true);
+    });
+
+    test('serializa archivos adjuntos con tipo y tamaño', () {
+      final post = PostModel(
+        id: '1',
+        authorUid: 'author',
+        authorName: 'Test',
+        text: 'Acta adjunta',
+        attachments: const [
+          FeedAttachment(
+            url: 'https://example.com/acta.pdf',
+            name: 'acta.pdf',
+            type: FeedAttachmentType.document,
+            size: 1200,
+          ),
+        ],
+        createdAt: DateTime(2026, 9, 26),
+      );
+
+      final restored = PostModel.fromFirestore(post.toFirestore(), '1');
+      expect(restored.attachments.single.name, 'acta.pdf');
+      expect(restored.attachments.single.type, FeedAttachmentType.document);
+      expect(restored.attachments.single.size, 1200);
     });
   });
 

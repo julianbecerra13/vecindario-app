@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/core/config/backend_features.dart';
 import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
@@ -25,6 +29,7 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
   _PriceMode _priceMode = _PriceMode.fixed;
   ServiceCategory _selectedCategory = ServiceCategory.hogar;
   bool _isSubmitting = false;
+  final List<File> _images = [];
 
   @override
   void dispose() {
@@ -85,7 +90,9 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
         createdAt: DateTime.now(),
       );
 
-      await ref.read(servicesRepositoryProvider).createService(service);
+      await ref
+          .read(servicesRepositoryProvider)
+          .createServiceWithImages(service, _images);
 
       if (mounted) {
         context.showSuccessSnackBar(context.l10n.serviceCreated);
@@ -98,6 +105,29 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  Future<void> _pickImages() async {
+    if (!kMediaUploadsEnabled) {
+      context.showSnackBar(kMediaUploadsUnavailableMessage);
+      return;
+    }
+    final remaining = 4 - _images.length;
+    if (remaining <= 0) {
+      context.showErrorSnackBar('Puedes agregar máximo 4 fotografías.');
+      return;
+    }
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+    );
+    if (result == null || !mounted) return;
+    final selected = result.files
+        .where((item) => item.path != null && item.size <= 10 * 1024 * 1024)
+        .take(remaining)
+        .map((item) => File(item.path!));
+    setState(() => _images.addAll(selected));
   }
 
   @override
@@ -126,6 +156,57 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
                   )
                   .toList(),
             ),
+            const SizedBox(height: AppSizes.lg),
+
+            Text('Fotografías (${_images.length}/4)'),
+            const SizedBox(height: AppSizes.sm),
+            if (_images.isNotEmpty)
+              SizedBox(
+                height: 92,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _images.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(width: AppSizes.sm),
+                  itemBuilder: (context, index) => Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                        child: Image.file(
+                          _images[index],
+                          width: 92,
+                          height: 92,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        right: 2,
+                        top: 2,
+                        child: IconButton.filled(
+                          visualDensity: VisualDensity.compact,
+                          iconSize: 16,
+                          onPressed: () =>
+                              setState(() => _images.removeAt(index)),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            OutlinedButton.icon(
+              onPressed: _isSubmitting ? null : _pickImages,
+              icon: const Icon(Icons.add_photo_alternate_outlined),
+              label: Text(
+                kMediaUploadsEnabled
+                    ? 'Agregar fotografías'
+                    : 'Fotografías próximamente',
+              ),
+            ),
+            if (!kMediaUploadsEnabled)
+              const Text(
+                'Puedes publicar el servicio sin fotos. Se habilitarán al activar el almacenamiento.',
+              ),
             const SizedBox(height: AppSizes.lg),
 
             // Título
