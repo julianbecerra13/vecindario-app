@@ -231,7 +231,7 @@ flutterfire configure
 - [ ] Geolocalización para servicios cercanos
 - [ ] Chat en vivo entre vecinos
 - [ ] Reportes y estadísticas avanzadas
-- [ ] App web para admin
+- [x] App web para admin
 - [ ] Soporte multi-idioma completo (EN)
 
 ## Contribuir

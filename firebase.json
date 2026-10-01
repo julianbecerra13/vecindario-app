@@ -7,10 +7,13 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "web",
+    "public": "build/web",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "cleanUrls": true,
-    "rewrites": [{"source": "/feed/**", "destination": "/post.html"}],
+    "rewrites": [
+      {"source": "/feed/**", "destination": "/post.html"},
+      {"source": "**", "destination": "/index.html"}
+    ],
     "headers": [{
       "source": "**",
       "headers": [{"key": "X-Content-Type-Options", "value": "nosniff"}, {"key": "Referrer-Policy", "value": "no-referrer"}]
@@ -42,6 +45,7 @@
         "lib/firebase_options.dart": {
           "projectId": "vecindario-app-a746b",
           "configurations": {
+            "web": "1:606807280271:web:a41c67f6ad51a5188a7efa",
             "android": "1:606807280271:android:2f9c0d03123b66158a7efa",
             "ios": "1:606807280271:ios:238dd146f2f8328b8a7efa"
           }

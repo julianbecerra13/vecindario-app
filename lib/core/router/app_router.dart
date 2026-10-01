@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/core/router/community_admin_routes.dart';
 import 'package:vecindario_app/core/router/resident_routes.dart';
@@ -71,11 +72,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (user.communityId != null && !user.verified && !onPending) {
             return '/pending-approval';
           }
+          if (kIsWeb &&
+              user.isAdmin &&
+              !state.matchedLocation.startsWith('/admin-web') &&
+              !state.matchedLocation.startsWith('/profile')) {
+            return '/admin-web';
+          }
         }
 
         // Los residentes pueden consultar módulos comunitarios. Las pantallas
         // de configuración, aprobación y creación siguen siendo solo admin.
         const adminOnlyRoutes = {
+          '/admin-web',
           '/premium',
           '/premium/pending',
           '/premium/settings',

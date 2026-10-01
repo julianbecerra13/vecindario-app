@@ -21,6 +21,7 @@ import 'package:vecindario_app/features/premium/manual/screens/manual_screen.dar
 import 'package:vecindario_app/features/premium/screens/admin_shell.dart';
 import 'package:vecindario_app/features/premium/screens/premium_dashboard_screen.dart';
 import 'package:vecindario_app/features/premium/subscriptions/screens/subscription_plans_screen.dart';
+import 'package:vecindario_app/features/web_admin/screens/web_admin_screen.dart';
 
 /// Rutas del módulo único de "Administración del conjunto" — fusiona lo que
 /// antes eran dos paneles separados (/admin y /premium: PendingApprovals y
@@ -28,6 +29,7 @@ import 'package:vecindario_app/features/premium/subscriptions/screens/subscripti
 /// guard fino (communityRole == admin || platformRole == super_admin) vive
 /// en app_router.dart.
 final List<RouteBase> communityAdminRoutes = [
+  GoRoute(path: '/admin-web', builder: (_, __) => const WebAdminScreen()),
   GoRoute(
     path: '/premium/access-management',
     builder: (_, __) => const AccessManagementScreen(),
