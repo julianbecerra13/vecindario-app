@@ -75,6 +75,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (kIsWeb &&
               user.isAdmin &&
               !state.matchedLocation.startsWith('/admin-web') &&
+              !state.matchedLocation.startsWith('/premium') &&
               !state.matchedLocation.startsWith('/profile')) {
             return '/admin-web';
           }

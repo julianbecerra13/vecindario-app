@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 
 enum _AdminArea {
   resumen('Resumen', Icons.dashboard_outlined),
@@ -26,9 +28,20 @@ class WebAdminScreen extends ConsumerStatefulWidget {
 }
 
 class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
-  _AdminArea _area = _AdminArea.resumen;
+  late _AdminArea _area;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _searchController = TextEditingController();
   String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    final requestedArea = Uri.base.queryParameters['area'];
+    _area = _AdminArea.values.firstWhere(
+      (area) => area.name == requestedArea,
+      orElse: () => _AdminArea.resumen,
+    );
+  }
 
   @override
   void dispose() {
@@ -44,6 +57,7 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
     final desktop = MediaQuery.sizeOf(context).width >= 940;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFFF4F7F6),
       drawer: desktop
           ? null
@@ -77,12 +91,16 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
                     onChanged: (value) => setState(() => _query = value),
                   ),
                   Expanded(
-                    child: SelectionArea(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.all(desktop ? 28 : 16),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(desktop ? 28 : 16),
+                      child: Align(
+                        alignment: Alignment.topLeft,
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 1440),
-                          child: _buildArea(communityName),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: _buildArea(communityName, community?.id),
+                          ),
                         ),
                       ),
                     ),
@@ -102,46 +120,62 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
       _query = '';
       _searchController.clear();
     });
-    if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
-      Navigator.of(context).pop();
+    context.go('/admin-web?area=${value.name}');
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _scaffoldKey.currentState?.closeDrawer();
     }
   }
 
-  Widget _buildArea(String communityName) => switch (_area) {
-    _AdminArea.resumen => _Overview(
-      communityName: communityName,
-      onNavigate: _selectArea,
-    ),
-    _AdminArea.comunidad => _RecordsPage(
-      title: 'Personas y viviendas',
-      description: 'Residentes, viviendas y solicitudes de acceso.',
-      actionLabel: 'Invitar residente',
-      columns: const ['Persona', 'Vivienda', 'Estado', 'Acción'],
-      rows: _filter(const [
-        ['Valentina Rojas', 'Torre 2 / 301', 'Por revisar', 'Revisar'],
-        ['Carlos Méndez', 'Torre 1 / 504', 'Verificado', 'Abrir'],
-        ['Ana Torres', 'Torre 3 / 102', 'Verificado', 'Abrir'],
-        ['Mateo Gómez', 'Torre 2 / 606', 'Pendiente', 'Revisar'],
-      ]),
-    ),
-    _AdminArea.atencion => _RecordsPage(
-      title: 'Solicitudes de la comunidad',
-      description: 'PQRS, multas, descargos y conversaciones de atención.',
-      actionLabel: 'Registrar solicitud',
-      columns: const ['Radicado', 'Asunto', 'Estado', 'Responsable'],
-      rows: _filter(const [
-        ['PQ-0028', 'Filtración en pasillo', 'En gestión', 'Laura Gómez'],
-        ['PQ-0023', 'Uso del salón', 'Por responder', 'Administración'],
-        ['M-0012', 'Descargo por ruido', 'En revisión', 'Comité'],
-        ['PQ-0020', 'Ruido nocturno', 'En espera', 'Convivencia'],
-      ]),
-    ),
-    _AdminArea.agenda => _AgendaPage(query: _query),
-    _AdminArea.comunicacion => _CommunicationPage(query: _query),
-    _AdminArea.finanzas => _FinancePage(query: _query),
-    _AdminArea.accesos => _AccessPage(query: _query),
-    _AdminArea.configuracion => const _SettingsPage(),
-  };
+  Widget _buildArea(String communityName, String? communityId) =>
+      switch (_area) {
+        _AdminArea.resumen => _Overview(
+          communityName: communityName,
+          onNavigate: _selectArea,
+        ),
+        _AdminArea.comunidad => _RecordsPage(
+          title: 'Personas y viviendas',
+          description: 'Residentes, viviendas y solicitudes de acceso.',
+          actionLabel: 'Gestionar residentes',
+          onAction: () => context.push('/premium/pending'),
+          columns: const ['Persona', 'Vivienda', 'Estado', 'Acción'],
+          rows: _filter(const [
+            ['Valentina Rojas', 'Torre 2 / 301', 'Por revisar', 'Revisar'],
+            ['Carlos Méndez', 'Torre 1 / 504', 'Verificado', 'Abrir'],
+            ['Ana Torres', 'Torre 3 / 102', 'Verificado', 'Abrir'],
+            ['Mateo Gómez', 'Torre 2 / 606', 'Pendiente', 'Revisar'],
+          ]),
+        ),
+        _AdminArea.atencion => _RecordsPage(
+          title: 'Solicitudes de la comunidad',
+          description: 'PQRS, multas, descargos y conversaciones de atención.',
+          actionLabel: 'Registrar solicitud',
+          onAction: () => context.push('/premium/pqrs/create'),
+          columns: const ['Radicado', 'Asunto', 'Estado', 'Responsable'],
+          rows: _filter(const [
+            ['PQ-0028', 'Filtración en pasillo', 'En gestión', 'Laura Gómez'],
+            ['PQ-0023', 'Uso del salón', 'Por responder', 'Administración'],
+            ['M-0012', 'Descargo por ruido', 'En revisión', 'Comité'],
+            ['PQ-0020', 'Ruido nocturno', 'En espera', 'Convivencia'],
+          ]),
+        ),
+        _AdminArea.agenda => _AgendaPage(
+          query: _query,
+          onAction: () => context.push('/premium/amenities'),
+        ),
+        _AdminArea.comunicacion => _CommunicationPage(
+          query: _query,
+          onAction: () => context.push('/premium/circulars/create'),
+        ),
+        _AdminArea.finanzas => _FinancePage(query: _query),
+        _AdminArea.accesos => _AccessPage(
+          query: _query,
+          onAction: () => context.push('/premium/access-management'),
+        ),
+        _AdminArea.configuracion => _SettingsPage(
+          communityId: communityId,
+          onOpenSettings: () => context.push('/premium/settings'),
+        ),
+      };
 
   List<List<String>> _filter(List<List<String>> rows) {
     if (_query.trim().isEmpty) return rows;
@@ -299,6 +333,10 @@ class _TopBar extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
           ),
+          if (desktop) ...[
+            const _EnvironmentBadge(),
+            const SizedBox(width: 14),
+          ],
           if (desktop)
             SizedBox(
               width: 330,
@@ -344,6 +382,30 @@ class _TopBar extends StatelessWidget {
   }
 }
 
+class _EnvironmentBadge extends StatelessWidget {
+  const _EnvironmentBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1D8),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Text(
+        'DATOS DEMO',
+        style: TextStyle(
+          color: Color(0xFF8A5700),
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          letterSpacing: .5,
+        ),
+      ),
+    );
+  }
+}
+
 class _Overview extends StatelessWidget {
   const _Overview({required this.communityName, required this.onNavigate});
   final String communityName;
@@ -362,20 +424,18 @@ class _Overview extends StatelessWidget {
           onAction: () => onNavigate(_AdminArea.comunicacion),
         ),
         const SizedBox(height: 22),
-        const Wrap(
-          spacing: 14,
-          runSpacing: 14,
-          children: [
-            _Metric(label: 'Accesos por revisar', value: '3'),
-            _Metric(label: 'Solicitudes abiertas', value: '8'),
-            _Metric(label: 'Reservas de hoy', value: '5'),
-            _Metric(label: 'Recaudo de septiembre', value: '85 %'),
+        const _MetricGrid(
+          metrics: [
+            ('Accesos por revisar', '3'),
+            ('Solicitudes abiertas', '8'),
+            ('Reservas de hoy', '5'),
+            ('Recaudo de septiembre', '85 %'),
           ],
         ),
         const SizedBox(height: 18),
         LayoutBuilder(
           builder: (context, constraints) {
-            final stacked = constraints.maxWidth < 900;
+            final stacked = constraints.maxWidth < 1080;
             final attention = _Panel(
               title: 'Necesita tu atención',
               child: Column(
@@ -439,12 +499,14 @@ class _RecordsPage extends StatelessWidget {
     required this.actionLabel,
     required this.columns,
     required this.rows,
+    this.onAction,
   });
   final String title;
   final String description;
   final String actionLabel;
   final List<String> columns;
   final List<List<String>> rows;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -456,7 +518,7 @@ class _RecordsPage extends StatelessWidget {
           title: title,
           subtitle: description,
           actionLabel: actionLabel,
-          onAction: () => _showActionDialog(context, actionLabel),
+          onAction: onAction,
         ),
         const SizedBox(height: 22),
         _DataTableCard(columns: columns, rows: rows),
@@ -466,8 +528,9 @@ class _RecordsPage extends StatelessWidget {
 }
 
 class _AgendaPage extends StatelessWidget {
-  const _AgendaPage({required this.query});
+  const _AgendaPage({required this.query, required this.onAction});
   final String query;
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -499,6 +562,7 @@ class _AgendaPage extends StatelessWidget {
       title: 'Espacios y agenda',
       description: 'Reservas de zonas comunes y citas con administración.',
       actionLabel: 'Configurar disponibilidad',
+      onAction: onAction,
       columns: const ['Fecha', 'Tipo', 'Referencia', 'Estado'],
       rows: rows,
     );
@@ -506,8 +570,9 @@ class _AgendaPage extends StatelessWidget {
 }
 
 class _CommunicationPage extends StatelessWidget {
-  const _CommunicationPage({required this.query});
+  const _CommunicationPage({required this.query, required this.onAction});
   final String query;
+  final VoidCallback onAction;
   @override
   Widget build(BuildContext context) {
     const all = [
@@ -528,6 +593,7 @@ class _CommunicationPage extends StatelessWidget {
       title: 'Comunicación oficial',
       description: 'Circulares, biblioteca, versiones y asambleas.',
       actionLabel: 'Nueva circular',
+      onAction: onAction,
       columns: const ['ID', 'Publicación', 'Fecha', 'Alcance'],
       rows: rows,
     );
@@ -539,6 +605,21 @@ class _FinancePage extends StatelessWidget {
   final String query;
   @override
   Widget build(BuildContext context) {
+    const all = [
+      ['P-0034', 'Soporte Torre 2 / 301', r'$480.000', 'Por verificar'],
+      ['MOV-918', 'Mantenimiento ascensor', r'-$3.200.000', 'Publicado'],
+      ['MOV-917', 'Cuotas de administración', r'$18.640.000', 'Conciliado'],
+    ];
+    final rows = query.trim().isEmpty
+        ? all
+        : all
+              .where(
+                (row) => row
+                    .join(' ')
+                    .toLowerCase()
+                    .contains(query.trim().toLowerCase()),
+              )
+              .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -547,32 +628,21 @@ class _FinancePage extends StatelessWidget {
           title: 'Finanzas · septiembre 2026',
           subtitle: 'Cartera, movimientos, soportes y presupuesto publicado.',
           actionLabel: 'Registrar movimiento',
-          onAction: () => _showActionDialog(context, 'Registrar movimiento'),
+          onAction: () => context.push('/premium/finances/create'),
         ),
         const SizedBox(height: 22),
-        const Wrap(
-          spacing: 14,
-          runSpacing: 14,
-          children: [
-            _Metric(label: 'Presupuesto anual', value: r'$428 M'),
-            _Metric(label: 'Ejecutado', value: '67 %'),
-            _Metric(label: 'Recaudo del mes', value: r'$54,8 M'),
-            _Metric(label: 'Cartera vencida', value: r'$9,2 M'),
+        const _MetricGrid(
+          metrics: [
+            ('Presupuesto anual', r'$428 M'),
+            ('Ejecutado', '67 %'),
+            ('Recaudo del mes', r'$54,8 M'),
+            ('Cartera vencida', r'$9,2 M'),
           ],
         ),
         const SizedBox(height: 18),
-        const _DataTableCard(
-          columns: ['Referencia', 'Concepto', 'Valor', 'Estado'],
-          rows: [
-            ['P-0034', 'Soporte Torre 2 / 301', r'$480.000', 'Por verificar'],
-            ['MOV-918', 'Mantenimiento ascensor', r'-$3.200.000', 'Publicado'],
-            [
-              'MOV-917',
-              'Cuotas de administración',
-              r'$18.640.000',
-              'Conciliado',
-            ],
-          ],
+        _DataTableCard(
+          columns: const ['Referencia', 'Concepto', 'Valor', 'Estado'],
+          rows: rows,
         ),
       ],
     );
@@ -580,8 +650,9 @@ class _FinancePage extends StatelessWidget {
 }
 
 class _AccessPage extends StatelessWidget {
-  const _AccessPage({required this.query});
+  const _AccessPage({required this.query, required this.onAction});
   final String query;
+  final VoidCallback onAction;
   @override
   Widget build(BuildContext context) {
     const all = [
@@ -603,32 +674,69 @@ class _AccessPage extends StatelessWidget {
       description:
           'Operarios autorizados, validaciones QR e historial de ingresos.',
       actionLabel: 'Gestionar operarios',
+      onAction: onAction,
       columns: const ['Hora', 'Punto', 'Persona', 'Resultado'],
       rows: rows,
     );
   }
 }
 
-class _SettingsPage extends StatefulWidget {
-  const _SettingsPage();
+class _SettingsPage extends ConsumerStatefulWidget {
+  const _SettingsPage({
+    required this.communityId,
+    required this.onOpenSettings,
+  });
+  final String? communityId;
+  final VoidCallback onOpenSettings;
   @override
-  State<_SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<_SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<_SettingsPage> {
+class _SettingsPageState extends ConsumerState<_SettingsPage> {
   bool notifications = true;
   bool qrAccess = true;
   bool appointments = true;
+  bool saving = false;
+
+  Future<void> _saveModules() async {
+    final id = widget.communityId;
+    if (id == null || saving) return;
+    setState(() => saving = true);
+    try {
+      await ref.read(communityRepositoryProvider).updateCommunity(id, {
+        'adminModules': {
+          'notifications': notifications,
+          'qrAccess': qrAccess,
+          'appointments': appointments,
+        },
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Configuración guardada')));
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No se pudo guardar: $error')));
+      }
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _PageHeading(
+        _PageHeading(
           eyebrow: 'CONFIGURACIÓN',
           title: 'Configuración del conjunto',
           subtitle: 'Capacidades, equipo, permisos y plan de la comunidad.',
+          actionLabel: 'Editar datos del conjunto',
+          onAction: widget.onOpenSettings,
         ),
         const SizedBox(height: 22),
         _Panel(
@@ -649,6 +757,22 @@ class _SettingsPageState extends State<_SettingsPage> {
                 value: appointments,
                 onChanged: (v) => setState(() => appointments = v),
                 title: const Text('Agenda de citas'),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton.icon(
+                  onPressed: widget.communityId == null || saving
+                      ? null
+                      : _saveModules,
+                  icon: saving
+                      ? const SizedBox.square(
+                          dimension: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save_outlined),
+                  label: Text(saving ? 'Guardando…' : 'Guardar cambios'),
+                ),
               ),
             ],
           ),
@@ -740,7 +864,6 @@ class _Metric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 245,
       padding: const EdgeInsets.all(20),
       decoration: _cardDecoration(),
       child: Column(
@@ -764,6 +887,38 @@ class _Metric extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MetricGrid extends StatelessWidget {
+  const _MetricGrid({required this.metrics});
+
+  final List<(String, String)> metrics;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1100
+            ? 4
+            : constraints.maxWidth >= 620
+            ? 2
+            : 1;
+        const gap = 14.0;
+        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final metric in metrics)
+              SizedBox(
+                width: width,
+                child: _Metric(label: metric.$1, value: metric.$2),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -810,29 +965,22 @@ class _TaskRow extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFE7EEEB))),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Color(0xFF71827E),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: const TextStyle(color: Color(0xFF71827E), fontSize: 13),
           ),
+          const SizedBox(height: 8),
           OutlinedButton(onPressed: onTap, child: Text(action)),
         ],
       ),
@@ -876,57 +1024,66 @@ class _DataTableCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: _cardDecoration(),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowColor: WidgetStateProperty.all(const Color(0xFFF2F6F4)),
-          columns: columns
-              .map(
-                (value) => DataColumn(
-                  label: Text(
-                    value,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                ),
-              )
-              .toList(),
-          rows: rows
-              .map(
-                (row) => DataRow(
-                  cells: row.map((cell) {
-                    final isStatus = {
-                      'Por revisar',
-                      'Pendiente',
-                      'En gestión',
-                      'En revisión',
-                      'Rechazado',
-                      'Solicitada',
-                    }.contains(cell);
-                    return DataCell(
-                      isStatus
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF1D8),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                cell,
-                                style: const TextStyle(
-                                  color: Color(0xFF8A5700),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            )
-                          : Text(cell),
-                    );
-                  }).toList(),
-                ),
-              )
-              .toList(),
+      clipBehavior: Clip.antiAlias,
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: DataTable(
+              columnSpacing: 36,
+              horizontalMargin: 22,
+              headingRowColor: WidgetStateProperty.all(const Color(0xFFF2F6F4)),
+              columns: columns
+                  .map(
+                    (value) => DataColumn(
+                      label: Text(
+                        value,
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              rows: rows
+                  .map(
+                    (row) => DataRow(
+                      cells: row.map((cell) {
+                        final isStatus = {
+                          'Por revisar',
+                          'Pendiente',
+                          'En gestión',
+                          'En revisión',
+                          'Rechazado',
+                          'Solicitada',
+                          'Por verificar',
+                        }.contains(cell);
+                        return DataCell(
+                          isStatus
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 9,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFF1D8),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    cell,
+                                    style: const TextStyle(
+                                      color: Color(0xFF8A5700),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                )
+                              : Text(cell),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -941,38 +1098,3 @@ BoxDecoration _cardDecoration() => BoxDecoration(
     BoxShadow(color: Color(0x0A000000), blurRadius: 14, offset: Offset(0, 4)),
   ],
 );
-
-Future<void> _showActionDialog(BuildContext context, String title) async {
-  final controller = TextEditingController();
-  await showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        maxLines: 3,
-        decoration: const InputDecoration(
-          labelText: 'Detalle',
-          hintText: 'Escribe la información necesaria',
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
-        ),
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Borrador guardado')));
-          },
-          child: const Text('Guardar borrador'),
-        ),
-      ],
-    ),
-  );
-  controller.dispose();
-}
