@@ -152,8 +152,16 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    // Firebase is the source of truth for the app session. Close it first so
+    // an optional Google cleanup failure can never leave the user signed in.
     await _auth.signOut();
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {
+      // There may be no active Google session (email/password users), or the
+      // Google SDK may not be configured on the current platform. Firebase is
+      // already signed out, so this cleanup must not break logout.
+    }
   }
 
   // --- Helpers ---

@@ -33,6 +33,7 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _searchController = TextEditingController();
   String _query = '';
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -90,10 +91,8 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
                     displayName: user?.displayName ?? 'Administración',
                     controller: _searchController,
                     onChanged: (value) => setState(() => _query = value),
-                    onLogout: () async {
-                      await ref.read(authNotifierProvider.notifier).logout();
-                      if (context.mounted) context.go('/login');
-                    },
+                    isLoggingOut: _isLoggingOut,
+                    onLogout: _logout,
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -140,6 +139,24 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
     );
   }
 
+  Future<void> _logout() async {
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    try {
+      await ref.read(authNotifierProvider.notifier).logout();
+      if (!mounted) return;
+      context.go('/login');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo cerrar la sesión. Intenta nuevamente.'),
+        ),
+      );
+      setState(() => _isLoggingOut = false);
+    }
+  }
+
   void _selectArea(_AdminArea value) {
     setState(() {
       _area = value;
@@ -163,6 +180,7 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
           description: 'Residentes, viviendas y solicitudes de acceso.',
           actionLabel: 'Gestionar residentes',
           onAction: () => context.push('/premium/pending'),
+          onRowTap: (_) => context.push('/premium/pending'),
           columns: const ['Persona', 'Vivienda', 'Estado', 'Acción'],
           rows: _filter(const [
             ['Valentina Rojas', 'Torre 2 / 301', 'Por revisar', 'Revisar'],
@@ -176,6 +194,7 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
           description: 'PQRS, multas, descargos y conversaciones de atención.',
           actionLabel: 'Registrar solicitud',
           onAction: () => context.push('/premium/pqrs/create'),
+          onRowTap: (_) => context.push('/premium/pqrs'),
           columns: const ['Radicado', 'Asunto', 'Estado', 'Responsable'],
           rows: _filter(const [
             ['PQ-0028', 'Filtración en pasillo', 'En gestión', 'Laura Gómez'],
@@ -334,6 +353,7 @@ class _TopBar extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     required this.onLogout,
+    required this.isLoggingOut,
   });
 
   final bool desktop;
@@ -342,6 +362,7 @@ class _TopBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onLogout;
+  final bool isLoggingOut;
 
   @override
   Widget build(BuildContext context) {
@@ -394,6 +415,7 @@ class _TopBar extends StatelessWidget {
             ),
           const SizedBox(width: 14),
           PopupMenuButton<String>(
+            enabled: !isLoggingOut,
             tooltip: 'Menú de usuario',
             offset: const Offset(0, 48),
             shape: RoundedRectangleBorder(
@@ -429,15 +451,20 @@ class _TopBar extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: const Color(0xFFE0F0EA),
-                  child: Text(
-                    displayName.isEmpty
-                        ? 'AD'
-                        : displayName.substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      color: Color(0xFF07594F),
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  child: isLoggingOut
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          displayName.isEmpty
+                              ? 'AD'
+                              : displayName.substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            color: Color(0xFF07594F),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                 ),
                 if (desktop) ...[
                   const SizedBox(width: 8),
@@ -575,6 +602,7 @@ class _RecordsPage extends StatelessWidget {
     required this.columns,
     required this.rows,
     this.onAction,
+    this.onRowTap,
   });
   final String title;
   final String description;
@@ -582,6 +610,7 @@ class _RecordsPage extends StatelessWidget {
   final List<String> columns;
   final List<List<String>> rows;
   final VoidCallback? onAction;
+  final ValueChanged<int>? onRowTap;
 
   @override
   Widget build(BuildContext context) {
@@ -596,7 +625,7 @@ class _RecordsPage extends StatelessWidget {
           onAction: onAction,
         ),
         const SizedBox(height: 22),
-        _DataTableCard(columns: columns, rows: rows),
+        _DataTableCard(columns: columns, rows: rows, onRowTap: onRowTap),
       ],
     );
   }
@@ -638,6 +667,7 @@ class _AgendaPage extends StatelessWidget {
       description: 'Reservas de zonas comunes y citas con administración.',
       actionLabel: 'Configurar disponibilidad',
       onAction: onAction,
+      onRowTap: (_) => context.push('/premium/amenities'),
       columns: const ['Fecha', 'Tipo', 'Referencia', 'Estado'],
       rows: rows,
     );
@@ -669,6 +699,7 @@ class _CommunicationPage extends StatelessWidget {
       description: 'Circulares, biblioteca, versiones y asambleas.',
       actionLabel: 'Nueva circular',
       onAction: onAction,
+      onRowTap: (_) => context.push('/premium/circulars'),
       columns: const ['ID', 'Publicación', 'Fecha', 'Alcance'],
       rows: rows,
     );
@@ -718,6 +749,7 @@ class _FinancePage extends StatelessWidget {
         _DataTableCard(
           columns: const ['Referencia', 'Concepto', 'Valor', 'Estado'],
           rows: rows,
+          onRowTap: (_) => context.push('/premium/finances'),
         ),
       ],
     );
@@ -750,6 +782,7 @@ class _AccessPage extends StatelessWidget {
           'Operarios autorizados, validaciones QR e historial de ingresos.',
       actionLabel: 'Gestionar operarios',
       onAction: onAction,
+      onRowTap: (_) => context.push('/premium/access-management'),
       columns: const ['Hora', 'Punto', 'Persona', 'Resultado'],
       rows: rows,
     );
@@ -1084,9 +1117,14 @@ class _AgendaItem extends StatelessWidget {
 }
 
 class _DataTableCard extends StatelessWidget {
-  const _DataTableCard({required this.columns, required this.rows});
+  const _DataTableCard({
+    required this.columns,
+    required this.rows,
+    this.onRowTap,
+  });
   final List<String> columns;
   final List<List<String>> rows;
+  final ValueChanged<int>? onRowTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1119,10 +1157,13 @@ class _DataTableCard extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              rows: rows
+              rows: rows.indexed
                   .map(
-                    (row) => DataRow(
-                      cells: row.map((cell) {
+                    (entry) => DataRow(
+                      onSelectChanged: onRowTap == null
+                          ? null
+                          : (_) => onRowTap!(entry.$1),
+                      cells: entry.$2.map((cell) {
                         final isStatus = {
                           'Por revisar',
                           'Pendiente',
