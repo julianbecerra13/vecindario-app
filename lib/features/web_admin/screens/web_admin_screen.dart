@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
@@ -89,6 +90,10 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
                     displayName: user?.displayName ?? 'Administración',
                     controller: _searchController,
                     onChanged: (value) => setState(() => _query = value),
+                    onLogout: () async {
+                      await ref.read(authNotifierProvider.notifier).logout();
+                      if (context.mounted) context.go('/login');
+                    },
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -99,7 +104,28 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
                           constraints: const BoxConstraints(maxWidth: 1440),
                           child: SizedBox(
                             width: double.infinity,
-                            child: _buildArea(communityName, community?.id),
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 280),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              transitionBuilder: (child, animation) {
+                                final slide = Tween<Offset>(
+                                  begin: const Offset(.025, 0),
+                                  end: Offset.zero,
+                                ).animate(animation);
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: slide,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: KeyedSubtree(
+                                key: ValueKey(_area),
+                                child: _buildArea(communityName, community?.id),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -237,34 +263,42 @@ class _Sidebar extends StatelessWidget {
               for (final area in _AdminArea.values)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
-                  child: Material(
-                    color: selected == area
-                        ? const Color(0xFFE5F1ED)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    child: ListTile(
-                      dense: true,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      leading: Icon(
-                        area.icon,
-                        color: selected == area
-                            ? const Color(0xFF07594F)
-                            : Colors.white70,
-                      ),
-                      title: Text(
-                        area.label,
-                        style: TextStyle(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOut,
+                    decoration: BoxDecoration(
+                      color: selected == area
+                          ? const Color(0xFFE5F1ED)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      child: ListTile(
+                        dense: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        leading: Icon(
+                          area.icon,
                           color: selected == area
                               ? const Color(0xFF07594F)
-                              : Colors.white,
-                          fontWeight: selected == area
-                              ? FontWeight.w700
-                              : FontWeight.w500,
+                              : Colors.white70,
                         ),
+                        title: Text(
+                          area.label,
+                          style: TextStyle(
+                            color: selected == area
+                                ? const Color(0xFF07594F)
+                                : Colors.white,
+                            fontWeight: selected == area
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                        ),
+                        onTap: () => onSelect(area),
                       ),
-                      onTap: () => onSelect(area),
                     ),
                   ),
                 ),
@@ -299,6 +333,7 @@ class _TopBar extends StatelessWidget {
     required this.displayName,
     required this.controller,
     required this.onChanged,
+    required this.onLogout,
   });
 
   final bool desktop;
@@ -306,6 +341,7 @@ class _TopBar extends StatelessWidget {
   final String displayName;
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
+  final VoidCallback onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -357,25 +393,64 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           const SizedBox(width: 14),
-          CircleAvatar(
-            backgroundColor: const Color(0xFFE0F0EA),
-            child: Text(
-              displayName.isEmpty
-                  ? 'AD'
-                  : displayName.substring(0, 1).toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFF07594F),
-                fontWeight: FontWeight.w800,
+          PopupMenuButton<String>(
+            tooltip: 'Menú de usuario',
+            offset: const Offset(0, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            onSelected: (value) {
+              if (value == 'profile') context.push('/profile');
+              if (value == 'logout') onLogout();
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    Icon(Icons.person_outline_rounded),
+                    SizedBox(width: 12),
+                    Text('Mi perfil'),
+                  ],
+                ),
               ),
+              PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout_rounded),
+                    SizedBox(width: 12),
+                    Text('Cerrar sesión'),
+                  ],
+                ),
+              ),
+            ],
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: const Color(0xFFE0F0EA),
+                  child: Text(
+                    displayName.isEmpty
+                        ? 'AD'
+                        : displayName.substring(0, 1).toUpperCase(),
+                    style: const TextStyle(
+                      color: Color(0xFF07594F),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                if (desktop) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    displayName,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+                ],
+              ],
             ),
           ),
-          if (desktop) ...[
-            const SizedBox(width: 8),
-            Text(
-              displayName,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ],
         ],
       ),
     );
