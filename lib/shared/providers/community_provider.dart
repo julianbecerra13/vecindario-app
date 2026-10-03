@@ -8,3 +8,11 @@ final currentCommunityProvider = StreamProvider<CommunityModel?>((ref) {
   if (communityId == null) return Stream.value(null);
   return ref.watch(communityRepositoryProvider).watchCommunity(communityId);
 });
+
+final managedCommunitiesProvider = StreamProvider<List<CommunityModel>>((ref) {
+  final user = ref.watch(currentUserProvider).valueOrNull;
+  if (user == null || !user.isAdmin) return Stream.value(const []);
+  return ref
+      .watch(communityRepositoryProvider)
+      .watchManagedCommunities(user.id);
+});

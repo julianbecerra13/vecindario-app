@@ -27,6 +27,22 @@ class CommunityRepository {
         });
   }
 
+  /// Comunidades administradas por una misma cuenta. El esquema mantiene
+  /// `adminUid` para ser compatible con los conjuntos ya creados.
+  Stream<List<CommunityModel>> watchManagedCommunities(String adminUid) {
+    return _firestore
+        .collection(FirestorePaths.communities)
+        .where('adminUid', isEqualTo: adminUid)
+        .snapshots()
+        .map((snapshot) {
+          final communities = snapshot.docs
+              .map((doc) => CommunityModel.fromFirestore(doc.data(), doc.id))
+              .toList();
+          communities.sort((a, b) => a.name.compareTo(b.name));
+          return communities;
+        });
+  }
+
   Future<CommunityModel?> getCommunityByInviteCode(String code) async {
     final query = await _firestore
         .collection(FirestorePaths.communities)

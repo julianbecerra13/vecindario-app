@@ -17,8 +17,11 @@ service firebase.storage {
 
     function isCommunityAdmin(communityId) {
       return isAuthenticated()
-        && userData().communityId == communityId
-        && userData().communityRole == 'admin';
+        && ((userData().communityId == communityId
+             && userData().communityRole == 'admin')
+          || firestore.get(/databases/(default)/documents/communities/$(communityId)).data.adminUid == request.auth.uid
+          || ('adminUids' in firestore.get(/databases/(default)/documents/communities/$(communityId)).data
+              && request.auth.uid in firestore.get(/databases/(default)/documents/communities/$(communityId)).data.adminUids));
     }
 
     function isImage(maxBytes) {
@@ -36,6 +39,14 @@ service firebase.storage {
     }
 
     function isFeedAttachment() {
+      return request.resource != null
+        && request.resource.size <= 30 * 1024 * 1024
+        && request.resource.contentType.matches(
+          '(image/(jpeg|png|webp)|application/pdf|audio/(mpeg|mp4|wav)|video/(mp4|quicktime))'
+        );
+    }
+
+    function isCircularAttachment() {
       return request.resource != null
         && request.resource.size <= 30 * 1024 * 1024
         && request.resource.contentType.matches(
@@ -126,9 +137,9 @@ service firebase.storage {
     }
 
     match /communities/{communityId}/circulars/{circularId}/{fileName} {
-      allow read: if isVerifiedMember(communityId);
+      allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
       allow create, update, delete: if isCommunityAdmin(communityId)
-        && (request.resource == null || isDocument(10 * 1024 * 1024));
+        && (request.resource == null || isCircularAttachment());
     }
 
     match /communities/{communityId}/fines/{fineId}/{fileName} {

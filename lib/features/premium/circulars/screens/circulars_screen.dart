@@ -7,6 +7,7 @@ import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/datetime_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/core/services/media_opener.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -154,6 +155,25 @@ class _CircularCard extends ConsumerWidget {
                 style: AppTextStyles.bodySmall,
               ),
               const SizedBox(height: AppSizes.sm),
+              if (circular.attachmentURLs.isNotEmpty) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: circular.attachmentURLs.indexed
+                      .map(
+                        (entry) => ActionChip(
+                          avatar: const Icon(
+                            Icons.attach_file_rounded,
+                            size: 16,
+                          ),
+                          label: Text('Abrir archivo ${entry.$1 + 1}'),
+                          onPressed: () => openMedia(entry.$2),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: AppSizes.sm),
+              ],
               // Indicadores
               Row(
                 children: [

@@ -5,6 +5,7 @@ import 'package:vecindario_app/core/constants/app_sizes.dart';
 import 'package:vecindario_app/core/extensions/context_extensions.dart';
 import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
+import 'package:vecindario_app/core/config/backend_features.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
@@ -23,6 +24,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
   CircularPriority _priority = CircularPriority.general;
   bool _requiresSignature = false;
   bool _isLoading = false;
+  final List<String> _attachmentUrls = [];
 
   @override
   void dispose() {
@@ -36,7 +38,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
       context.showErrorSnackBar(context.l10n.circularTitleRequired);
       return;
     }
-    if (_bodyController.text.trim().isEmpty) {
+    if (_bodyController.text.trim().isEmpty && _attachmentUrls.isEmpty) {
       context.showErrorSnackBar(context.l10n.circularBodyRequired);
       return;
     }
@@ -50,6 +52,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
       id: '',
       title: _titleController.text.trim(),
       body: _bodyController.text.trim(),
+      attachmentURLs: List.unmodifiable(_attachmentUrls),
       authorUid: user.id,
       authorName: user.displayName,
       priority: _priority,
@@ -71,6 +74,46 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<void> _addAttachmentLink() async {
+    final controller = TextEditingController();
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Adjuntar documento o archivo'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          decoration: const InputDecoration(
+            labelText: 'Enlace público',
+            hintText: 'https://drive.google.com/...',
+            helperText: 'PDF, imagen, audio, video o documento',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Adjuntar'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (value == null || value.isEmpty || !mounted) return;
+    final uri = Uri.tryParse(value);
+    if (uri == null ||
+        !uri.hasScheme ||
+        !{'http', 'https'}.contains(uri.scheme)) {
+      context.showErrorSnackBar('Ingresa un enlace HTTP o HTTPS válido.');
+      return;
+    }
+    setState(() => _attachmentUrls.add(value));
   }
 
   @override
@@ -152,6 +195,66 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
             ),
             const SizedBox(height: AppSizes.md),
 
+            const Text('Documentos y archivos', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSizes.sm),
+            if (_attachmentUrls.isNotEmpty)
+              ..._attachmentUrls.indexed.map(
+                (entry) => Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.attach_file_rounded),
+                    title: Text(
+                      Uri.parse(entry.$2).pathSegments.isEmpty
+                          ? 'Archivo adjunto'
+                          : Uri.parse(entry.$2).pathSegments.last,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(
+                      entry.$2,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: IconButton(
+                      tooltip: 'Quitar archivo',
+                      onPressed: () =>
+                          setState(() => _attachmentUrls.removeAt(entry.$1)),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ),
+                ),
+              ),
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _addAttachmentLink,
+                  icon: const Icon(Icons.link_rounded),
+                  label: const Text('Adjuntar enlace'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: kMediaUploadsEnabled
+                      ? () => context.showSnackBar(
+                          'Selecciona el archivo desde tu dispositivo.',
+                        )
+                      : () => context.showSnackBar(
+                          kMediaUploadsUnavailableMessage,
+                        ),
+                  icon: const Icon(Icons.upload_file_rounded),
+                  label: const Text('Subir archivo'),
+                ),
+              ],
+            ),
+            if (!kMediaUploadsEnabled)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  'Mientras Firebase Storage no esté habilitado, puedes adjuntar enlaces públicos de Drive, PDF, imágenes, audio o video.',
+                  style: TextStyle(fontSize: 12, color: Colors.orange),
+                ),
+              ),
+            const SizedBox(height: AppSizes.md),
+
             // Opciones
             SwitchListTile(
               title: Text(
@@ -167,7 +270,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
               ),
               value: _requiresSignature,
               onChanged: (v) => setState(() => _requiresSignature = v),
-              activeColor: const Color(0xFF8B5CF6),
+              activeThumbColor: const Color(0xFF8B5CF6),
               contentPadding: EdgeInsets.zero,
             ),
           ],

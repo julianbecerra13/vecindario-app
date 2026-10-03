@@ -101,6 +101,38 @@ void main() {
       });
     });
 
+    test(
+      'watchManagedCommunities devuelve todos los conjuntos del admin',
+      () async {
+        for (final entry in [
+          ('c1', 'Cedros', 'admin-1'),
+          ('c2', 'Alameda', 'admin-1'),
+          ('c3', 'Otro', 'admin-2'),
+        ]) {
+          await firestore
+              .collection(FirestorePaths.communities)
+              .doc(entry.$1)
+              .set({
+                'name': entry.$2,
+                'address': '',
+                'city': 'Bogotá',
+                'estrato': 3,
+                'adminUid': entry.$3,
+                'inviteCode': entry.$1.toUpperCase(),
+                'memberCount': 0,
+                'unitType': 'apartment',
+                'createdAt': DateTime.now(),
+              });
+        }
+
+        final communities = await repository
+            .watchManagedCommunities('admin-1')
+            .first;
+
+        expect(communities.map((item) => item.id), ['c2', 'c1']);
+      },
+    );
+
     group('getCommunityByInviteCode', () {
       test('encuentra comunidad por código invitación', () async {
         // Arrange

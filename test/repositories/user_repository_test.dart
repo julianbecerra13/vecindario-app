@@ -124,5 +124,62 @@ void main() {
         expect(pending.first.displayName, 'Pendiente');
       },
     );
+
+    test('reviewResident aprueba y actualiza el contador', () async {
+      await fakeFirestore.collection('communities').doc('comm1').set({
+        'memberCount': 4,
+      });
+      await fakeFirestore.collection('users').doc('pending').set({
+        'displayName': 'Pendiente',
+        'email': 'p@t.com',
+        'communityId': 'comm1',
+        'verified': false,
+        'createdAt': DateTime.now(),
+      });
+
+      await repo.reviewResident(
+        uid: 'pending',
+        communityId: 'comm1',
+        reviewerUid: 'admin1',
+        approve: true,
+      );
+
+      final user = await fakeFirestore.collection('users').doc('pending').get();
+      final community = await fakeFirestore
+          .collection('communities')
+          .doc('comm1')
+          .get();
+      expect(user.data()!['verified'], true);
+      expect(user.data()!['verifiedBy'], 'admin1');
+      expect(community.data()!['memberCount'], 5);
+    });
+
+    test('reviewResident rechaza y desvincula la solicitud', () async {
+      await fakeFirestore.collection('communities').doc('comm1').set({
+        'memberCount': 4,
+      });
+      await fakeFirestore.collection('users').doc('pending').set({
+        'displayName': 'Pendiente',
+        'email': 'p@t.com',
+        'communityId': 'comm1',
+        'tower': '2',
+        'apartment': '301',
+        'verified': false,
+        'createdAt': DateTime.now(),
+      });
+
+      await repo.reviewResident(
+        uid: 'pending',
+        communityId: 'comm1',
+        reviewerUid: 'admin1',
+        approve: false,
+      );
+
+      final user = await fakeFirestore.collection('users').doc('pending').get();
+      expect(user.data()!['communityId'], isNull);
+      expect(user.data()!['tower'], isNull);
+      expect(user.data()!['apartment'], isNull);
+      expect(user.data()!['verified'], false);
+    });
   });
 }

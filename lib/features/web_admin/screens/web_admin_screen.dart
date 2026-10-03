@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/features/admin/providers/admin_providers.dart';
 import 'package:vecindario_app/features/auth/providers/auth_notifier.dart';
+import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
+import 'package:vecindario_app/shared/models/community_model.dart';
 import 'package:vecindario_app/shared/providers/community_provider.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
@@ -55,6 +59,8 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
   Widget build(BuildContext context) {
     final community = ref.watch(currentCommunityProvider).valueOrNull;
     final user = ref.watch(currentUserProvider).valueOrNull;
+    final managedCommunities =
+        ref.watch(managedCommunitiesProvider).valueOrNull ?? const [];
     final communityName = community?.name ?? 'Mirador de los Cedros';
     final desktop = MediaQuery.sizeOf(context).width >= 940;
 
@@ -88,6 +94,12 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
                   _TopBar(
                     desktop: desktop,
                     communityName: communityName,
+                    selectedCommunityId: community?.id,
+                    managedCommunities: managedCommunities,
+                    onCommunitySelected: (communityId) {
+                      ref.read(selectedCommunityIdProvider.notifier).state =
+                          communityId;
+                    },
                     displayName: user?.displayName ?? 'Administración',
                     controller: _searchController,
                     onChanged: (value) => setState(() => _query = value),
@@ -171,48 +183,22 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
 
   Widget _buildArea(String communityName, String? communityId) =>
       switch (_area) {
-        _AdminArea.resumen => _Overview(
+        _AdminArea.resumen => _LiveOverview(
           communityName: communityName,
           onNavigate: _selectArea,
         ),
-        _AdminArea.comunidad => _RecordsPage(
-          title: 'Personas y viviendas',
-          description: 'Residentes, viviendas y solicitudes de acceso.',
-          actionLabel: 'Gestionar residentes',
-          onAction: () => context.push('/premium/pending'),
-          onRowTap: (_) => context.push('/premium/pending'),
-          columns: const ['Persona', 'Vivienda', 'Estado', 'Acción'],
-          rows: _filter(const [
-            ['Valentina Rojas', 'Torre 2 / 301', 'Por revisar', 'Revisar'],
-            ['Carlos Méndez', 'Torre 1 / 504', 'Verificado', 'Abrir'],
-            ['Ana Torres', 'Torre 3 / 102', 'Verificado', 'Abrir'],
-            ['Mateo Gómez', 'Torre 2 / 606', 'Pendiente', 'Revisar'],
-          ]),
-        ),
-        _AdminArea.atencion => _RecordsPage(
-          title: 'Solicitudes de la comunidad',
-          description: 'PQRS, multas, descargos y conversaciones de atención.',
-          actionLabel: 'Registrar solicitud',
-          onAction: () => context.push('/premium/pqrs/create'),
-          onRowTap: (_) => context.push('/premium/pqrs'),
-          columns: const ['Radicado', 'Asunto', 'Estado', 'Responsable'],
-          rows: _filter(const [
-            ['PQ-0028', 'Filtración en pasillo', 'En gestión', 'Laura Gómez'],
-            ['PQ-0023', 'Uso del salón', 'Por responder', 'Administración'],
-            ['M-0012', 'Descargo por ruido', 'En revisión', 'Comité'],
-            ['PQ-0020', 'Ruido nocturno', 'En espera', 'Convivencia'],
-          ]),
-        ),
+        _AdminArea.comunidad => _PendingResidentsArea(query: _query),
+        _AdminArea.atencion => _PqrsArea(query: _query),
         _AdminArea.agenda => _AgendaPage(
           query: _query,
           onAction: () => context.push('/premium/amenities'),
         ),
-        _AdminArea.comunicacion => _CommunicationPage(
+        _AdminArea.comunicacion => _LiveCommunicationPage(
           query: _query,
           onAction: () => context.push('/premium/circulars/create'),
         ),
-        _AdminArea.finanzas => _FinancePage(query: _query),
-        _AdminArea.accesos => _AccessPage(
+        _AdminArea.finanzas => _LiveFinancePage(query: _query),
+        _AdminArea.accesos => _LiveAccessPage(
           query: _query,
           onAction: () => context.push('/premium/access-management'),
         ),
@@ -221,14 +207,6 @@ class _WebAdminScreenState extends ConsumerState<WebAdminScreen> {
           onOpenSettings: () => context.push('/premium/settings'),
         ),
       };
-
-  List<List<String>> _filter(List<List<String>> rows) {
-    if (_query.trim().isEmpty) return rows;
-    final query = _query.toLowerCase();
-    return rows
-        .where((row) => row.any((cell) => cell.toLowerCase().contains(query)))
-        .toList();
-  }
 }
 
 class _Sidebar extends StatelessWidget {
@@ -349,6 +327,9 @@ class _TopBar extends StatelessWidget {
   const _TopBar({
     required this.desktop,
     required this.communityName,
+    required this.selectedCommunityId,
+    required this.managedCommunities,
+    required this.onCommunitySelected,
     required this.displayName,
     required this.controller,
     required this.onChanged,
@@ -358,6 +339,9 @@ class _TopBar extends StatelessWidget {
 
   final bool desktop;
   final String communityName;
+  final String? selectedCommunityId;
+  final List<CommunityModel> managedCommunities;
+  final ValueChanged<String?> onCommunitySelected;
   final String displayName;
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -384,11 +368,43 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           Expanded(
-            child: Text(
-              communityName,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-            ),
+            child: managedCommunities.length > 1
+                ? DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value:
+                          managedCommunities.any(
+                            (item) => item.id == selectedCommunityId,
+                          )
+                          ? selectedCommunityId
+                          : managedCommunities.first.id,
+                      isExpanded: false,
+                      icon: const Icon(Icons.expand_more_rounded),
+                      items: managedCommunities
+                          .map<DropdownMenuItem<String>>(
+                            (item) => DropdownMenuItem<String>(
+                              value: item.id,
+                              child: Text(
+                                item.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: onCommunitySelected,
+                    ),
+                  )
+                : Text(
+                    communityName,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
           ),
           if (desktop) ...[
             const _EnvironmentBadge(),
@@ -508,90 +524,476 @@ class _EnvironmentBadge extends StatelessWidget {
   }
 }
 
-class _Overview extends StatelessWidget {
-  const _Overview({required this.communityName, required this.onNavigate});
+class _LiveOverview extends ConsumerWidget {
+  const _LiveOverview({required this.communityName, required this.onNavigate});
   final String communityName;
   final ValueChanged<_AdminArea> onNavigate;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pending = ref.watch(pendingResidentsProvider);
+    final pqrs = ref.watch(allPqrsProvider);
+    final circulars = ref.watch(circularsProvider);
+    final finances = ref.watch(financesProvider);
+    final hasError = [
+      pending,
+      pqrs,
+      circulars,
+      finances,
+    ].any((v) => v.hasError);
+    final isLoading = [
+      pending,
+      pqrs,
+      circulars,
+      finances,
+    ].any((v) => v.isLoading);
+    final income =
+        finances.valueOrNull
+            ?.where((entry) => entry.type.name == 'income')
+            .fold<int>(0, (total, entry) => total + entry.amount) ??
+        0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _PageHeading(
-          eyebrow: 'W01 / RESUMEN',
+          eyebrow: 'RESUMEN EN TIEMPO REAL',
           title: 'Hoy en tu comunidad',
           subtitle: communityName,
           actionLabel: 'Crear circular',
           onAction: () => onNavigate(_AdminArea.comunicacion),
         ),
         const SizedBox(height: 22),
-        const _MetricGrid(
-          metrics: [
-            ('Accesos por revisar', '3'),
-            ('Solicitudes abiertas', '8'),
-            ('Reservas de hoy', '5'),
-            ('Recaudo de septiembre', '85 %'),
-          ],
-        ),
+        if (isLoading) const LinearProgressIndicator(),
+        if (hasError)
+          const _Panel(
+            title: 'No pudimos actualizar el resumen',
+            child: Text('Revisa la conexión o los permisos de Firebase.'),
+          )
+        else
+          _MetricGrid(
+            metrics: [
+              ('Accesos por revisar', '${pending.valueOrNull?.length ?? 0}'),
+              (
+                'Solicitudes abiertas',
+                '${pqrs.valueOrNull?.where((item) => item.status.name != 'closed' && item.status.name != 'resolved').length ?? 0}',
+              ),
+              (
+                'Circulares publicadas',
+                '${circulars.valueOrNull?.length ?? 0}',
+              ),
+              ('Ingresos registrados', _money(income)),
+            ],
+          ),
         const SizedBox(height: 18),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final stacked = constraints.maxWidth < 1080;
-            final attention = _Panel(
-              title: 'Necesita tu atención',
-              child: Column(
-                children: [
-                  _TaskRow(
-                    title: 'Alta de Valentina · Torre 2 / 301',
-                    subtitle: 'Revisar identidad y vínculo con vivienda',
-                    action: 'Revisar',
-                    onTap: () => onNavigate(_AdminArea.comunidad),
-                  ),
-                  _TaskRow(
-                    title: 'PQ-0028 · Filtración en pasillo',
-                    subtitle: 'Mantenimiento · Actualizada hace 2 h',
-                    action: 'Atender',
-                    onTap: () => onNavigate(_AdminArea.atencion),
-                  ),
-                  _TaskRow(
-                    title: '3 soportes de pago por verificar',
-                    subtitle: 'No están aplicados al saldo',
-                    action: 'Revisar',
-                    onTap: () => onNavigate(_AdminArea.finanzas),
-                  ),
-                ],
+        _Panel(
+          title: 'Acciones pendientes',
+          child: Column(
+            children: [
+              _TaskRow(
+                title:
+                    '${pending.valueOrNull?.length ?? 0} solicitudes de ingreso',
+                subtitle: 'Aprobar o rechazar residentes sin salir del panel',
+                action: 'Gestionar',
+                onTap: () => onNavigate(_AdminArea.comunidad),
               ),
-            );
-            const agenda = _Panel(
-              title: 'Agenda del conjunto',
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _AgendaItem('2:00 p. m. · Zona BBQ', 'Reserva R-0086'),
-                  _AgendaItem('3:00 p. m. · Inspección', 'PQ-0028'),
-                  _AgendaItem('Mañana · Ascensor Torre 2', 'Mantenimiento'),
-                ],
+              _TaskRow(
+                title:
+                    '${pqrs.valueOrNull?.where((item) => item.status.name == 'received').length ?? 0} PQRS nuevas',
+                subtitle: 'Solicitudes pendientes de primera respuesta',
+                action: 'Atender',
+                onTap: () => onNavigate(_AdminArea.atencion),
               ),
-            );
-            if (stacked) {
-              return Column(
-                children: [attention, const SizedBox(height: 14), agenda],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PendingResidentsArea extends ConsumerStatefulWidget {
+  const _PendingResidentsArea({required this.query});
+  final String query;
+
+  @override
+  ConsumerState<_PendingResidentsArea> createState() =>
+      _PendingResidentsAreaState();
+}
+
+class _PendingResidentsAreaState extends ConsumerState<_PendingResidentsArea> {
+  final Set<String> _selected = {};
+  final Set<String> _busy = {};
+
+  Future<void> _decide(String uid, bool approve) async {
+    final communityId = ref.read(currentCommunityIdProvider);
+    if (communityId == null || _busy.contains(uid)) return;
+    setState(() => _busy.add(uid));
+    try {
+      final reviewer = ref.read(currentUserProvider).valueOrNull;
+      if (reviewer == null) return;
+      await ref
+          .read(userRepositoryProvider)
+          .reviewResident(
+            uid: uid,
+            communityId: communityId,
+            reviewerUid: reviewer.id,
+            approve: approve,
+          );
+      if (mounted) {
+        setState(() => _selected.remove(uid));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              approve ? 'Residente aprobado' : 'Solicitud rechazada',
+            ),
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo completar la acción: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy.remove(uid));
+    }
+  }
+
+  Future<void> _decideSelected(bool approve) async {
+    for (final uid in _selected.toList()) {
+      await _decide(uid, approve);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = ref.watch(pendingResidentsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _PageHeading(
+          eyebrow: 'OPERACIÓN',
+          title: 'Personas y viviendas',
+          subtitle:
+              'Aprueba o rechaza solicitudes directamente desde la lista.',
+        ),
+        const SizedBox(height: 16),
+        if (_selected.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Wrap(
+              spacing: 10,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => _decideSelected(true),
+                  icon: const Icon(Icons.check_rounded),
+                  label: Text('Aprobar (${_selected.length})'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _decideSelected(false),
+                  icon: const Icon(Icons.close_rounded),
+                  label: Text('Rechazar (${_selected.length})'),
+                ),
+              ],
+            ),
+          ),
+        pending.when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => _Panel(
+            title: 'No se pudieron cargar las solicitudes',
+            child: Text('$error'),
+          ),
+          data: (residents) {
+            final query = widget.query.trim().toLowerCase();
+            final filtered = residents
+                .where(
+                  (user) =>
+                      query.isEmpty ||
+                      '${user.displayName} ${user.email} ${user.unitInfo}'
+                          .toLowerCase()
+                          .contains(query),
+                )
+                .toList();
+            if (filtered.isEmpty) {
+              return const _Panel(
+                title: 'Todo al día',
+                child: Text(
+                  'No hay solicitudes pendientes para esta comunidad.',
+                ),
               );
             }
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 3, child: attention),
-                const SizedBox(width: 14),
-                const Expanded(flex: 2, child: agenda),
-              ],
+            return Container(
+              decoration: _cardDecoration(),
+              child: Column(
+                children: filtered.map((user) {
+                  final busy = _busy.contains(user.id);
+                  return CheckboxListTile(
+                    value: _selected.contains(user.id),
+                    onChanged: busy
+                        ? null
+                        : (checked) => setState(() {
+                            if (checked ?? false) {
+                              _selected.add(user.id);
+                            } else {
+                              _selected.remove(user.id);
+                            }
+                          }),
+                    title: Text(user.displayName),
+                    subtitle: Text('${user.unitInfo} · ${user.email}'),
+                    secondary: busy
+                        ? const SizedBox.square(
+                            dimension: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Wrap(
+                            spacing: 4,
+                            children: [
+                              IconButton(
+                                tooltip: 'Rechazar',
+                                onPressed: () => _decide(user.id, false),
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              IconButton.filledTonal(
+                                tooltip: 'Aprobar',
+                                onPressed: () => _decide(user.id, true),
+                                icon: const Icon(Icons.check_rounded),
+                              ),
+                            ],
+                          ),
+                  );
+                }).toList(),
+              ),
             );
           },
         ),
       ],
     );
   }
+}
+
+class _PqrsArea extends ConsumerWidget {
+  const _PqrsArea({required this.query});
+  final String query;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(allPqrsProvider)
+        .when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) =>
+              _Panel(title: 'Error al cargar PQRS', child: Text('$error')),
+          data: (items) {
+            final filtered = items.where((item) {
+              final text =
+                  '${item.type.label} ${item.category.label} ${item.description} ${item.residentName}'
+                      .toLowerCase();
+              return query.trim().isEmpty ||
+                  text.contains(query.trim().toLowerCase());
+            }).toList();
+            return _RecordsPage(
+              title: 'Solicitudes de la comunidad',
+              description:
+                  'PQRS reales recibidas desde la aplicación del residente.',
+              actionLabel: 'Registrar solicitud',
+              onAction: () => context.push('/premium/pqrs/create'),
+              onRowTap: (_) => context.push('/premium/pqrs'),
+              columns: const ['Residente', 'Tipo', 'Categoría', 'Estado'],
+              rows: filtered
+                  .map(
+                    (item) => [
+                      item.residentName,
+                      item.type.label,
+                      item.category.label,
+                      item.status.label,
+                    ],
+                  )
+                  .toList(),
+            );
+          },
+        );
+  }
+}
+
+class _LiveCommunicationPage extends ConsumerWidget {
+  const _LiveCommunicationPage({required this.query, required this.onAction});
+  final String query;
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(circularsProvider)
+        .when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) => _Panel(
+            title: 'Error al cargar circulares',
+            child: Text('$error'),
+          ),
+          data: (items) {
+            final filtered = items
+                .where(
+                  (item) =>
+                      query.trim().isEmpty ||
+                      '${item.title} ${item.body}'.toLowerCase().contains(
+                        query.trim().toLowerCase(),
+                      ),
+                )
+                .toList();
+            return _RecordsPage(
+              title: 'Comunicación oficial',
+              description: 'Circulares sincronizadas con la aplicación móvil.',
+              actionLabel: 'Nueva circular',
+              onAction: onAction,
+              onRowTap: (_) => context.push('/premium/circulars'),
+              columns: const [
+                'Publicación',
+                'Prioridad',
+                'Adjuntos',
+                'Lecturas',
+              ],
+              rows: filtered
+                  .map(
+                    (item) => [
+                      item.title,
+                      item.priority.label,
+                      '${item.attachmentURLs.length}',
+                      '${item.readBy.length}',
+                    ],
+                  )
+                  .toList(),
+            );
+          },
+        );
+  }
+}
+
+class _LiveFinancePage extends ConsumerWidget {
+  const _LiveFinancePage({required this.query});
+  final String query;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(financesProvider)
+        .when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) =>
+              _Panel(title: 'Error al cargar finanzas', child: Text('$error')),
+          data: (entries) {
+            final filtered = entries
+                .where(
+                  (entry) =>
+                      query.trim().isEmpty ||
+                      '${entry.category} ${entry.description}'
+                          .toLowerCase()
+                          .contains(query.trim().toLowerCase()),
+                )
+                .toList();
+            return _RecordsPage(
+              title: 'Finanzas',
+              description: 'Movimientos reales publicados para la comunidad.',
+              actionLabel: 'Registrar movimiento',
+              onAction: () => context.push('/premium/finances/create'),
+              onRowTap: (_) => context.push('/premium/finances'),
+              columns: const ['Tipo', 'Categoría', 'Descripción', 'Valor'],
+              rows: filtered
+                  .map(
+                    (entry) => [
+                      entry.type.label,
+                      entry.category,
+                      entry.description,
+                      _money(entry.amount),
+                    ],
+                  )
+                  .toList(),
+            );
+          },
+        );
+  }
+}
+
+class _LiveAccessPage extends ConsumerWidget {
+  const _LiveAccessPage({required this.query, required this.onAction});
+  final String query;
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final communityId = ref.watch(currentCommunityIdProvider);
+    if (communityId == null) {
+      return const _Panel(
+        title: 'Sin comunidad',
+        child: Text('Selecciona una comunidad.'),
+      );
+    }
+    final stream = ref
+        .watch(firestoreProvider)
+        .collection('communities')
+        .doc(communityId)
+        .collection('access_logs')
+        .orderBy('createdAt', descending: true)
+        .limit(100)
+        .snapshots();
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: stream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _Panel(
+            title: 'Error al cargar accesos',
+            child: Text('${snapshot.error}'),
+          );
+        }
+        if (!snapshot.hasData) return const LinearProgressIndicator();
+        final rows = snapshot.data!.docs
+            .map((doc) {
+              final data = doc.data();
+              final date = (data['createdAt'] as Timestamp?)?.toDate();
+              return [
+                date == null
+                    ? 'Pendiente'
+                    : '${date.day}/${date.month} ${date.hour}:${date.minute.toString().padLeft(2, '0')}',
+                data['zone'] as String? ?? 'Sin zona',
+                '${data['residents'] ?? 0}',
+                '${data['visitors'] ?? 0}',
+              ];
+            })
+            .where(
+              (row) =>
+                  query.trim().isEmpty ||
+                  row
+                      .join(' ')
+                      .toLowerCase()
+                      .contains(query.trim().toLowerCase()),
+            )
+            .toList();
+        return _RecordsPage(
+          title: 'Accesos y operarios',
+          description: 'Historial real de validaciones QR.',
+          actionLabel: 'Gestionar operarios',
+          onAction: onAction,
+          onRowTap: (_) => context.push('/premium/access-management'),
+          columns: const ['Fecha', 'Punto', 'Residentes', 'Visitantes'],
+          rows: rows,
+        );
+      },
+    );
+  }
+}
+
+String _money(int value) {
+  final digits = value.abs().toString();
+  final buffer = StringBuffer();
+  for (var i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 == 0) buffer.write('.');
+    buffer.write(digits[i]);
+  }
+  return '${value < 0 ? '-' : ''}\$${buffer.toString()}';
 }
 
 class _RecordsPage extends StatelessWidget {
@@ -631,161 +1033,48 @@ class _RecordsPage extends StatelessWidget {
   }
 }
 
-class _AgendaPage extends StatelessWidget {
+class _AgendaPage extends ConsumerWidget {
   const _AgendaPage({required this.query, required this.onAction});
   final String query;
   final VoidCallback onAction;
 
   @override
-  Widget build(BuildContext context) {
-    const events = [
-      ['Hoy · 2:00 p. m.', 'Zona BBQ', 'Reserva R-0086', 'Confirmada'],
-      [
-        'Hoy · 3:00 p. m.',
-        'Cita administración',
-        'Valentina Rojas',
-        'Confirmada',
-      ],
-      ['Mañana · 9:00 a. m.', 'Salón social', 'Reserva R-0089', 'Pendiente'],
-      [
-        'Viernes · 4:30 p. m.',
-        'Cita administración',
-        'Carlos Méndez',
-        'Solicitada',
-      ],
-    ];
-    final rows = query.isEmpty
-        ? events
-        : events
-              .where(
-                (row) =>
-                    row.join(' ').toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
-    return _RecordsPage(
-      title: 'Espacios y agenda',
-      description: 'Reservas de zonas comunes y citas con administración.',
-      actionLabel: 'Configurar disponibilidad',
-      onAction: onAction,
-      onRowTap: (_) => context.push('/premium/amenities'),
-      columns: const ['Fecha', 'Tipo', 'Referencia', 'Estado'],
-      rows: rows,
-    );
-  }
-}
-
-class _CommunicationPage extends StatelessWidget {
-  const _CommunicationPage({required this.query, required this.onAction});
-  final String query;
-  final VoidCallback onAction;
-  @override
-  Widget build(BuildContext context) {
-    const all = [
-      ['C-0041', 'Mantenimiento del ascensor', '25 sep', '82 % leído'],
-      ['C-0040', 'Cierre temporal de piscina', '22 sep', '91 % leído'],
-      ['A-0018', 'Asamblea extraordinaria', '18 sep', '76 % leído'],
-      ['DOC-12', 'Manual de convivencia v3', '10 sep', 'Publicado'],
-    ];
-    final rows = query.isEmpty
-        ? all
-        : all
-              .where(
-                (row) =>
-                    row.join(' ').toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
-    return _RecordsPage(
-      title: 'Comunicación oficial',
-      description: 'Circulares, biblioteca, versiones y asambleas.',
-      actionLabel: 'Nueva circular',
-      onAction: onAction,
-      onRowTap: (_) => context.push('/premium/circulars'),
-      columns: const ['ID', 'Publicación', 'Fecha', 'Alcance'],
-      rows: rows,
-    );
-  }
-}
-
-class _FinancePage extends StatelessWidget {
-  const _FinancePage({required this.query});
-  final String query;
-  @override
-  Widget build(BuildContext context) {
-    const all = [
-      ['P-0034', 'Soporte Torre 2 / 301', r'$480.000', 'Por verificar'],
-      ['MOV-918', 'Mantenimiento ascensor', r'-$3.200.000', 'Publicado'],
-      ['MOV-917', 'Cuotas de administración', r'$18.640.000', 'Conciliado'],
-    ];
-    final rows = query.trim().isEmpty
-        ? all
-        : all
-              .where(
-                (row) => row
-                    .join(' ')
-                    .toLowerCase()
-                    .contains(query.trim().toLowerCase()),
-              )
-              .toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _PageHeading(
-          eyebrow: 'W13 / FINANZAS',
-          title: 'Finanzas · septiembre 2026',
-          subtitle: 'Cartera, movimientos, soportes y presupuesto publicado.',
-          actionLabel: 'Registrar movimiento',
-          onAction: () => context.push('/premium/finances/create'),
-        ),
-        const SizedBox(height: 22),
-        const _MetricGrid(
-          metrics: [
-            ('Presupuesto anual', r'$428 M'),
-            ('Ejecutado', '67 %'),
-            ('Recaudo del mes', r'$54,8 M'),
-            ('Cartera vencida', r'$9,2 M'),
-          ],
-        ),
-        const SizedBox(height: 18),
-        _DataTableCard(
-          columns: const ['Referencia', 'Concepto', 'Valor', 'Estado'],
-          rows: rows,
-          onRowTap: (_) => context.push('/premium/finances'),
-        ),
-      ],
-    );
-  }
-}
-
-class _AccessPage extends StatelessWidget {
-  const _AccessPage({required this.query, required this.onAction});
-  final String query;
-  final VoidCallback onAction;
-  @override
-  Widget build(BuildContext context) {
-    const all = [
-      ['14:22', 'Piscina', 'Valentina Rojas', 'Permitido'],
-      ['14:18', 'Portería', 'Visitante · Andrés P.', 'Permitido'],
-      ['13:55', 'Piscina', 'QR vencido', 'Rechazado'],
-      ['13:42', 'Gimnasio', 'Carlos Méndez', 'Permitido'],
-    ];
-    final rows = query.isEmpty
-        ? all
-        : all
-              .where(
-                (row) =>
-                    row.join(' ').toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
-    return _RecordsPage(
-      title: 'Accesos y operarios',
-      description:
-          'Operarios autorizados, validaciones QR e historial de ingresos.',
-      actionLabel: 'Gestionar operarios',
-      onAction: onAction,
-      onRowTap: (_) => context.push('/premium/access-management'),
-      columns: const ['Hora', 'Punto', 'Persona', 'Resultado'],
-      rows: rows,
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref
+        .watch(amenitiesProvider)
+        .when(
+          loading: () => const LinearProgressIndicator(),
+          error: (error, _) =>
+              _Panel(title: 'Error al cargar espacios', child: Text('$error')),
+          data: (amenities) {
+            final rows = amenities
+                .where(
+                  (item) =>
+                      query.trim().isEmpty ||
+                      '${item.name} ${item.description} ${item.hours}'
+                          .toLowerCase()
+                          .contains(query.trim().toLowerCase()),
+                )
+                .map(
+                  (item) => [
+                    item.name,
+                    item.hours,
+                    '${item.capacity} personas',
+                    _money(item.hourlyRate),
+                  ],
+                )
+                .toList();
+            return _RecordsPage(
+              title: 'Espacios y agenda',
+              description: 'Zonas sociales disponibles para reservas.',
+              actionLabel: 'Configurar disponibilidad',
+              onAction: onAction,
+              onRowTap: (_) => context.push('/premium/amenities'),
+              columns: const ['Espacio', 'Horario', 'Capacidad', 'Tarifa'],
+              rows: rows,
+            );
+          },
+        );
   }
 }
 
@@ -886,13 +1175,11 @@ class _SettingsPageState extends ConsumerState<_SettingsPage> {
           ),
         ),
         const SizedBox(height: 14),
-        const _DataTableCard(
-          columns: ['Miembro', 'Rol', 'Alcance', 'Estado'],
-          rows: [
-            ['Laura Gómez', 'Administradora', 'Todos los módulos', 'Activo'],
-            ['Jairo Rodríguez', 'Operario', 'Accesos', 'Activo'],
-            ['Marcela Díaz', 'Contabilidad', 'Finanzas', 'Invitación enviada'],
-          ],
+        const _Panel(
+          title: 'Equipo y permisos',
+          child: Text(
+            'La administración de operarios se realiza desde Accesos. No se muestran usuarios simulados.',
+          ),
         ),
       ],
     );
@@ -1094,26 +1381,6 @@ class _TaskRow extends StatelessWidget {
       ),
     );
   }
-}
-
-class _AgendaItem extends StatelessWidget {
-  const _AgendaItem(this.title, this.subtitle);
-  final String title;
-  final String subtitle;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 9),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-        Text(
-          subtitle,
-          style: const TextStyle(color: Color(0xFF71827E), fontSize: 13),
-        ),
-      ],
-    ),
-  );
 }
 
 class _DataTableCard extends StatelessWidget {

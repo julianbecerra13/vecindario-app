@@ -130,4 +130,42 @@ class UserRepository {
               .toList(),
         );
   }
+
+  /// Aprueba o rechaza una solicitud desde el panel administrativo. La
+  /// transacción mantiene sincronizados el usuario y el contador comunitario.
+  Future<void> reviewResident({
+    required String uid,
+    required String communityId,
+    required String reviewerUid,
+    required bool approve,
+  }) async {
+    final userRef = _firestore.collection(FirestorePaths.users).doc(uid);
+    final communityRef = _firestore
+        .collection(FirestorePaths.communities)
+        .doc(communityId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(userRef);
+      final data = snapshot.data();
+      if (data == null || data['communityId'] != communityId) {
+        throw StateError('La solicitud ya no pertenece a este conjunto.');
+      }
+      if (approve) {
+        transaction.update(userRef, {
+          'verified': true,
+          'verifiedAt': FieldValue.serverTimestamp(),
+          'verifiedBy': reviewerUid,
+        });
+        transaction.update(communityRef, {
+          'memberCount': FieldValue.increment(1),
+        });
+      } else {
+        transaction.update(userRef, {
+          'communityId': null,
+          'tower': null,
+          'apartment': null,
+          'verified': false,
+        });
+      }
+    });
+  }
 }

@@ -20,7 +20,12 @@ service cloud.firestore {
     }
 
     function isCommunityAdmin(communityId) {
-      return isCommunityMember(communityId) && getUserData().communityRole == 'admin';
+      return isAuthenticated() && (
+        (isCommunityMember(communityId) && getUserData().communityRole == 'admin')
+        || get(/databases/$(database)/documents/communities/$(communityId)).data.adminUid == request.auth.uid
+        || ('adminUids' in get(/databases/$(database)/documents/communities/$(communityId)).data
+            && request.auth.uid in get(/databases/$(database)/documents/communities/$(communityId)).data.adminUids)
+      );
     }
 
     function isVerified() {
@@ -59,6 +64,18 @@ service cloud.firestore {
             || (resource.data.communityId == null
                 && resource.data.verified == false
                 && request.resource.data.verified == false));
+      allow update: if isCommunityAdmin(resource.data.communityId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'verified', 'verifiedAt', 'verifiedBy', 'communityId', 'tower',
+          'apartment'
+        ])
+        && (
+          (request.resource.data.verified == true
+            && request.resource.data.communityId == resource.data.communityId
+            && request.resource.data.verifiedBy == request.auth.uid)
+          || (request.resource.data.verified == false
+            && request.resource.data.communityId == null)
+        );
       allow delete: if false;
 
       // Notificaciones del usuario
@@ -216,7 +233,10 @@ service cloud.firestore {
     }
 
     match /communities/{communityId} {
-      allow read: if isCommunityMember(communityId) || isSuperAdmin();
+      allow read: if isCommunityMember(communityId)
+        || resource.data.adminUid == request.auth.uid
+        || ('adminUids' in resource.data && request.auth.uid in resource.data.adminUids)
+        || isSuperAdmin();
       allow create: if isSuperAdmin();
       allow update: if isCommunityAdmin(communityId) || isSuperAdmin();
       allow delete: if isSuperAdmin();
@@ -268,7 +288,7 @@ service cloud.firestore {
 
       // Circulares oficiales
       match /circulars/{circularId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create: if isCommunityAdmin(communityId);
         allow update: if isCommunityAdmin(communityId)
           || (isVerifiedMember(communityId)
@@ -296,7 +316,7 @@ service cloud.firestore {
 
       // Amenidades (zonas sociales)
       match /amenities/{amenityId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create, update, delete: if isCommunityAdmin(communityId);
       }
 
@@ -316,13 +336,13 @@ service cloud.firestore {
 
       // Finanzas
       match /finances/{financeId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create, update, delete: if isCommunityAdmin(communityId);
       }
 
       // Presupuestos
       match /budgets/{budgetId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create, update, delete: if isCommunityAdmin(communityId);
       }
 
@@ -336,13 +356,13 @@ service cloud.firestore {
 
       // Manual de convivencia
       match /manual_versions/{versionId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create, update, delete: if isCommunityAdmin(communityId);
       }
 
       // Asambleas
       match /assemblies/{assemblyId} {
-        allow read: if isVerifiedMember(communityId);
+        allow read: if isVerifiedMember(communityId) || isCommunityAdmin(communityId);
         allow create, update: if isCommunityAdmin(communityId);
         allow delete: if false;
       }

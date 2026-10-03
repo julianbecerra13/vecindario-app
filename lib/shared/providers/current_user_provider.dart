@@ -27,9 +27,18 @@ final currentUserProvider = StreamProvider<UserModel?>((ref) {
   );
 });
 
+/// Conjunto seleccionado en el panel web por un administrador que gestiona
+/// más de una comunidad. Para residentes permanece nulo y se usa su conjunto.
+final selectedCommunityIdProvider = StateProvider<String?>((ref) => null);
+
 final currentCommunityIdProvider = Provider<String?>((ref) {
   final userAsync = ref.watch(currentUserProvider);
-  return userAsync.whenOrNull(data: (user) => user?.communityId);
+  final user = userAsync.valueOrNull;
+  if (user == null) return null;
+  if (user.isAdmin) {
+    return ref.watch(selectedCommunityIdProvider) ?? user.communityId;
+  }
+  return user.communityId;
 });
 
 final isVerifiedProvider = Provider<bool>((ref) {
