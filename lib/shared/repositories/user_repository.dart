@@ -3,13 +3,15 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
+import 'package:vecindario_app/core/services/media_storage_service.dart';
 import 'package:vecindario_app/shared/models/user_model.dart';
 
 class UserRepository {
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
+  final MediaStorageService? _mediaStorage;
 
-  UserRepository(this._firestore, this._storage);
+  UserRepository(this._firestore, this._storage, [this._mediaStorage]);
 
   Future<UserModel?> getUser(String uid) async {
     final doc = await _firestore
@@ -41,12 +43,14 @@ class UserRepository {
   }
 
   Future<String> uploadProfilePhoto(String uid, File file) async {
-    final ref = _storage.ref().child('users/$uid/profile.jpg');
-    final snapshot = await ref.putFile(
-      file,
-      SettableMetadata(contentType: 'image/jpeg'),
+    final storage = _mediaStorage;
+    if (storage == null) throw StateError('Almacenamiento no configurado');
+    return storage.uploadFile(
+      file: file,
+      name: 'profile.jpg',
+      folder: 'users/$uid',
+      contentType: 'image/jpeg',
     );
-    return snapshot.ref.getDownloadURL();
   }
 
   Future<void> requestAccountDeletion(String uid) async {

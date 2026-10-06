@@ -9,7 +9,9 @@ Todas las pantallas y funcionalidades principales han sido implementadas y proba
 ## Stack Tecnológico
 
 - **Frontend**: Flutter 3.32+ (Dart 3.8+)
-- **Backend**: Firebase (Auth, Firestore, Storage, FCM, Analytics)
+- **Backend**: Firebase (Auth, Firestore, FCM, Analytics)
+- **Archivos multimedia**: Cloudinary Free (sin tarjeta)
+- **Archivos multimedia**: Cloudinary Free (sin tarjeta)
 - **Cloud**: Cloud Functions (Go)
 - **Pagos**: Wompi / MercadoPago
 - **State Management**: Riverpod + Riverpod Annotations
@@ -174,6 +176,50 @@ flutter run --release
 # En dispositivo específico
 flutter run -d <device-id>
 ```
+
+### Cargas gratuitas con Cloudinary
+
+Firebase Storage exige asociar facturación. Vecindario usa un preset unsigned de
+Cloudinary para subir fotos, documentos, audio y video sin incluir secretos en
+la aplicación.
+
+1. Crear una cuenta gratuita en Cloudinary.
+2. Crear un upload preset **Unsigned** llamado, por ejemplo,
+   `vecindario_unsigned`.
+3. Restringir en el preset los formatos permitidos y un tamaño máximo de 30 MB.
+4. Compilar con los valores públicos:
+
+```bash
+flutter build web --release \
+  --dart-define=CLOUDINARY_UPLOADS_ENABLED=true \
+  --dart-define=CLOUDINARY_CLOUD_NAME=TU_CLOUD_NAME \
+  --dart-define=CLOUDINARY_UPLOAD_PRESET=vecindario_unsigned
+```
+
+Para Android se usan los mismos tres `--dart-define`. El `API secret` de
+Cloudinary nunca debe agregarse al repositorio ni a una compilación cliente.
+
+### Cargas gratuitas con Cloudinary
+
+Firebase Storage exige asociar facturación. Vecindario usa un preset unsigned de
+Cloudinary para subir fotos, documentos, audio y video sin incluir secretos en
+la aplicación.
+
+1. Crear una cuenta gratuita en Cloudinary.
+2. Crear un upload preset **Unsigned** llamado, por ejemplo,
+   `vecindario_unsigned`.
+3. Restringir en el preset los formatos permitidos y un tamaño máximo de 30 MB.
+4. Compilar con los valores públicos:
+
+```bash
+flutter build web --release \
+  --dart-define=CLOUDINARY_UPLOADS_ENABLED=true \
+  --dart-define=CLOUDINARY_CLOUD_NAME=TU_CLOUD_NAME \
+  --dart-define=CLOUDINARY_UPLOAD_PRESET=vecindario_unsigned
+```
+
+Para Android se usan los mismos tres `--dart-define`. El `API secret` de
+Cloudinary nunca debe agregarse al repositorio ni a una compilación cliente.
 
 ## Análisis y Tests
 

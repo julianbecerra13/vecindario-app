@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vecindario_app/shared/models/user_model.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/repositories/user_repository.dart';
+import 'package:vecindario_app/shared/providers/media_storage_provider.dart';
 
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
@@ -12,6 +13,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(
     ref.watch(firestoreProvider),
     ref.watch(firebaseStorageProvider),
+    ref.watch(mediaStorageProvider),
   );
 });
 

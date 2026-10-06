@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +12,7 @@ import 'package:vecindario_app/core/config/backend_features.dart';
 import 'package:vecindario_app/features/premium/models/circular_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/media_storage_provider.dart';
 
 class CreateCircularScreen extends ConsumerStatefulWidget {
   const CreateCircularScreen({super.key});
@@ -24,6 +28,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
   CircularPriority _priority = CircularPriority.general;
   bool _requiresSignature = false;
   bool _isLoading = false;
+  bool _isUploading = false;
   final List<String> _attachmentUrls = [];
 
   @override
@@ -115,6 +120,87 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
     }
     setState(() => _attachmentUrls.add(value));
   }
+
+  Future<void> _uploadAttachment() async {
+    final storage = ref.read(mediaStorageProvider);
+    if (storage == null) {
+      context.showSnackBar(kMediaUploadsUnavailableMessage);
+      return;
+    }
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      withData: true,
+      allowedExtensions: const [
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'mp3',
+        'm4a',
+        'wav',
+        'mp4',
+        'mov',
+      ],
+    );
+    final picked = result?.files.single;
+    if (picked == null || !mounted) return;
+    final maxBytes = _isVideo(picked.extension)
+        ? 30 * 1024 * 1024
+        : 10 * 1024 * 1024;
+    if (picked.size > maxBytes) {
+      context.showErrorSnackBar('El archivo supera el límite permitido.');
+      return;
+    }
+    Uint8List? bytes = picked.bytes;
+    if (bytes == null && picked.path != null) {
+      bytes = await picked.xFile.readAsBytes();
+    }
+    if (bytes == null) {
+      if (mounted) context.showErrorSnackBar('No fue posible leer el archivo.');
+      return;
+    }
+    setState(() => _isUploading = true);
+    try {
+      final communityId = ref.read(currentCommunityIdProvider) ?? 'general';
+      final url = await storage.uploadBytes(
+        bytes: bytes,
+        name: picked.name,
+        folder: 'communities/$communityId/circulars',
+        contentType: _contentType(picked.extension),
+      );
+      if (mounted) setState(() => _attachmentUrls.add(url));
+    } catch (error) {
+      if (mounted) context.showErrorSnackBar('No se pudo subir: $error');
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  bool _isVideo(String? extension) =>
+      {'mp4', 'mov'}.contains(extension?.toLowerCase());
+
+  String _contentType(String? extension) => switch (extension?.toLowerCase()) {
+    'png' => 'image/png',
+    'webp' => 'image/webp',
+    'pdf' => 'application/pdf',
+    'doc' => 'application/msword',
+    'docx' =>
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'xls' => 'application/vnd.ms-excel',
+    'xlsx' =>
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'mp3' => 'audio/mpeg',
+    'm4a' => 'audio/mp4',
+    'wav' => 'audio/wav',
+    'mp4' => 'video/mp4',
+    'mov' => 'video/quicktime',
+    _ => 'image/jpeg',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -233,15 +319,14 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
                   label: const Text('Adjuntar enlace'),
                 ),
                 OutlinedButton.icon(
-                  onPressed: kMediaUploadsEnabled
-                      ? () => context.showSnackBar(
-                          'Selecciona el archivo desde tu dispositivo.',
+                  onPressed: _isUploading ? null : _uploadAttachment,
+                  icon: _isUploading
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : () => context.showSnackBar(
-                          kMediaUploadsUnavailableMessage,
-                        ),
-                  icon: const Icon(Icons.upload_file_rounded),
-                  label: const Text('Subir archivo'),
+                      : const Icon(Icons.upload_file_rounded),
+                  label: Text(_isUploading ? 'Subiendo...' : 'Subir archivo'),
                 ),
               ],
             ),
@@ -249,7 +334,7 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
               const Padding(
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
-                  'Mientras Firebase Storage no esté habilitado, puedes adjuntar enlaces públicos de Drive, PDF, imágenes, audio o video.',
+                  'Configura Cloudinary para subir archivos gratis o adjunta un enlace público.',
                   style: TextStyle(fontSize: 12, color: Colors.orange),
                 ),
               ),

@@ -2,7 +2,8 @@
 
 ## Stack
 - Flutter 3.32+ (Dart 3.8+)
-- Firebase: Auth, Firestore, Storage, FCM, Analytics
+- Firebase: Auth, Firestore, FCM, Analytics
+- Archivos: Cloudinary Free mediante upload preset unsigned
 - Cloud Functions: Go
 - Pagos: Wompi / MercadoPago
 
@@ -43,7 +44,9 @@ flutter test                       # Correr tests
 - Proyecto configurado: `vecindario-app-a746b`
 - Authentication, Firestore y Hosting están activos.
 - Las reglas de Firestore se prueban con emuladores antes de desplegarse.
-- Storage multimedia no está disponible mientras el proyecto permanezca sin facturación.
+- Las cargas multimedia usan Cloudinary para no requerir facturación de Firebase.
+- La compilación necesita `CLOUDINARY_UPLOADS_ENABLED`, `CLOUDINARY_CLOUD_NAME`
+  y `CLOUDINARY_UPLOAD_PRESET` mediante `--dart-define`.
 - No activar facturación ni desplegar funciones que la requieran sin autorización expresa.
 
 ## Reglas

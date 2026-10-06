@@ -3,11 +3,12 @@ import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/repositories/feed_repository.dart';
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
+import 'package:vecindario_app/shared/providers/media_storage_provider.dart';
 
 final feedRepositoryProvider = Provider<FeedRepository>((ref) {
   return FeedRepository(
     ref.watch(firestoreProvider),
-    ref.watch(firebaseStorageProvider),
+    ref.watch(mediaStorageProvider),
   );
 });
 

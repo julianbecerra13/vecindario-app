@@ -4,11 +4,12 @@ import 'package:vecindario_app/features/services/repositories/services_repositor
 import 'package:vecindario_app/shared/providers/firebase_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
 import 'package:vecindario_app/shared/models/review_model.dart';
+import 'package:vecindario_app/shared/providers/media_storage_provider.dart';
 
 final servicesRepositoryProvider = Provider<ServicesRepository>((ref) {
   return ServicesRepository(
     ref.watch(firestoreProvider),
-    ref.watch(firebaseStorageProvider),
+    ref.watch(mediaStorageProvider),
   );
 });
 

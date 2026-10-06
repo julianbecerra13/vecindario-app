@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
+import 'package:vecindario_app/core/services/media_storage_service.dart';
 import 'package:vecindario_app/features/services/models/service_model.dart';
 import 'package:vecindario_app/shared/models/review_model.dart';
 
 class ServicesRepository {
   final FirebaseFirestore _firestore;
-  final FirebaseStorage? _storage;
+  final MediaStorageService? _storage;
 
   ServicesRepository(this._firestore, [this._storage]);
 
@@ -111,14 +111,12 @@ class ServicesRepository {
         : 'image/jpeg';
     final storage = _storage;
     if (storage == null) throw StateError('Almacenamiento no configurado');
-    final reference = storage.ref(
-      'services/$serviceId/image_$index.$normalizedExtension',
+    return storage.uploadFile(
+      file: image,
+      name: 'image_$index.$normalizedExtension',
+      folder: 'services/$serviceId',
+      contentType: contentType,
     );
-    final snapshot = await reference.putFile(
-      image,
-      SettableMetadata(contentType: contentType),
-    );
-    return snapshot.ref.getDownloadURL();
   }
 
   Future<void> updateService(

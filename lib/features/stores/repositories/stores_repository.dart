@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
+import 'package:vecindario_app/core/services/media_storage_service.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/features/stores/models/store_item_model.dart';
 import 'package:vecindario_app/features/stores/models/store_model.dart';
@@ -10,7 +10,7 @@ import 'package:vecindario_app/shared/models/review_model.dart';
 
 class StoresRepository {
   final FirebaseFirestore _firestore;
-  final FirebaseStorage? _storage;
+  final MediaStorageService? _storage;
 
   StoresRepository(this._firestore, [this._storage]);
 
@@ -199,9 +199,12 @@ class StoresRepository {
   ) async {
     final storage = _storage;
     if (storage == null) throw StateError('Almacenamiento no configurado');
-    final ref = storage.ref('stores/$storeId/item_$itemId.jpg');
-    await ref.putFile(file, SettableMetadata(contentType: 'image/jpeg'));
-    return ref.getDownloadURL();
+    return storage.uploadFile(
+      file: file,
+      name: 'item_$itemId.jpg',
+      folder: 'stores/$storeId',
+      contentType: 'image/jpeg',
+    );
   }
 
   Future<void> updateStoreItem(

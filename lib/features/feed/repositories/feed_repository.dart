@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:vecindario_app/core/constants/firestore_paths.dart';
+import 'package:vecindario_app/core/services/media_storage_service.dart';
 import 'package:vecindario_app/features/feed/models/post_model.dart';
 import 'package:vecindario_app/features/feed/models/comment_model.dart';
 import 'package:vecindario_app/features/feed/models/feed_attachment.dart';
 
 class FeedRepository {
   final FirebaseFirestore _firestore;
-  final FirebaseStorage? _storage;
+  final MediaStorageService? _storage;
 
   FeedRepository(this._firestore, [this._storage]);
 
@@ -222,14 +222,14 @@ class FeedRepository {
   ) async {
     final storage = _storage;
     if (storage == null) throw StateError('Almacenamiento no configurado');
-    final snapshot = await storage
-        .ref(path)
-        .putFile(
-          pending.file,
-          SettableMetadata(contentType: pending.contentType),
-        );
+    final url = await storage.uploadFile(
+      file: pending.file,
+      name: pending.name,
+      folder: path.substring(0, path.lastIndexOf('/')),
+      contentType: pending.contentType,
+    );
     return FeedAttachment(
-      url: await snapshot.ref.getDownloadURL(),
+      url: url,
       name: pending.name,
       type: pending.type,
       size: pending.size,

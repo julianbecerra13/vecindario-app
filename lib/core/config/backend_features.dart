@@ -1,9 +1,16 @@
-/// Capacidades dependientes de servicios externos.
+/// Configuración pública de Cloudinary inyectada al compilar.
 ///
-/// Firebase Storage requiere facturación en el proyecto actual. Mientras se
-/// activa, las funciones de datos continúan usando Auth y Firestore reales,
-/// pero la interfaz no ofrece cargas que inevitablemente fallarían.
-const bool kMediaUploadsEnabled = false;
+/// El upload preset debe ser `unsigned`, limitar formatos/tamaños desde
+/// Cloudinary y no contiene secretos. Nunca se incluye el API secret en la app.
+const String kCloudinaryCloudName = String.fromEnvironment(
+  'CLOUDINARY_CLOUD_NAME',
+);
+const String kCloudinaryUploadPreset = String.fromEnvironment(
+  'CLOUDINARY_UPLOAD_PRESET',
+);
+const bool kMediaUploadsEnabled = bool.fromEnvironment(
+  'CLOUDINARY_UPLOADS_ENABLED',
+);
 
 const String kMediaUploadsUnavailableMessage =
-    'Las cargas de archivos estarán disponibles cuando se active el almacenamiento del servidor.';
+    'Las cargas gratuitas necesitan configurar Cloudinary en esta versión.';
