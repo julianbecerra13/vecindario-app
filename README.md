@@ -2,18 +2,18 @@
 
 Aplicación Flutter para gestión integral de comunidades residenciales en Colombia. Conecta vecinos, facilita transacciones comerciales y digitaliza la administración comunitaria.
 
-## Estado del Proyecto: ✅ COMPLETO
+## Estado del Proyecto: MVP GRATUITO EN VALIDACIÓN
 
-Todas las pantallas y funcionalidades principales han sido implementadas y probadas.
+El núcleo comunitario usa Firebase Auth, Firestore y Cloud Functions reales. La
+versión gratuita opera sin pagos en línea ni cargas directas de archivos.
 
 ## Stack Tecnológico
 
 - **Frontend**: Flutter 3.32+ (Dart 3.8+)
 - **Backend**: Firebase (Auth, Firestore, FCM, Analytics)
-- **Archivos multimedia**: Cloudinary Free (sin tarjeta)
-- **Archivos multimedia**: Cloudinary Free (sin tarjeta)
+- **Contenido multimedia**: enlaces públicos en el MVP gratuito
 - **Cloud**: Cloud Functions (Go)
-- **Pagos**: Wompi / MercadoPago
+- **Pagos**: efectivo o transferencia coordinada con tienda/administración
 - **State Management**: Riverpod + Riverpod Annotations
 - **Routing**: GoRouter con role-based access control
 - **Modelos**: Freezed + json_serializable
@@ -60,7 +60,7 @@ lib/
 - **Login** - Inicio de sesión
 - **Registro** - Crear nueva cuenta
 - **Recuperar Contraseña** - Reset de contraseña
-- **Verificación de Teléfono** - Confirmación OTP
+- **Verificación de Teléfono** - fuera del MVP hasta validación
 - **Unirse a Comunidad** - Búsqueda y unión a comunidad
 - **Aprobación Pendiente** - Estado de aprobación
 - **Onboarding** - Introducción a la app
@@ -124,7 +124,7 @@ lib/
 
 ✅ **Autenticación**
 - Login/Register con email y contraseña
-- OTP por teléfono
+- Correo y contraseña; Google sujeto a validación de la cuenta utilizada
 - Recuperar contraseña
 - Unirse a comunidad con código
 - Aprobación admin de nuevos residentes
@@ -177,49 +177,14 @@ flutter run --release
 flutter run -d <device-id>
 ```
 
-### Cargas gratuitas con Cloudinary
+### Alcance del MVP gratuito
 
-Firebase Storage exige asociar facturación. Vecindario usa un preset unsigned de
-Cloudinary para subir fotos, documentos, audio y video sin incluir secretos en
-la aplicación.
-
-1. Crear una cuenta gratuita en Cloudinary.
-2. Crear un upload preset **Unsigned** llamado, por ejemplo,
-   `vecindario_unsigned`.
-3. Restringir en el preset los formatos permitidos y un tamaño máximo de 30 MB.
-4. Compilar con los valores públicos:
-
-```bash
-flutter build web --release \
-  --dart-define=CLOUDINARY_UPLOADS_ENABLED=true \
-  --dart-define=CLOUDINARY_CLOUD_NAME=TU_CLOUD_NAME \
-  --dart-define=CLOUDINARY_UPLOAD_PRESET=vecindario_unsigned
-```
-
-Para Android se usan los mismos tres `--dart-define`. El `API secret` de
-Cloudinary nunca debe agregarse al repositorio ni a una compilación cliente.
-
-### Cargas gratuitas con Cloudinary
-
-Firebase Storage exige asociar facturación. Vecindario usa un preset unsigned de
-Cloudinary para subir fotos, documentos, audio y video sin incluir secretos en
-la aplicación.
-
-1. Crear una cuenta gratuita en Cloudinary.
-2. Crear un upload preset **Unsigned** llamado, por ejemplo,
-   `vecindario_unsigned`.
-3. Restringir en el preset los formatos permitidos y un tamaño máximo de 30 MB.
-4. Compilar con los valores públicos:
-
-```bash
-flutter build web --release \
-  --dart-define=CLOUDINARY_UPLOADS_ENABLED=true \
-  --dart-define=CLOUDINARY_CLOUD_NAME=TU_CLOUD_NAME \
-  --dart-define=CLOUDINARY_UPLOAD_PRESET=vecindario_unsigned
-```
-
-Para Android se usan los mismos tres `--dart-define`. El `API secret` de
-Cloudinary nunca debe agregarse al repositorio ni a una compilación cliente.
+- Publicaciones, comentarios y encuestas de texto.
+- Circulares con texto y enlaces públicos.
+- Pedidos pagados directamente en efectivo o transferencia.
+- Saldos y multas coordinados mediante solicitud a administración.
+- Consulta y compartición del resumen de datos desde la app.
+- Sin cargas directas, pagos en línea, OTP ni Apple Sign-In.
 
 ## Análisis y Tests
 

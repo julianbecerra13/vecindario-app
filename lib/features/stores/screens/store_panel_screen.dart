@@ -761,16 +761,14 @@ class _ItemsTab extends ConsumerWidget {
               children: [
                 InkWell(
                   borderRadius: BorderRadius.circular(14),
-                  onTap: () async {
-                    if (!kMediaUploadsEnabled) {
-                      context.showSnackBar(kMediaUploadsUnavailableMessage);
-                      return;
-                    }
-                    final file = await showImagePickerSheet(ctx);
-                    if (file != null && ctx.mounted) {
-                      setDialogState(() => selectedImage = file);
-                    }
-                  },
+                  onTap: !kMediaUploadsEnabled
+                      ? null
+                      : () async {
+                          final file = await showImagePickerSheet(ctx);
+                          if (file != null && ctx.mounted) {
+                            setDialogState(() => selectedImage = file);
+                          }
+                        },
                   child: Container(
                     width: double.infinity,
                     height: 130,
@@ -795,11 +793,7 @@ class _ItemsTab extends ConsumerWidget {
                             children: [
                               Icon(Icons.add_a_photo_outlined, size: 34),
                               SizedBox(height: 6),
-                              Text(
-                                kMediaUploadsEnabled
-                                    ? 'Agregar fotografía'
-                                    : 'Fotografías próximamente',
-                              ),
+                              Text('Producto sin fotografía'),
                             ],
                           )
                         : const Align(

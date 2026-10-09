@@ -12,9 +12,9 @@ import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/features/stores/models/order_model.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/app_card.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:vecindario_app/shared/widgets/offline_payment_notice.dart';
 
 class FinancesScreen extends ConsumerWidget {
   const FinancesScreen({super.key});
@@ -426,7 +426,6 @@ class _ResidentFinancesView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statementAsync = ref.watch(myAccountStatementProvider);
-    final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.financeStatementTitle)),
@@ -505,16 +504,7 @@ class _ResidentFinancesView extends ConsumerWidget {
               ),
               if (!statement.isUpToDate) ...[
                 const SizedBox(height: AppSizes.md),
-                PaymentButton(
-                  label: context.l10n.financePayPendingFee,
-                  amountCOP: statement.balance,
-                  reference: PaymentService.generateReference(
-                    PaymentType.cuota,
-                    currentUser?.id ?? '',
-                  ),
-                  type: PaymentType.cuota,
-                  customerEmail: currentUser?.email ?? '',
-                ),
+                const OfflinePaymentNotice(),
               ],
               const SizedBox(height: AppSizes.lg),
               Text(context.l10n.financeHistory, style: AppTextStyles.heading3),

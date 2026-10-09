@@ -8,9 +8,9 @@ import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/fine_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
 import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/confirm_dialog.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:vecindario_app/shared/widgets/offline_payment_notice.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class FineDetailScreen extends ConsumerStatefulWidget {
@@ -35,7 +35,6 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
   Widget build(BuildContext context) {
     final fineAsync = ref.watch(fineDetailProvider(widget.fineId));
     final isAdmin = ref.watch(isAdminProvider);
-    final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.fineDetailTitle)),
@@ -305,15 +304,9 @@ class _FineDetailScreenState extends ConsumerState<FineDetailScreen> {
                 // Botón de pago
                 if (fine.canPay && !isAdmin) ...[
                   const SizedBox(height: AppSizes.xl),
-                  PaymentButton(
-                    label: context.l10n.finePayFine,
-                    amountCOP: fine.amount,
-                    reference: PaymentService.generateReference(
-                      PaymentType.fine,
-                      fine.id,
-                    ),
-                    type: PaymentType.fine,
-                    customerEmail: currentUser?.email ?? '',
+                  const OfflinePaymentNotice(
+                    message:
+                        'Solicita los datos de transferencia e indica el número de la multa para que la administración registre el pago.',
                   ),
                 ],
 

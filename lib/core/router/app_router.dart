@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vecindario_app/core/config/backend_features.dart';
 import 'package:vecindario_app/core/router/community_admin_routes.dart';
 import 'package:vecindario_app/core/router/resident_routes.dart';
 import 'package:vecindario_app/core/router/super_admin_routes.dart';
@@ -34,7 +35,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/forgot-password' ||
           state.matchedLocation == '/onboarding' ||
-          state.matchedLocation.startsWith('/verify-phone');
+          (kPhoneVerificationEnabled &&
+              state.matchedLocation.startsWith('/verify-phone'));
 
       if (!isLoggedIn && !isAuthRoute) return '/login';
       if (isLoggedIn && isAuthRoute) {
@@ -135,12 +137,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         builder: (_, __) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
-        path: '/verify-phone/:phone',
-        builder: (_, state) => PhoneVerificationScreen(
-          phoneNumber: state.pathParameters['phone'] ?? '',
+      if (kPhoneVerificationEnabled)
+        GoRoute(
+          path: '/verify-phone/:phone',
+          builder: (_, state) => PhoneVerificationScreen(
+            phoneNumber: state.pathParameters['phone'] ?? '',
+          ),
         ),
-      ),
       GoRoute(
         path: '/join-community',
         builder: (_, __) => const JoinCommunityScreen(),

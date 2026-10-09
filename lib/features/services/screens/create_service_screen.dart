@@ -194,18 +194,15 @@ class _CreateServiceScreenState extends ConsumerState<CreateServiceScreen> {
                   ),
                 ),
               ),
-            OutlinedButton.icon(
-              onPressed: _isSubmitting ? null : _pickImages,
-              icon: const Icon(Icons.add_photo_alternate_outlined),
-              label: Text(
-                kMediaUploadsEnabled
-                    ? 'Agregar fotografías'
-                    : 'Fotografías próximamente',
+            if (kMediaUploadsEnabled)
+              OutlinedButton.icon(
+                onPressed: _isSubmitting ? null : _pickImages,
+                icon: const Icon(Icons.add_photo_alternate_outlined),
+                label: const Text('Agregar fotografías'),
               ),
-            ),
             if (!kMediaUploadsEnabled)
               const Text(
-                'Puedes publicar el servicio sin fotos. Se habilitarán al activar el almacenamiento.',
+                'Puedes publicar el servicio con título, descripción, precio y contacto.',
               ),
             const SizedBox(height: AppSizes.lg),
 

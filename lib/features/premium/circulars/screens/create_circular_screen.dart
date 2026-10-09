@@ -318,24 +318,25 @@ class _CreateCircularScreenState extends ConsumerState<CreateCircularScreen> {
                   icon: const Icon(Icons.link_rounded),
                   label: const Text('Adjuntar enlace'),
                 ),
-                OutlinedButton.icon(
-                  onPressed: _isUploading ? null : _uploadAttachment,
-                  icon: _isUploading
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.upload_file_rounded),
-                  label: Text(_isUploading ? 'Subiendo...' : 'Subir archivo'),
-                ),
+                if (kMediaUploadsEnabled)
+                  OutlinedButton.icon(
+                    onPressed: _isUploading ? null : _uploadAttachment,
+                    icon: _isUploading
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.upload_file_rounded),
+                    label: Text(_isUploading ? 'Subiendo...' : 'Subir archivo'),
+                  ),
               ],
             ),
             if (!kMediaUploadsEnabled)
               const Padding(
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
-                  'Configura Cloudinary para subir archivos gratis o adjunta un enlace público.',
-                  style: TextStyle(fontSize: 12, color: Colors.orange),
+                  'Puedes adjuntar un enlace público de Drive, PDF, imagen, audio o video.',
+                  style: TextStyle(fontSize: 12),
                 ),
               ),
             const SizedBox(height: AppSizes.md),

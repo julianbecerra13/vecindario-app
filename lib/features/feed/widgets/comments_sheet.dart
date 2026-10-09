@@ -273,13 +273,12 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
             padding: const EdgeInsets.all(AppSizes.sm),
             child: Row(
               children: [
-                IconButton(
-                  tooltip: kMediaUploadsEnabled
-                      ? 'Adjuntar archivo'
-                      : 'Archivos próximamente',
-                  onPressed: _sending ? null : _pickAttachment,
-                  icon: const Icon(Icons.attach_file),
-                ),
+                if (kMediaUploadsEnabled)
+                  IconButton(
+                    tooltip: 'Adjuntar archivo',
+                    onPressed: _sending ? null : _pickAttachment,
+                    icon: const Icon(Icons.attach_file),
+                  ),
                 Expanded(
                   child: TextField(
                     controller: _controller,

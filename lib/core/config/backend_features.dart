@@ -12,5 +12,11 @@ const bool kMediaUploadsEnabled = bool.fromEnvironment(
   'CLOUDINARY_UPLOADS_ENABLED',
 );
 
+/// Capacidades que permanecen fuera del MVP gratuito hasta completar su
+/// configuración y validación de extremo a extremo.
+const bool kOnlinePaymentsEnabled = false;
+const bool kPhoneVerificationEnabled = false;
+const bool kAppleSignInEnabled = false;
+
 const String kMediaUploadsUnavailableMessage =
-    'Las cargas gratuitas necesitan configurar Cloudinary en esta versión.';
+    'Esta versión permite contenido de texto y enlaces públicos.';

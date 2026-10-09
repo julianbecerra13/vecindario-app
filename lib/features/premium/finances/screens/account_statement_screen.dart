@@ -7,9 +7,8 @@ import 'package:vecindario_app/core/extensions/l10n_extensions.dart';
 import 'package:vecindario_app/core/theme/text_styles.dart';
 import 'package:vecindario_app/features/premium/models/finance_model.dart';
 import 'package:vecindario_app/features/premium/providers/premium_providers.dart';
-import 'package:vecindario_app/shared/providers/current_user_provider.dart';
-import 'package:vecindario_app/shared/services/payment_service.dart';
 import 'package:vecindario_app/shared/widgets/loading_indicator.dart';
+import 'package:vecindario_app/shared/widgets/offline_payment_notice.dart';
 
 class AccountStatementScreen extends ConsumerWidget {
   const AccountStatementScreen({super.key});
@@ -17,7 +16,6 @@ class AccountStatementScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statementAsync = ref.watch(myAccountStatementProvider);
-    final currentUser = ref.watch(currentUserProvider).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.financeStatementTitle)),
@@ -84,18 +82,7 @@ class AccountStatementScreen extends ConsumerWidget {
 
                 const SizedBox(height: AppSizes.lg),
 
-                // Botón de pagar cuota
-                if (statement.balance > 0)
-                  PaymentButton(
-                    label: context.l10n.financePayFee,
-                    amountCOP: statement.balance,
-                    reference: PaymentService.generateReference(
-                      PaymentType.cuota,
-                      currentUser?.id ?? '',
-                    ),
-                    type: PaymentType.cuota,
-                    customerEmail: currentUser?.email ?? '',
-                  ),
+                if (statement.balance > 0) const OfflinePaymentNotice(),
 
                 const SizedBox(height: AppSizes.xl),
 

@@ -128,36 +128,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           name: user.displayName,
                           radius: 48,
                         ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: _pickPhoto,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: kMediaUploadsEnabled
-                              ? AppColors.primary
-                              : context.colors.textHint,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 16,
-                          color: Colors.white,
+                  if (kMediaUploadsEnabled)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _pickPhoto,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
             if (!kMediaUploadsEnabled) ...[
               const SizedBox(height: AppSizes.sm),
               const Text(
-                'La foto de perfil se habilitará al activar el almacenamiento.',
+                'En esta versión puedes actualizar tu nombre y teléfono.',
                 textAlign: TextAlign.center,
               ),
             ],

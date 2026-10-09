@@ -48,7 +48,7 @@ class TermsScreen extends StatelessWidget {
             _Section(
               title: '5. Comercio y Pagos',
               body:
-                  'Las transacciones entre vecinos y tiendas son responsabilidad de las partes involucradas. Vecindario cobra una comisión de servicio por cada pedido. Los pagos en línea son procesados por Wompi, un proveedor de pagos regulado.',
+                  'Las transacciones entre vecinos y tiendas son responsabilidad de las partes involucradas. Los pagos se coordinan directamente mediante efectivo o transferencia, según la información suministrada por la tienda o la administración.',
             ),
             _Section(
               title: '6. Contenido del Usuario',

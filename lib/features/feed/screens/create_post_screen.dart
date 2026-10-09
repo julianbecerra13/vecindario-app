@@ -250,18 +250,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               ),
             ],
             const SizedBox(height: AppSizes.sm),
-            OutlinedButton.icon(
-              onPressed: actionState.isLoading ? null : _pickAttachments,
-              icon: const Icon(Icons.attach_file),
-              label: Text(
-                kMediaUploadsEnabled
-                    ? 'Adjuntar imágenes, PDF, audio o video'
-                    : 'Archivos próximamente',
-              ),
-            ),
-            if (!kMediaUploadsEnabled)
+            if (kMediaUploadsEnabled)
+              OutlinedButton.icon(
+                onPressed: actionState.isLoading ? null : _pickAttachments,
+                icon: const Icon(Icons.attach_file),
+                label: const Text('Adjuntar imágenes, PDF, audio o video'),
+              )
+            else
               const Text(
-                'Las publicaciones de texto siguen disponibles.',
+                'Publicación de texto: puedes compartir noticias, avisos y encuestas.',
                 style: TextStyle(fontSize: 12),
               ),
             // Opciones de encuesta
